@@ -12,9 +12,15 @@
   <a href="https://codeclimate.com/github/xOPERATIONS/pat/test_coverage">
     <img src="https://api.codeclimate.com/v1/badges/fea781e4cd69005f6a9c/test_coverage" alt="Test Coverage" />
   </a>
+
+  <br />
+  <img src="docs/pat-command.gif" alt="PAT in terminal" />
+
 </div>
 
 <br />
+
+## Purpose
 
 The purpose of PAT is to replace the manual procedure creation process for Extravehicular Activities (EVAs, AKA "spacewalks") by NASA, Johnson Space Center personnel. The goal of the application is to be able to write EVA procedures as simple YAML files and run `pat build` to generate Word and/or other documents in a standardized procedure format, similar to the Space Shuttle mission "STS-134" procedures found on page `FS 7-20` of [this document](https://www.nasa.gov/centers/johnson/pdf/539922main_EVA_134_F_A.pdf). More EVAs can be found at the [FOIA archive](https://www.nasa.gov/centers/johnson/news/flightdatafiles/foia_archive.html).
 

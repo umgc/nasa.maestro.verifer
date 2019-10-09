@@ -42,8 +42,9 @@ module.exports = class HtmlProcedureWriter extends ProcedureWriter {
 	}
 
 	writeFile(filepath) {
+		const relativeFilepath = path.relative(process.cwd(), filepath);
 		fs.writeFileSync(filepath, this.wrapDocument());
-		consoleHelper.success(`${filepath} written!`);
+		consoleHelper.success(`SUCCESS: ${relativeFilepath} written!`);
 	}
 
 	genHeader(task) {

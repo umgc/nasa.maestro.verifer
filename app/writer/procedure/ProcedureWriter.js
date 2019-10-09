@@ -77,7 +77,6 @@ module.exports = class ProcedureWriter {
 				if (uncommitted.length > 1 || uncommitted[0] !== '') {
 					const plural = uncommitted.length === 1 ? '' : 's';
 					this.gitUncommittedChanges = `${uncommitted.length} uncommitted change${plural}`;
-					console.log(this.gitUncommittedChanges);
 				} else {
 					this.gitUncommittedChanges = false;
 				}

@@ -3,7 +3,7 @@
 const docx = require('docx');
 const DocxProcedureWriter = require('./DocxProcedureWriter');
 const SodfDocxTaskWriter = require('../task/SodfDocxTaskWriter');
-const consoleHelper = require('../../helpers/consoleHelper');
+// const consoleHelper = require('../../helpers/consoleHelper');
 
 module.exports = class SodfDocxProcedureWriter extends DocxProcedureWriter {
 
@@ -51,8 +51,5 @@ module.exports = class SodfDocxProcedureWriter extends DocxProcedureWriter {
 			margins: this.getPageMargins(),
 			children: sectionChildren
 		});
-
-		consoleHelper.success(`Added section to SODF DOCX for task ${task.title}`);
 	}
-
 };

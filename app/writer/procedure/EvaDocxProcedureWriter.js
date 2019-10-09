@@ -6,7 +6,7 @@ const fs = require('fs');
 
 const DocxProcedureWriter = require('./DocxProcedureWriter');
 const EvaDocxTaskWriter = require('../task/EvaDocxTaskWriter');
-const consoleHelper = require('../../helpers/consoleHelper');
+// const consoleHelper = require('../../helpers/consoleHelper');
 const TimelineWriter = require('../TimelineWriter');
 
 module.exports = class EvaDocxProcedureWriter extends DocxProcedureWriter {
@@ -113,7 +113,6 @@ module.exports = class EvaDocxProcedureWriter extends DocxProcedureWriter {
 				// layout
 			})]
 		});
-		consoleHelper.success(`Added section to EVA DOCX for task ${task.title}`);
 	}
 
 };
