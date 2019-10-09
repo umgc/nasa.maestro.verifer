@@ -127,6 +127,12 @@ function doTransform(text, xformFormat) {
 	}
 }
 
+function docxStringsToTextRuns(transformArr) {
+	return transformArr.map((cur) => {
+		return typeof cur === 'string' ? new docx.TextRun(cur) : cur;
+	});
+}
+
 module.exports = class TextTransform {
 
 	constructor(format) {
@@ -138,13 +144,9 @@ module.exports = class TextTransform {
 	}
 
 	transform(text) {
-		const transform = doTransform(text, this.format);
+		let transform = doTransform(text, this.format);
 		if (this.format === 'docx') {
-			for (let t = 0; t < transform.length; t++) {
-				if (typeof transform[t] === 'string') {
-					transform[t] = new docx.TextRun(transform[t]);
-				}
-			}
+			transform = docxStringsToTextRuns(transform);
 		}
 		return transform;
 	}
