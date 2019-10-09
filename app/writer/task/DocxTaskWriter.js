@@ -85,7 +85,7 @@ module.exports = class DocxTaskWriter extends TaskWriter {
 		const lines = [];
 		for (const line of blockLines) {
 			lines.push(new docx.Paragraph({
-				text: this.textTransform.transform(line).join(''),
+				children: this.textTransform.transform(line),
 				numbering: {
 					num: numbering.concrete,
 					level: 0
@@ -314,9 +314,7 @@ module.exports = class DocxTaskWriter extends TaskWriter {
 		}
 
 		if (typeof stepText === 'string') {
-			paraOptions.children.push(new docx.TextRun({
-				text: this.textTransform.transform(stepText).join('')
-			}));
+			paraOptions.children.push(...this.textTransform.transform(stepText));
 		} else if (Array.isArray(stepText)) {
 			console.log(stepText);
 			paraOptions.children.push(...stepText);
@@ -345,7 +343,7 @@ module.exports = class DocxTaskWriter extends TaskWriter {
 			stepText = ` ${stepText}`; // add a space between checkbox and text
 		}
 
-		paraOptions.children.push(new docx.TextRun(this.textTransform.transform(stepText).join('')));
+		paraOptions.children.push(...this.textTransform.transform(stepText));
 
 		return this.addParagraph(paraOptions);
 	}

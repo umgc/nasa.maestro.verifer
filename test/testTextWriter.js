@@ -4,6 +4,7 @@
 'use strict';
 
 const expect = require('chai').expect;
+const docx = require('docx');
 const TextTransform = require('../app/writer/TextTransform.js');
 
 /**
@@ -39,6 +40,7 @@ describe('TextTransform', function() {
 
 	describe('#transform', () => {
 		const tx = new TextTransform('html');
+		const txDocx = new TextTransform('docx');
 
 		it('should convert a single item without added whitespace', () => {
 			const xformed = tx.transform('GREEN');
@@ -72,7 +74,7 @@ describe('TextTransform', function() {
 				['{{CHECKEDBOX}}', '☑'],
 				['{{LEFT}}', '←'],
 				['{{RIGHT}}', '→'],
-				['ANCHOR', '<strong>ANCHOR</strong>'],
+				['ANCHOR', '<span style="font-weight:bold;color:black;">ANCHOR</span>'],
 
 				// items that will not be converted, add 3rd item "true". See below for explanation.
 				[' ', ' ', true],
@@ -107,6 +109,42 @@ describe('TextTransform', function() {
 			expect(xformed).to.be.an('array');
 			expect(xformed.join('')).to.equal(expectedOutput.join(''));
 			expect(xformed).to.eql(expectedOutput);
+		});
+
+		it('should create docx symbols', () => {
+			const xformed = txDocx.transform('This is a {{CHECKBOX}}');
+			expect(xformed).to.be.an('array');
+			expect(xformed).to.eql([
+				new docx.TextRun('This is a '),
+				new docx.SymbolRun('F071')
+			]);
+		});
+
+		it('should create make capitalized colors bold and colorized', () => {
+			const xformed = txDocx.transform('REDGREENBLUEYELLOW');
+			expect(xformed).to.be.an('array');
+			expect(xformed).to.eql([
+				new docx.TextRun({
+					text: 'RED',
+					bold: true,
+					color: 'red'
+				}),
+				new docx.TextRun({
+					text: 'GREEN',
+					bold: true,
+					color: 'green'
+				}),
+				new docx.TextRun({
+					text: 'BLUE',
+					bold: true,
+					color: 'blue'
+				}),
+				new docx.TextRun({
+					text: 'YELLOW',
+					bold: true,
+					color: '#FFC000'
+				})
+			]);
 		});
 	});
 });
