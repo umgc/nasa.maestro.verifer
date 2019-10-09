@@ -8,6 +8,7 @@ const arrayHelper = require('../../helpers/arrayHelper');
 const typeHelper = require('../../helpers/typeHelper');
 
 const TaskWriter = require('./TaskWriter');
+const TextTransform = require('../TextTransform');
 
 module.exports = class DocxTaskWriter extends TaskWriter {
 
@@ -16,6 +17,7 @@ module.exports = class DocxTaskWriter extends TaskWriter {
 
 		this.taskNumbering = null;
 		this.getNumbering();
+		this.textTransform = new TextTransform('docx');
 
 		this.checkboxNumbering = {
 			numbering: null,
@@ -83,7 +85,7 @@ module.exports = class DocxTaskWriter extends TaskWriter {
 		const lines = [];
 		for (const line of blockLines) {
 			lines.push(new docx.Paragraph({
-				text: this.markupFilter(line),
+				children: this.textTransform.transform(line),
 				numbering: {
 					num: numbering.concrete,
 					level: 0
@@ -312,9 +314,7 @@ module.exports = class DocxTaskWriter extends TaskWriter {
 		}
 
 		if (typeof stepText === 'string') {
-			paraOptions.children.push(new docx.TextRun({
-				text: this.markupFilter(stepText)
-			}));
+			paraOptions.children.push(...this.textTransform.transform(stepText));
 		} else if (Array.isArray(stepText)) {
 			console.log(stepText);
 			paraOptions.children.push(...stepText);
@@ -343,7 +343,7 @@ module.exports = class DocxTaskWriter extends TaskWriter {
 			stepText = ` ${stepText}`; // add a space between checkbox and text
 		}
 
-		paraOptions.children.push(new docx.TextRun(this.markupFilter(` ${stepText}`)));
+		paraOptions.children.push(...this.textTransform.transform(stepText));
 
 		return this.addParagraph(paraOptions);
 	}
