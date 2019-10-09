@@ -11,10 +11,16 @@ const TextTransform = require('../app/writer/TextTransform.js');
  */
 describe('TextTransform', function() {
 	describe('#constructor', () => {
-		const tx = new TextTransform('docx');
-
 		it('should set the format', () => {
+			const tx = new TextTransform('docx');
 			expect(tx.format).to.equal('docx');
+		});
+
+		it('should error if an invalid format is supplied', () => {
+			const badConstructor = function() {
+				new TextTransform('this-is-an-invalid-format'); // eslint-disable-line no-new
+			};
+			expect(badConstructor).to.throw();
 		});
 	});
 

@@ -53,32 +53,34 @@ for (const color of colors) {
 	});
 }
 
+function getNextTransform(text, xformFormat) {
+	for (const xform of transforms) {
+		if (text.indexOf(xform.text) !== -1) {
+			const searchStart = text.indexOf(xform.text);
+			const searchEnd = searchStart + xform.text.length;
+			const result = {
+				prefix: text.substring(0, searchStart),
+				transform: xform[xformFormat],
+				suffix: text.substring(searchEnd)
+			};
+			if (typeof result.transform === 'function') {
+				result.transform = result.transform(xform.text);
+			}
+			return result;
+		}
+	}
+	return false;
+}
+
 function doTransform(text, xformFormat) {
 	if (!text) {
 		return [];
 	}
-	if (!xformFormat) {
-		throw new Error('TextWriter#doTransform must have second arg xformFormat');
-	}
-	let prefix;
-	let suffix;
-	let transformed;
-	const result = [];
-	for (const xform of transforms) {
-		if (text.indexOf(xform.text) !== -1) {
-			prefix = text.substring(0, text.indexOf(xform.text));
-			suffix = text.substring(text.indexOf(xform.text) + xform.text.length);
-			transformed = xform[xformFormat];
-			if (typeof transformed === 'function') {
-				transformed = transformed(xform.text);
-			}
-			break;
-		}
-	}
-	if (prefix || suffix || transformed) {
-		result.push(...doTransform(prefix, xformFormat)); // recurse until no more prefixes
-		result.push(transformed);
-		result.push(...doTransform(suffix, xformFormat)); // recurse until no more suffixes
+	const transformed = getNextTransform(text, xformFormat);
+	if (transformed) {
+		const result = doTransform(transformed.prefix, xformFormat); // recurse until no prefix
+		result.push(transformed.transform);
+		result.push(...doTransform(transformed.suffix, xformFormat)); // recurse until no suffix
 		return result;
 	} else {
 		return [text];
