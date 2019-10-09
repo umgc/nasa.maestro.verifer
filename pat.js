@@ -22,7 +22,7 @@ const EvaHtmlProcedureWriter = require('./app/writer/procedure/EvaHtmlProcedureW
  * @param   {*} args Command line arguments
  */
 function run(args) {
-	program.fullName = `Procedure Author Thing v${pjson.version}`;
+	program.fullName = `PAT v${pjson.version}`;
 	program.repoURL = pjson.repository.url;
 
 	console.log(`${program.fullName}\n`);
