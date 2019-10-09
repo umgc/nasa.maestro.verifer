@@ -1,6 +1,9 @@
 NASA EVA Task Generator YAML Definition
 =======================================
 
+!!! THIS FILE IS PROBABLY VERY OUT OF DATE !!!
+==============================================
+
 Table of Contents
 -----------------
 
