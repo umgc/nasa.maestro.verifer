@@ -7,13 +7,6 @@ module.exports = class SodfDocxTaskWriter extends DocxTaskWriter {
 
 	constructor(task, procedureWriter) {
 		super(task, procedureWriter);
-
-		this.container = {
-			children: [],
-			add: function(item) {
-				this.children.push(item);
-			}
-		};
 	}
 
 	writeDivisions() {

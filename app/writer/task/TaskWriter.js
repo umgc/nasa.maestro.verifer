@@ -15,8 +15,6 @@ module.exports = class TaskWriter {
 		this.maxImageWidth = 800; // landscape: 800, portrait probably 640
 		this.maxImageHeight = 640; // landscape: 640, portrait can be more like 800
 
-		this.container = null;
-
 		this.stepNumber = 1;
 
 		const abstractMethods = [
@@ -31,10 +29,6 @@ module.exports = class TaskWriter {
 				throw new Error(`Abstract method "${fn}" not implemented in class ${this.constructor.name}`);
 			}
 		}
-	}
-
-	setContainer(container) {
-		this.container = container;
 	}
 
 	fitImageInBox(img, box = {}) {
