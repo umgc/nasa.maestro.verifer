@@ -5,8 +5,8 @@ const path = require('path');
 const YAML = require('yamljs');
 const filenamify = require('filenamify');
 
-const Column = require('./column.js');
-const Task = require('./task.js');
+const Column = require('./Column');
+const Task = require('./Task');
 const SpacewalkValidator = require('../schema/spacewalkValidator');
 
 function translatePath(procedureFilePath, taskFileName) {

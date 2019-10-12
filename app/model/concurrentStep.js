@@ -1,6 +1,6 @@
 'use strict';
 
-const Step = require('./step.js');
+const Step = require('./Step');
 
 function getRealActorId(taskRoles, actorIdGuess) {
 

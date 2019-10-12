@@ -10,7 +10,7 @@ const path = require('path');
 const fs = require('fs');
 const yj = require('yamljs');
 
-const Procedure = require('../app/model/procedure');
+const Procedure = require('../app/model/Procedure');
 
 /**
  * Positive testing for procedure
