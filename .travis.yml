@@ -1,5 +1,6 @@
 language: node_js
 node_js:
+  - "8"
   - "10"
   - "12"
 env:
@@ -7,7 +8,8 @@ env:
     - CC_TEST_REPORTER_ID=c247365a9a7270a8a0e198746a58db6228982a5fcec2f9d94dc081dba241e0a0
 matrix:
   allow_failures:
-  - node_js: "12"
+    - node_js: "8"
+    - node_js: "12"
 install:
   - npm install
 before_script:
