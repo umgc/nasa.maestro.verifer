@@ -1,6 +1,6 @@
 'use strict';
 
-const ConcurrentStep = require('./concurrentStep.js');
+const ConcurrentStep = require('./ConcurrentStep.js');
 const TaskRole = require('./TaskRole.js');
 const consoleHelper = require('../helpers/consoleHelper');
 

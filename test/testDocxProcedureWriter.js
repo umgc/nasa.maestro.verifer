@@ -6,7 +6,7 @@
 const expect = require('chai').expect;
 const docx = require('docx');
 const DocxProcedureWriter = require('../app/writer/procedure/DocxProcedureWriter');
-const Procedure = require('../app/model/procedure');
+const Procedure = require('../app/model/Procedure');
 
 describe('DocxProcedureWriter', function() {
 	describe('#constructor', () => {

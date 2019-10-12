@@ -32,6 +32,10 @@ module.exports = class SodfDocxProcedureWriter extends DocxProcedureWriter {
 		};
 	}
 
+	/**
+	 * Create a docx section from a Task object from this.procedure.tasks
+	 * @param {Task} task
+	 */
 	renderTask(task) {
 
 		const handler = new SodfDocxTaskWriter(
@@ -39,17 +43,12 @@ module.exports = class SodfDocxProcedureWriter extends DocxProcedureWriter {
 			this
 		);
 
-		const sectionChildren = [];
-		sectionChildren.push(
-			...handler.writeDivisions()
-		);
-
 		this.doc.addSection({
 			headers: { default: this.genTaskHeader(task) },
 			footers: { default: this.genFooter() },
 			size: this.getPageSize(),
 			margins: this.getPageMargins(),
-			children: sectionChildren
+			children: handler.writeDivisions()
 		});
 	}
 };

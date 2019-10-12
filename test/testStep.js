@@ -6,7 +6,7 @@
 const expect = require('chai').expect;
 const yj = require('yamljs');
 
-const Step = require('../app/model/step');
+const Step = require('../app/model/Step');
 const TaskRole = require('../app/model/TaskRole');
 
 const taskRoles = {

@@ -12,7 +12,7 @@ const pjson = require('./package.json');
 const ver = require('./app/helpers/versionHelper');
 const consoleHelper = require('./app/helpers/consoleHelper');
 
-const Procedure = require('./app/model/procedure');
+const Procedure = require('./app/model/Procedure');
 const EvaDocxProcedureWriter = require('./app/writer/procedure/EvaDocxProcedureWriter');
 const SodfDocxProcedureWriter = require('./app/writer/procedure/SodfDocxProcedureWriter');
 const EvaHtmlProcedureWriter = require('./app/writer/procedure/EvaHtmlProcedureWriter');
