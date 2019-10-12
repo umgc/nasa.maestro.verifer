@@ -20,8 +20,7 @@ module.exports = class TaskWriter {
 		const abstractMethods = [
 			'addImages',
 			'addParagraph',
-			'addBlock',
-			'insertStep'
+			'addBlock'
 		];
 
 		for (const fn of abstractMethods) {

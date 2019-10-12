@@ -278,6 +278,10 @@ module.exports = class DocxTaskWriter extends TaskWriter {
 		};
 	}
 
+	alterStepParagraphOptions(paraOptions /* , options */) {
+		return paraOptions;
+	}
+
 	/**
 	 * ! TBD a description
 	 * @param {*} stepText        Text to add as a step
@@ -294,29 +298,16 @@ module.exports = class DocxTaskWriter extends TaskWriter {
 		if (!options.columnKeys) {
 			options.columnKeys = [];
 		}
-		const paraOptions = {
+		let paraOptions = {
 			numbering: this.getTaskNumbering(options.level),
 			children: []
 		};
 
-		if (options.actors.length > 0) {
-			const actorToColumnIntersect = options.actors.filter((value) => {
-				return options.columnKeys.includes(value);
-			});
-			const isPrimeActor = actorToColumnIntersect.length > 0;
-
-			if (!isPrimeActor) {
-				paraOptions.children.push(new docx.TextRun({
-					text: options.actors[0] + ': ',
-					bold: true
-				}));
-			}
-		}
+		paraOptions = this.alterStepParagraphOptions(paraOptions, options);
 
 		if (typeof stepText === 'string') {
 			paraOptions.children.push(...this.textTransform.transform(stepText));
 		} else if (Array.isArray(stepText)) {
-			console.log(stepText);
 			paraOptions.children.push(...stepText);
 		} else {
 			throw new Error('addStepText() stepText must be string or array');
