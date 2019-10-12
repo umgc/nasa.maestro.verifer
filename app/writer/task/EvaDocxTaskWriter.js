@@ -45,29 +45,6 @@ module.exports = class EvaDocxTaskWriter extends DocxTaskWriter {
 
 	}
 
-	writeDivisions() {
-		// Array of divisions. A division is a set of one or more series of
-		// steps. So a division may have just one series for the "IV" actor, or
-		// it may have multiple series for multiple actors.
-		//
-		// Example:
-		// divisions = [
-		//   { IV: [Step, Step, Step] },             // div 0: just IV series
-		//   { IV: [Step], EV1: [Step, Step] },      // div 1: IV & EV1 series
-		//   { EV1: [Step, Step], EV2: [Step] }      // div 2: EV1 & EV2 series
-		// ]
-		const divisions = this.task.concurrentSteps;
-		const tableRows = [];
-		for (const division of divisions) {
-			tableRows.push(
-				// todo Make this writeDivision return an array of table rows so writeDivisions()
-				// todo   can be more easily reused. Also, may want to legitimately return more than
-				// todo   one row if a pre-row of images is generated.
-				this.writeDivision(division));
-		}
-		return tableRows;
-	}
-
 	writeDivision(division) {
 		const divWriter = new EvaDivisionWriter();
 
@@ -117,7 +94,10 @@ module.exports = class EvaDocxTaskWriter extends DocxTaskWriter {
 		});
 
 		this.divisionIndex++;
-		return tableRow;
+
+		// return it as an array of table rows for future expansion and to make similar to other
+		// divisionWriter() methods.
+		return [tableRow];
 	}
 
 	writeSeries(series, columnKeys) {
