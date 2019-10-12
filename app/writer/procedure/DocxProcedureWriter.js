@@ -6,6 +6,7 @@ const docx = require('docx');
 
 const consoleHelper = require('../../helpers/consoleHelper');
 
+const styles = require('./styles.js');
 const ProcedureWriter = require('./ProcedureWriter');
 
 module.exports = class DocxProcedureWriter extends ProcedureWriter {
@@ -37,8 +38,12 @@ module.exports = class DocxProcedureWriter extends ProcedureWriter {
 		];
 		this.levels = [];
 
-		this.doc = this.getDoc();
+		const docOptions = this.getDocMeta();
+		docOptions.styles = {
+			paragraphStyles: styles
+		};
 
+		this.doc = new docx.Document(docOptions);
 	}
 
 	/**
@@ -57,49 +62,6 @@ module.exports = class DocxProcedureWriter extends ProcedureWriter {
 			hanging: this.hanging
 		};
 		return output;
-	}
-
-	getDoc() {
-		const doc = new docx.Document(this.getDocMeta());
-		doc.Styles.createParagraphStyle('normal', 'Normal')
-			.basedOn('Normal')
-			.next('Normal')
-			.font('Arial')
-			.quickFormat()
-			.size(20)
-			.indent({ left: 45 })
-			.spacing({
-				// line: 276,
-				before: 45, // 20 * 72 * 0.05,
-				after: 0 // 20 * 72 * 0.05
-			});
-
-		doc.Styles.createParagraphStyle('listparagraph', 'List Paragraph')
-			.basedOn('List Paragraph')
-			.next('List Paragraph')
-			.font('Arial')
-			.quickFormat()
-			.size(20)
-			.spacing({
-				// line: 276,
-				before: 45, // 20 * 72 * 0.05,
-				after: 0 // 20 * 72 * 0.05
-			});
-
-		doc.Styles.createParagraphStyle('strong', 'Strong')
-			.basedOn('Normal')
-			.next('Normal')
-			.font('Arial')
-			.bold()
-			.quickFormat()
-			.size(20)
-			.spacing({
-				// line: 276,
-				before: 45, // 20 * 72 * 0.05,
-				after: 0 // 20 * 72 * 0.05
-			});
-
-		return doc;
 	}
 
 	writeFile(filepath) {

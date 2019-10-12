@@ -50,7 +50,7 @@
     "ajv": "^6.10.2",
     "colors": "^1.4.0",
     "commander": "^2.20.1",
-    "docx": "git+https://github.com/jamesmontalvo3/docx.git#build",
+    "docx": "^5.0.0-rc7",
     "filenamify": "^4.1.0",
     "image-size": "^0.8.3",
     "nunjucks": "^3.2.0",
