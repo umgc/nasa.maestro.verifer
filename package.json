@@ -7,11 +7,12 @@
     "lint": "eslint . --color",
     "lint-fix": "eslint . --color --fix",
     "test": "mocha",
+    "test:colors": "mocha  --colors",
     "test:coverage": "nyc --all --reporter=text --reporter=lcov npm run test"
   },
   "pre-commit": [
     "lint",
-    "test"
+    "test:colors"
   ],
   "bin": {
     "pat": "./index.js"
