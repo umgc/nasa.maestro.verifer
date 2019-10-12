@@ -6,6 +6,7 @@ const docx = require('docx');
 
 const consoleHelper = require('../../helpers/consoleHelper');
 
+const styles = require('./styles.js');
 const ProcedureWriter = require('./ProcedureWriter');
 
 module.exports = class DocxProcedureWriter extends ProcedureWriter {
@@ -39,64 +40,7 @@ module.exports = class DocxProcedureWriter extends ProcedureWriter {
 
 		const docOptions = this.getDocMeta();
 		docOptions.styles = {
-			paragraphStyles: [
-				{
-					id: 'normal',
-					name: 'Normal',
-					basedOn: 'Normal',
-					next: 'Normal',
-					quickFormat: true,
-					run: {
-						font: 'Arial',
-						size: 20
-					},
-					paragraph: {
-						indent: {
-							left: 45
-						},
-						spacing: {
-							before: 45,
-							after: 0
-						}
-					}
-
-				},
-				{
-					id: 'listparagraph',
-					name: 'List Paragraph',
-					basedOn: 'List Paragraph',
-					next: 'List Paragraph',
-					quickFormat: true,
-					run: {
-						font: 'Arial',
-						size: 20
-					},
-					paragraph: {
-						spacing: {
-							before: 45,
-							after: 0
-						}
-					}
-				},
-				{
-					id: 'strong',
-					name: 'Strong',
-					basedOn: 'Normal',
-					next: 'Normal',
-					quickFormat: true,
-					run: {
-						font: 'Arial',
-						size: 20,
-						bold: true
-					},
-					paragraph: {
-						spacing: {
-							before: 45,
-							after: 0
-						}
-					}
-				}
-			]
+			paragraphStyles: styles
 		};
 
 		this.doc = new docx.Document(docOptions);
