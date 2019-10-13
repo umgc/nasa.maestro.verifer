@@ -41,7 +41,7 @@ module.exports = class SodfDocxTaskWriter extends DocxTaskWriter {
 			const actor = row.actor === this.procedure.lastActor ? '' : row.actor;
 			const location = row.location === this.procedure.lastLocation ? '' : row.location;
 
-			docxTableRows.push(this.createRow(actor, location, [...row.stepParagraphs]));
+			docxTableRows.push(this.createRow(actor, location, row.stepParagraphs));
 
 			this.procedure.lastActor = row.actor;
 			this.procedure.lastLocation = row.location;
