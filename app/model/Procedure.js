@@ -164,7 +164,7 @@ module.exports = class Procedure {
      *
      * @throws {Error} if an error is encountered parsing the file.
      */
-	async populateFromFile(fileName) {
+	populateFromFile(fileName) {
 
 		this.procedureFile = fileName;
 
