@@ -1,0 +1,23 @@
+procedure_name: Simple Procedure
+
+columns:
+
+  - key: IV
+    display: IV/SSRMS
+    actors: "*"
+
+  - key: EV1
+    actors: EV1
+    display: EV1 (Drew)
+
+  - key: EV3
+    actors: EV3
+    display: EV3 (Taz)
+
+
+tasks:
+
+  - file: egress.yml
+    roles:
+      crewA: EV1
+      crewB: EV3

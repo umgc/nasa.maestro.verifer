@@ -13,26 +13,40 @@ module.exports = class SodfDocxTaskWriter extends DocxTaskWriter {
 	writeDivision(division) {
 		const docxTableRows = [];
 
-		let hopper = [];
+		const preRows = [];
+		let index = 0;
+
+		const notSameActorAndLocation = (actor, location) => {
+			return preRows[index].actor !== actor || preRows[index].location !== location;
+		};
 
 		for (const actor in division) {
 			// actor, location, [stepParagraphs]
 			const series = this.writeSeries(division[actor]);
 			for (const stepInfo of series) {
-				const lastActor = this.procedure.lastActor;
-				const lastLocation = this.procedure.lastLocation;
 
-				if (lastActor !== stepInfo.actor || lastLocation !== stepInfo.location) {
-					const actorText = lastActor === stepInfo.actor ? '' : lastActor;
-					const locationText = lastLocation === stepInfo.location ? '' : lastLocation;
-					docxTableRows.push(this.createRow(actorText, locationText, hopper));
-					hopper = []; // empty the hopper
+				if (!preRows[index]) {
+					preRows[index] = stepInfo;
+				} else if (notSameActorAndLocation(stepInfo.actor, stepInfo.location)) {
+					index++;
+					preRows[index] = stepInfo;
+				} else {
+					preRows[index].stepParagraphs.push(...stepInfo.stepParagraphs);
 				}
-				hopper.push(...stepInfo.stepParagraphs);
-				this.procedure.lastActor = stepInfo.actor;
-				this.procedure.lastLocation = stepInfo.location;
 			}
 		}
+
+		for (const row of preRows) {
+
+			const actor = row.actor === this.procedure.lastActor ? '' : row.actor;
+			const location = row.location === this.procedure.lastLocation ? '' : row.location;
+
+			docxTableRows.push(this.createRow(actor, location, [...row.stepParagraphs]));
+
+			this.procedure.lastActor = row.actor;
+			this.procedure.lastLocation = row.location;
+		}
+
 		return docxTableRows;
 	}
 
