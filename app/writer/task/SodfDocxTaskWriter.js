@@ -25,12 +25,13 @@ module.exports = class SodfDocxTaskWriter extends DocxTaskWriter {
 			const series = this.writeSeries(division[actor]);
 			for (const stepInfo of series) {
 
-				if (!preRows[index]) {
+				if (!preRows[index]) { // initiate the first row
 					preRows[index] = stepInfo;
 				} else if (notSameActorAndLocation(stepInfo.actor, stepInfo.location)) {
 					index++;
-					preRows[index] = stepInfo;
+					preRows[index] = stepInfo; // create new row if actor/location don't match prev
 				} else {
+					// append step paragraphs to previous if matching actor/location
 					preRows[index].stepParagraphs.push(...stepInfo.stepParagraphs);
 				}
 			}
@@ -73,23 +74,22 @@ module.exports = class SodfDocxTaskWriter extends DocxTaskWriter {
 			right: borderValues
 		};
 
+		const createRow = (content) => {
+			if (typeof content === 'string') {
+				content = [new docx.Paragraph({ text: content })]; // wrap in an array of paragraph
+			}
+			return new docx.TableCell({
+				children: content,
+				verticalAlign: docx.VerticalAlign.TOP,
+				borders: borders
+			});
+		};
+
 		return new docx.TableRow({
 			children: [
-				new docx.TableCell({
-					children: [new docx.Paragraph({ text: actor })],
-					verticalAlign: docx.VerticalAlign.TOP,
-					borders: borders
-				}),
-				new docx.TableCell({
-					children: [new docx.Paragraph({ text: location })],
-					verticalAlign: docx.VerticalAlign.TOP,
-					borders: borders
-				}),
-				new docx.TableCell({
-					children: stepParagraphs,
-					verticalAlign: docx.VerticalAlign.TOP,
-					borders: borders
-				})
+				createRow(actor),
+				createRow(location),
+				createRow(stepParagraphs)
 			]
 		});
 	}
