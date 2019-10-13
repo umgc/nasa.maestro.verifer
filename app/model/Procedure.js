@@ -163,6 +163,7 @@ module.exports = class Procedure {
      * @param {*} fileName The full path to the YAML file
      *
      * @throws {Error} if an error is encountered parsing the file.
+	 * @return {Error|null}
      */
 	populateFromFile(fileName) {
 
@@ -228,6 +229,7 @@ module.exports = class Procedure {
 			return err;
 		}
 
+		return null;
 	}
 
 };
