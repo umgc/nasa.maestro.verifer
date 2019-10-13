@@ -1,0 +1,26 @@
+title: EGRESS/SETUP
+
+roles:
+  - name: crewA
+    description: A description
+    duration:
+      minutes: 25
+  - name: crewB
+    description: asdf
+    duration:
+      minutes: 25
+
+steps:
+
+  - crewA:
+    - step: step 1
+    - step: step 1a
+  - crewB: step 2
+  - IV: step 3
+  - simo:
+      IV: step 4
+      crewA: step 5
+      crewB: step 6
+  - simo:
+      IV: step 7
+      crewB: step 8

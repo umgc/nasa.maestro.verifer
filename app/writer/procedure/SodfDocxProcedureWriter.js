@@ -9,6 +9,8 @@ module.exports = class SodfDocxProcedureWriter extends DocxProcedureWriter {
 
 	constructor(program, procedure) {
 		super(program, procedure);
+		this.lastActor = false;
+		this.lastLocation = false;
 	}
 
 	getRightTabPosition() {
@@ -48,7 +50,17 @@ module.exports = class SodfDocxProcedureWriter extends DocxProcedureWriter {
 			footers: { default: this.genFooter() },
 			size: this.getPageSize(),
 			margins: this.getPageMargins(),
-			children: handler.writeDivisions()
+			children: [new docx.Table({
+				rows: handler.writeDivisions(),
+				width: {
+					size: 100,
+					type: docx.WidthType.PERCENTAGE
+				}
+				// columnWidths
+				// margins: { marginUnitType, top, bottom, right, left }
+				// float
+				// layout
+			})]
 		});
 	}
 };
