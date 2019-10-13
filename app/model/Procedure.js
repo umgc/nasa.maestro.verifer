@@ -163,8 +163,9 @@ module.exports = class Procedure {
      * @param {*} fileName The full path to the YAML file
      *
      * @throws {Error} if an error is encountered parsing the file.
+	 * @return {Error|null}
      */
-	async populateFromFile(fileName) {
+	populateFromFile(fileName) {
 
 		this.procedureFile = fileName;
 
@@ -228,6 +229,7 @@ module.exports = class Procedure {
 			return err;
 		}
 
+		return null;
 	}
 
 };

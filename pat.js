@@ -44,54 +44,53 @@ function run(args) {
 
 			// Parse the input file
 			const procedure = new Procedure();
-			procedure.populateFromFile(procedureFile).then((err) => {
-				// Check if an error occurred
-				if (err) {
-					consoleHelper.noExitError(`Error while processing procedure ${file}: ${err}`);
-					if (err.validationErrors) {
-						consoleHelper.noExitError('Validation Errors:');
-						consoleHelper.noExitError(err.validationErrors);
-					}
-					return;
+			const err = procedure.populateFromFile(procedureFile);
+
+			// Check if an error occurred
+			if (err) {
+				consoleHelper.noExitError(`Error while processing procedure ${file}: ${err}`);
+				if (err.validationErrors) {
+					consoleHelper.noExitError('Validation Errors:');
+					consoleHelper.noExitError(err.validationErrors);
 				}
+				return;
+			}
 
-				console.logIfVerbose(program, 2, 4);
-				console.logIfVerbose(procedure, 1, 3);
+			console.logIfVerbose(program, 2, 4);
+			console.logIfVerbose(procedure, 1, 3);
 
-				if (program.evaDocx) {
-					console.log('Creating EVA format');
-					const eva = new EvaDocxProcedureWriter(program, procedure);
+			if (program.evaDocx) {
+				console.log('Creating EVA format');
+				const eva = new EvaDocxProcedureWriter(program, procedure);
 
-					eva.renderIntro(function() {
-						eva.renderTasks();
-						eva.writeFile(path.join(
-							program.outputPath,
-							`${procedure.filename}.docx`
-						));
-					});
-				}
-
-				if (program.sodf) {
-					console.log('Creating SODF format');
-					const sodf = new SodfDocxProcedureWriter(program, procedure);
-					sodf.renderTasks();
-					sodf.writeFile(path.join(
+				eva.renderIntro(function() {
+					eva.renderTasks();
+					eva.writeFile(path.join(
 						program.outputPath,
-						`${procedure.filename}.sodf.docx`
+						`${procedure.filename}.docx`
 					));
-				}
+				});
+			}
 
-				if (program.html) {
-					console.log('Creating EVA HTML format');
-					const evaHtml = new EvaHtmlProcedureWriter(program, procedure);
-					evaHtml.renderTasks();
-					evaHtml.writeFile(path.join(
-						program.outputPath,
-						`${procedure.filename}.eva.html`
-					));
-				}
+			if (program.sodf) {
+				console.log('Creating SODF format');
+				const sodf = new SodfDocxProcedureWriter(program, procedure);
+				sodf.renderTasks();
+				sodf.writeFile(path.join(
+					program.outputPath,
+					`${procedure.filename}.sodf.docx`
+				));
+			}
 
-			});
+			if (program.html) {
+				console.log('Creating EVA HTML format');
+				const evaHtml = new EvaHtmlProcedureWriter(program, procedure);
+				evaHtml.renderTasks();
+				evaHtml.writeFile(path.join(
+					program.outputPath,
+					`${procedure.filename}.eva.html`
+				));
+			}
 
 		});
 	});
