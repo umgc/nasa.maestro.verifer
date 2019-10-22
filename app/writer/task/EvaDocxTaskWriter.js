@@ -1,6 +1,6 @@
 'use strict';
 
-const clonedeep = require('lodash/clonedeep');
+const clonedeep = require('lodash/cloneDeep');
 const docx = require('docx');
 const DocxTaskWriter = require('./DocxTaskWriter');
 const EvaDivisionWriter = require('./EvaDivisionWriter');
