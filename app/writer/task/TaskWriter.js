@@ -4,6 +4,10 @@ const consoleHelper = require('../../helpers/consoleHelper');
 
 module.exports = class TaskWriter {
 
+	/**
+	 * @param {Task} task
+	 * @param {ProcedureWriter} procedureWriter
+	 */
 	constructor(task, procedureWriter) {
 
 		this.task = task;

@@ -12,6 +12,10 @@ const TextTransform = require('../TextTransform');
 
 module.exports = class DocxTaskWriter extends TaskWriter {
 
+	/**
+	 * @param {Task} task
+	 * @param {DocxProcedureWriter} procedureWriter
+	 */
 	constructor(task, procedureWriter) {
 		super(task, procedureWriter);
 
@@ -278,7 +282,7 @@ module.exports = class DocxTaskWriter extends TaskWriter {
 		};
 	}
 
-	alterStepParagraphOptions(paraOptions /* , options */) {
+	alterStepParagraphOptions(paraOptions /* , stepOptions */) {
 		return paraOptions;
 	}
 

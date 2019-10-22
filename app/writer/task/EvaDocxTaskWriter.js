@@ -1,11 +1,16 @@
 'use strict';
 
+const clonedeep = require('lodash/clonedeep');
 const docx = require('docx');
 const DocxTaskWriter = require('./DocxTaskWriter');
 const EvaDivisionWriter = require('./EvaDivisionWriter');
 
 module.exports = class EvaDocxTaskWriter extends DocxTaskWriter {
 
+	/**
+	 * @param {Task} task
+	 * @param {EvaDocxProcedureWriter} procedureWriter
+	 */
 	constructor(task, procedureWriter) {
 		super(task, procedureWriter);
 
@@ -100,6 +105,13 @@ module.exports = class EvaDocxTaskWriter extends DocxTaskWriter {
 		return [tableRow];
 	}
 
+	/**
+	 * todo Add description
+	 * @param {Array} series             Array of Step objects belonging to an actor or joint actors
+	 * @param {Array|string} columnKeys  String column key for the column, or array if joint actors
+	 *                                   from multiple columns
+	 * @return {Array}                   Array of docx.Paragraph objects
+	 */
 	writeSeries(series, columnKeys) {
 		const steps = [];
 		this.preInsertSteps();
@@ -111,23 +123,32 @@ module.exports = class EvaDocxTaskWriter extends DocxTaskWriter {
 		return steps;
 	}
 
-	alterStepParagraphOptions(paraOptions, options) {
+	/**
+	 * A set of options is passed into a new docx.Paragraph object. This includes properties like
+	 * 'children' and 'numbering'. When running addStepText(), this function below is run to allow
+	 * modification of those paragraph options prior to creating the paragraph.
+	 * @param {*} paraOptions
+	 * @param {*} stepOptions
+	 * @return {Object}          Paragraph options object like { children: [], numbering: ... }
+	 */
+	alterStepParagraphOptions(paraOptions, stepOptions) {
 
-		if (options.actors.length > 0) {
-			const actorToColumnIntersect = options.actors.filter((value) => {
-				return options.columnKeys.includes(value);
+		const result = clonedeep(paraOptions);
+
+		if (stepOptions.actors.length > 0 && stepOptions.columnKeys.length > 0) {
+			const actorToColumnIntersect = stepOptions.actors.filter((value) => {
+				return stepOptions.columnKeys.includes(value);
 			});
 			const isPrimeActor = actorToColumnIntersect.length > 0;
-
 			if (!isPrimeActor) {
-				paraOptions.children.push(new docx.TextRun({
-					text: options.actors[0] + ': ',
+				result.children.push(new docx.TextRun({
+					text: stepOptions.actors[0] + ': ',
 					bold: true
 				}));
 			}
 		}
 
-		return paraOptions;
+		return result;
 	}
 
 };
