@@ -24,3 +24,11 @@ steps:
   - simo:
       IV: step 7
       crewB: step 8
+  - crewA + crewB:
+    - step: step 9
+    - step: step 10
+  - simo:
+      crewA + IV: step 11
+      crewB:
+        - step: step 12
+        - step: step 13
