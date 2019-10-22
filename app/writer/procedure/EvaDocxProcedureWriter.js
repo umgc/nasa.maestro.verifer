@@ -96,7 +96,7 @@ module.exports = class EvaDocxProcedureWriter extends DocxProcedureWriter {
 			...handler.writeDivisions()
 		);
 
-		this.doc.addSection({
+		const sectionOptions = {
 			headers: { default: this.genTaskHeader(task) },
 			footers: { default: this.genFooter() },
 			size: this.getPageSize(),
@@ -112,7 +112,12 @@ module.exports = class EvaDocxProcedureWriter extends DocxProcedureWriter {
 				// float
 				// layout
 			})]
-		});
+		};
+		this.doc.addSection(sectionOptions);
+
+		// for now just returned for testing purposes. Ideally this should be returned and another
+		// function should handle adding the section to the document.
+		return sectionOptions;
 	}
 
 };
