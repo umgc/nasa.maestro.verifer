@@ -4,7 +4,7 @@
 'use strict';
 
 const expect = require('chai').expect;
-const yj = require('yamljs');
+const YAML = require('js-yaml');
 
 const Step = require('../app/model/Step');
 const TaskRole = require('../app/model/TaskRole');
@@ -57,7 +57,7 @@ describe('Step constructor - Positive Testing', function() {
             note: this is a note
         `;
 
-		const yamlObject = yj.parse(yamlString);
+		const yamlObject = YAML.safeLoad(yamlString);
 
 		it('should return a procedure for normal input', () => {
 
@@ -143,7 +143,7 @@ describe('Step constructor - Positive Testing', function() {
                 - second note
         `;
 
-		const yamlObject = yj.parse(yamlString);
+		const yamlObject = YAML.safeLoad(yamlString);
 
 		it('should return a procedure for normal input', () => {
 

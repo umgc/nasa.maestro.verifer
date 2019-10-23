@@ -8,7 +8,7 @@ const sinon = require('sinon');
 const path = require('path');
 
 const fs = require('fs');
-const yj = require('yamljs');
+const YAML = require('js-yaml');
 
 const Procedure = require('../app/model/Procedure');
 
@@ -43,7 +43,7 @@ describe('Procedure constructor - Positive Testing', function() {
 
 		// not used anywhere, but keeping to make sure yamlString is valid
 		try {
-			yj.parse(yamlString);
+			YAML.safeLoad(yamlString);
 		} catch (err) {
 			throw new Error(err);
 		}
@@ -62,7 +62,7 @@ describe('Procedure constructor - Positive Testing', function() {
 
 		// not used anywhere, but keeping to make sure egressYamlString is valid
 		try {
-			yj.parse(egressYamlString);
+			YAML.safeLoad(egressYamlString);
 		} catch (err) {
 			throw new Error(err);
 		}

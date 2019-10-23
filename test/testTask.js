@@ -4,7 +4,7 @@
 'use strict';
 
 const expect = require('chai').expect;
-const yj = require('yamljs');
+const YAML = require('js-yaml');
 
 const Task = require('../app/model/Task');
 
@@ -36,7 +36,7 @@ describe('Task constructor - Positive Testing', function() {
             - EV1:
                 - step: "Go Outside"
         `;
-		var taskDefinition = yj.parse(yamlString);
+		var taskDefinition = YAML.safeLoad(yamlString);
 
 		it('should return a task for normal input', () => {
 
@@ -71,7 +71,7 @@ describe('Task constructor - Negative Testing', function() {
             - EV1:
                 - step: "Go Outside"
         `;
-		var fakeYamlObj = yj.parse(yamlString);
+		var fakeYamlObj = YAML.safeLoad(yamlString);
 
 		it('should throw error if title doesn\'t exist', () => {
 
@@ -86,7 +86,7 @@ describe('Task constructor - Negative Testing', function() {
         title: Egress
         duration: 00:25
         `;
-		var taskDefinition = yj.parse(yamlString);
+		var taskDefinition = YAML.safeLoad(yamlString);
 
 		it('should throw error if steps don\'t exist', () => {
 
