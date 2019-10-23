@@ -2,7 +2,7 @@
 
 module.exports = [
 	{
-		key: 'pgtset',
+		key: 'pgt.set',
 		class: 'PgtSet',
 		description: '',
 		examples: '',
@@ -10,7 +10,7 @@ module.exports = [
 		reject: [] // list of modules that cannot be used with this module
 	},
 	{
-		key: 'apfrinstall',
+		key: 'apfr.install',
 		class: 'ApfrInstall',
 		description: '',
 		examples: '',

@@ -15,7 +15,7 @@ module.exports = class ApfrInstall extends StepModule {
 
 	constructor(step, stepYaml) {
 		super();
-		this.key = 'apfrinstall';
+		this.key = 'apfr.install';
 		this.step = step;
 		this.raw = stepYaml;
 

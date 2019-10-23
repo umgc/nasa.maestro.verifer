@@ -42,7 +42,7 @@ module.exports = class PgtSet extends StepModule {
 
 	constructor(step, stepYaml) {
 		super();
-		this.key = 'pgtset';
+		this.key = 'pgt.set';
 		this.step = step;
 		this.raw = stepYaml;
 
