@@ -169,64 +169,66 @@ module.exports = class Procedure {
 
 		this.procedureFile = fileName;
 
+		// Check if the file exists
+		if (!fs.existsSync(fileName)) {
+			return new Error(`Could not find file ${fileName}`);
+		}
+
+		// Validate the input file
+		const spacewalkValidator = new SpacewalkValidator();
 		try {
-
-			// Check if the file exists
-			if (!fs.existsSync(fileName)) {
-				throw new Error(`Could not find file ${fileName}`);
-			}
-
-			// Validate the input file
-			const spacewalkValidator = new SpacewalkValidator();
 			spacewalkValidator.validateProcedureSchemaFile(fileName);
-
-			// Load the YAML File
-			const procedureYaml = YAML.safeLoad(fs.readFileSync(fileName, 'utf8'));
-
-			// Save the procedure Name
-			this.name = procedureYaml.procedure_name;
-			this.filename = filenamify(this.name.replace(/\s+/g, '_'));
-
-			if (procedureYaml.columns) {
-				for (var columnYaml of procedureYaml.columns) {
-					this.columns.push(new Column(columnYaml));
-				}
-			}
-
-			this.actorToColumn = mapActorToColumn(this.columns);
-			this.columnToDisplay = mapColumnKeyToDisplay(this.columns);
-
-			// Save the tasks
-			for (const proceduresTaskInstance of procedureYaml.tasks) {
-
-				// Since the task file is in relative path to the procedure
-				// file, need to translate it!
-				const taskFileName = translatePath(fileName, proceduresTaskInstance.file);
-
-				spacewalkValidator.validateTaskSchemaFile(taskFileName);
-				const taskDefinition = YAML.safeLoad(fs.readFileSync(taskFileName, 'utf8'));
-
-				// Save the task!
-				this.tasks.push(new Task(
-					taskDefinition, // all the task info from the task file (steps, etc)
-					proceduresTaskInstance, // info about task from procedure file
-					this.getColumnKeys(),
-					this
-				));
-
-			}
-
-			// Pull in css file if it is defined
-			if (procedureYaml.css) {
-				const cssFileName = translatePath(fileName, procedureYaml.css);
-				if (!fs.existsSync(cssFileName)) {
-					throw new Error(`Could not find css file ${cssFileName}`);
-				}
-				this.css = fs.readFileSync(cssFileName);
-			}
-
 		} catch (err) {
 			return err;
+		}
+
+		// Load the YAML File
+		const procedureYaml = YAML.safeLoad(fs.readFileSync(fileName, 'utf8'));
+
+		// Save the procedure Name
+		this.name = procedureYaml.procedure_name;
+		this.filename = filenamify(this.name.replace(/\s+/g, '_'));
+
+		if (procedureYaml.columns) {
+			for (var columnYaml of procedureYaml.columns) {
+				this.columns.push(new Column(columnYaml));
+			}
+		}
+
+		this.actorToColumn = mapActorToColumn(this.columns);
+		this.columnToDisplay = mapColumnKeyToDisplay(this.columns);
+
+		// Save the tasks
+		for (const proceduresTaskInstance of procedureYaml.tasks) {
+
+			// Since the task file is in relative path to the procedure
+			// file, need to translate it!
+			const taskFileName = translatePath(fileName, proceduresTaskInstance.file);
+
+			try {
+				spacewalkValidator.validateTaskSchemaFile(taskFileName);
+			} catch (err) {
+				return err;
+			}
+			const taskDefinition = YAML.safeLoad(fs.readFileSync(taskFileName, 'utf8'));
+
+			// Save the task!
+			this.tasks.push(new Task(
+				taskDefinition, // all the task info from the task file (steps, etc)
+				proceduresTaskInstance, // info about task from procedure file
+				this.getColumnKeys(),
+				this
+			));
+
+		}
+
+		// Pull in css file if it is defined
+		if (procedureYaml.css) {
+			const cssFileName = translatePath(fileName, procedureYaml.css);
+			if (!fs.existsSync(cssFileName)) {
+				throw new Error(`Could not find css file ${cssFileName}`);
+			}
+			this.css = fs.readFileSync(cssFileName);
 		}
 
 		return null;
