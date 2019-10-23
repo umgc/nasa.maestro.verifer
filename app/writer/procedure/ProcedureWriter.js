@@ -56,7 +56,7 @@ module.exports = class ProcedureWriter {
 				console.error(err);
 			}
 		} else {
-			this.gitHash = 'NO VERSION (NOT CONFIG MANAGED)';
+			this.gitHash = 'NO VERSION (NOT CONFIG CONTROLLED)';
 		}
 
 		return this.gitHash;
@@ -111,7 +111,7 @@ module.exports = class ProcedureWriter {
 				console.error(err);
 			}
 		} else {
-			this.gitDate = 'NO DATE (NOT CONFIG MANAGED)';
+			this.gitDate = 'NO DATE (NOT CONFIG CONTROLLED)';
 		}
 
 		return this.gitDate;

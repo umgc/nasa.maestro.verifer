@@ -4,7 +4,7 @@
 'use strict';
 
 const expect = require('chai').expect;
-const yj = require('yamljs');
+const YAML = require('js-yaml');
 
 const ConcurrentStep = require('../app/model/ConcurrentStep');
 const TaskRole = require('../app/model/TaskRole');
@@ -45,7 +45,7 @@ describe('ConcurrentStep constructor - Positive Testing', function() {
             EV1:
                 - step: "Go Outside"
         `;
-		var fakeYamlObj = yj.parse(yamlString);
+		var fakeYamlObj = YAML.safeLoad(yamlString);
 
 		it('should return a task for normal input', () => {
 
@@ -65,7 +65,7 @@ describe('ConcurrentStep constructor - Positive Testing', function() {
             crewA:
                 - step: "Go Outside"
         `;
-		var fakeYamlObj = yj.parse(yamlString);
+		var fakeYamlObj = YAML.safeLoad(yamlString);
 
 		it('should return a task for normal input', () => {
 
@@ -88,7 +88,7 @@ describe('ConcurrentStep constructor - Positive Testing', function() {
                     - step: "Stay Inside"
                     - step: "Watch EV1"
         `;
-		var fakeYamlObj = yj.parse(yamlString);
+		var fakeYamlObj = YAML.safeLoad(yamlString);
 
 		it('should return a task for normal input', () => {
 
@@ -118,7 +118,7 @@ describe('ConcurrentStep constructor - Positive Testing', function() {
                     - step: "Stay Inside"
                     - step: "Watch {{role:crewA}}"
         `;
-		var fakeYamlObj = yj.parse(yamlString);
+		var fakeYamlObj = YAML.safeLoad(yamlString);
 
 		it('should return a task for normal input', () => {
 

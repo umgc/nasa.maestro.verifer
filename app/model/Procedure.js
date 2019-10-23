@@ -2,7 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const YAML = require('yamljs');
+const YAML = require('js-yaml');
 const filenamify = require('filenamify');
 
 const Column = require('./Column');
@@ -181,7 +181,7 @@ module.exports = class Procedure {
 			spacewalkValidator.validateProcedureSchemaFile(fileName);
 
 			// Load the YAML File
-			const procedureYaml = YAML.load(fileName, null, true);
+			const procedureYaml = YAML.safeLoad(fs.readFileSync(fileName, 'utf8'));
 
 			// Save the procedure Name
 			this.name = procedureYaml.procedure_name;
@@ -204,7 +204,7 @@ module.exports = class Procedure {
 				const taskFileName = translatePath(fileName, proceduresTaskInstance.file);
 
 				spacewalkValidator.validateTaskSchemaFile(taskFileName);
-				const taskDefinition = YAML.load(taskFileName, null, true);
+				const taskDefinition = YAML.safeLoad(fs.readFileSync(taskFileName, 'utf8'));
 
 				// Save the task!
 				this.tasks.push(new Task(

@@ -3,7 +3,7 @@
 const path = require('path');
 const fs = require('fs');
 
-const YAML = require('yamljs');
+const YAML = require('js-yaml');
 const Ajv = require('ajv');
 
 const ValidationError = require('./validationError');
@@ -84,7 +84,7 @@ module.exports = class SpacewalkValidator {
 	validateFile(yamlFile, jsonSchemaFile) {
 
 		// Parse the yaml file into json
-		const yaml = YAML.load(yamlFile);
+		const yaml = YAML.safeLoad(fs.readFileSync(yamlFile, 'utf8'));
 
 		// Validate the YAML
 		return this.validateYaml(yaml, jsonSchemaFile);
