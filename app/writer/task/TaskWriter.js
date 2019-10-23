@@ -1,6 +1,8 @@
 'use strict';
 
 const consoleHelper = require('../../helpers/consoleHelper');
+// const stepModules = require('../../step-mods/stepModules');
+// const loadedModules = {};
 
 module.exports = class TaskWriter {
 
@@ -149,6 +151,11 @@ module.exports = class TaskWriter {
 
 	insertStep(step, level = 0) {
 		const children = [];
+
+		for (const module of step.modules) {
+			// allow the module to alter this step, changing title, warnings, text, etc
+			step = module.alterStep(this.setModuleOutputType());
+		}
 
 		if (step.images) {
 			children.push(...this.addImages(step.images));

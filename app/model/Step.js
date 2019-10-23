@@ -2,13 +2,16 @@
 
 const arrayHelper = require('../helpers/arrayHelper');
 const consoleHelper = require('../helpers/consoleHelper');
-
+const stepModules = require('../step-mods/stepModules');
 const Duration = require('./Duration');
+
+const loadedModules = {};
 
 module.exports = class Step {
 
 	constructor() {
 		// Initiate the vars as empty.
+		this.modules = [];
 		this.title = '';
 		this.text = '';
 		this.images = [];
@@ -78,6 +81,23 @@ module.exports = class Step {
 			this.substeps = this.parseSubsteps(stepYaml.substeps);
 		}
 
+		for (const module of stepModules) {
+			if (stepYaml[module.key]) {
+				if (!loadedModules[module.key]) {
+					loadedModules[module.key] = require(`../step-mods/${module.class}`);
+				}
+
+				// todo for any modules already in this.modules:
+				// todo (1) add suggestions for modules to use along with this (module.suggest)
+				// todo ... probably aggregate a list of suggestions, and after all modules loaded
+				// todo ... then you can check that list against all modules
+				// todo (2) add Errors for any module.reject
+				// todo (3) add warnings for modules in neither module.suggest nor module.reject
+
+				// instantiate StepModule
+				this.modules.push(new loadedModules[module.key](this, stepYaml));
+			}
+		}
 	}
 
 	parseBlock(textOrArray) {
