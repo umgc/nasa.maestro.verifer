@@ -2,12 +2,13 @@
 
 const fs = require('fs');
 const childProcess = require('child_process');
+const clonedeep = require('lodash/cloneDeep');
 
 module.exports = class ProcedureWriter {
 
 	constructor(program, procedure) {
 		this.program = program;
-		this.procedure = procedure;
+		this.procedure = clonedeep(procedure);
 
 		const abstractMethods = [
 			'writeFile'

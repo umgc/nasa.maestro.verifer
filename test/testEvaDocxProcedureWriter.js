@@ -6,12 +6,13 @@
 const path = require('path');
 const assert = require('chai').assert;
 const docx = require('docx');
+const clonedeep = require('lodash/cloneDeep');
 
 const Procedure = require('../app/model/Procedure');
 
 const EvaDocxProcedureWriter = require('../app/writer/procedure/EvaDocxProcedureWriter');
 
-describe('EvaDocxTaskWriter', function() {
+describe('EvaDocxProcedureWriter', function() {
 	const procedure = new Procedure();
 	const procedureFile = path.join(__dirname, 'cases/simple/procedures/proc.yml');
 
@@ -19,6 +20,7 @@ describe('EvaDocxTaskWriter', function() {
 	if (err) {
 		throw new Error(err);
 	}
+	const procedureClone = clonedeep(procedure);
 
 	const procWriter = new EvaDocxProcedureWriter({}, procedure);
 
@@ -89,7 +91,7 @@ describe('EvaDocxTaskWriter', function() {
 	// });
 
 	describe('renderTask()', function() {
-		const renderedTask = procWriter.renderTask(procedure.tasks[0]);
+		const renderedTask = procWriter.renderTask(procWriter.procedure.tasks[0]);
 
 		it('should have required keys', function() {
 			assert.hasAllKeys(renderedTask, ['headers', 'footers', 'size', 'margins', 'children']);
@@ -123,6 +125,10 @@ describe('EvaDocxTaskWriter', function() {
 
 			// number of rows in ./test/cases/simple/tasks/egress.yml, plus a header
 			assert.equal(tableRowCount, 8);
+		});
+
+		it('should not modify procedure object', function() {
+			assert.deepEqual(procedure, procedureClone);
 		});
 
 	});
