@@ -124,7 +124,7 @@ describe('EvaDocxProcedureWriter', function() {
 			}
 
 			// number of rows in ./test/cases/simple/tasks/egress.yml, plus a header
-			assert.equal(tableRowCount, 8);
+			assert.equal(tableRowCount, 9);
 		});
 
 		it('should not modify procedure object', function() {

@@ -3,40 +3,111 @@
 const StepModule = require('./StepModule');
 const docx = require('docx');
 
-const mtl = [
-	'2.5',
-	'5.5',
-	'10.5',
-	'15.5',
-	'23.5',
-	'30.5'
-];
-
-const torque = {
-	A1: '2.5',
-	A2: '3.8',
-	A3: '4.8',
-	A4: '6.3',
-	A5: '7.0',
-	A6: '8.3',
-	A7: '9.2',
-	B1: '12.0',
-	B2: '16.0',
-	B3: '18.4',
-	B4: '19.4',
-	B5: '22.0',
-	B6: '24.0',
-	B7: '25.5'
+const validSettings = {
+	torque: {
+		A1: '2.5',
+		A2: '3.8',
+		A3: '4.8',
+		A4: '6.3',
+		A5: '7.0',
+		A6: '8.3',
+		A7: '9.2',
+		B1: '12.0',
+		B2: '16.0',
+		B3: '18.4',
+		B4: '19.4',
+		B5: '22.0',
+		B6: '24.0',
+		B7: '25.5'
+	},
+	speed: {
+		CCW3: '60',
+		CCW2: '30',
+		CCW1: '10',
+		CW1: '10',
+		CW2: '30',
+		CW3: '60'
+	},
+	mtl: [
+		'2.5',
+		'5.5',
+		'10.5',
+		'15.5',
+		'23.5',
+		'30.5'
+	]
 };
 
-const speed = {
-	CCW3: 60,
-	CCW2: 30,
-	CCW1: 10,
-	CW1: 10,
-	CW2: 30,
-	CW3: 60
-};
+function getCollars(instance) {
+	const collars = [instance.torqueCollar, instance.speedCollar];
+	if (instance.mtlCollar) {
+		collars.push(instance.mtlCollar);
+	}
+	return collars;
+}
+
+function getCollarValues(instance, includeUnits = false) {
+	const values = [
+		validSettings.torque[instance.torqueCollar],
+		validSettings.speed[instance.speedCollar],
+		'MTL ' + (instance.mtlCollar || instance.mtlDefault)
+	];
+	if (includeUnits) {
+		values[0] += ' ft-lb';
+		values[1] += ' RPM';
+	}
+	return values;
+}
+
+function getSetString(instance) {
+	return `PGT [${getCollars(instance).join(', ')}]`;
+}
+
+function getValueString(instance) {
+	return `(${getCollarValues(instance, true).join(', ')})`;
+}
+
+function validateSetting(setting, type) {
+
+	if (type === 'mtl' && !setting) {
+		return null;
+	}
+
+	let valids;
+	if (type === 'mtl') {
+		valids = validSettings.mtl;
+	} else {
+		valids = Object.keys(validSettings[type]);
+	}
+
+	if (valids.indexOf(setting) === -1) {
+		throw new Error(`Setting ${setting} is not valid for PGT ${type}`);
+	}
+	return setting;
+}
+
+function getMtlAndSocket(mtlOrSocket, socketOrNull = null) {
+	let mtl,
+		socket;
+	if (mtlOrSocket) {
+		var mtlMatch = /^\d{1,2}\.\d{1}$/;
+		if (mtlMatch.test(mtlOrSocket)) {
+			if (validSettings.mtl.indexOf(mtlOrSocket) === -1) {
+				throw new Error(`PGT setting ${mtlOrSocket} does not appear to be a valid MTL setting`);
+			}
+			mtl = mtlOrSocket;
+		} else {
+			socket = mtlOrSocket;
+		}
+	}
+	if (socketOrNull) {
+		if (socket) {
+			throw new Error(`this.socket already set to ${socket}`);
+		}
+		socket = socketOrNull;
+	}
+	return { mtl: mtl, socket: socket };
+}
 
 module.exports = class PgtSet extends StepModule {
 
@@ -51,65 +122,22 @@ module.exports = class PgtSet extends StepModule {
 		const parts = inputString.split(',').map((val) => {
 			return val.trim();
 		});
-		this.torqueCollar = parts[0];
-		if (!torque[this.torqueCollar]) {
-			throw new Error(`PGT setting ${this.torqueCollar} not a valid torque setting`);
-		}
-		this.speedCollar = parts[1];
-		if (!speed[this.speedCollar]) {
-			throw new Error(`PGT setting ${this.speedCollar} not a valid speed setting`);
-		}
-		if (parts[2]) {
-			var mtlMatch = /^\d{1,2}\.\d{1}$/;
-			if (mtlMatch.test(parts[2])) {
-				if (mtl.indexOf(parts[2]) === -1) {
-					throw new Error(`PGT setting ${parts[2]} does not appear to be a valid MTL setting`);
-				}
-				this.mtlCollar = parts[2];
-			} else {
-				this.socket = parts[2];
-			}
-		}
-		if (parts[3]) {
-			if (this.socket) {
-				throw new Error(`this.socket already set to ${this.socket}`);
-			}
-			this.socket = parts[3];
-		}
+
+		this.torqueCollar = validateSetting(parts[0], 'torque');
+		this.speedCollar = validateSetting(parts[1], 'speed');
+
+		const more = getMtlAndSocket(parts[2], parts[3]);
+
+		this.mtlCollar = validateSetting(more.mtl, 'mtl');
+		this.socket = more.socket;
+		// this.socket = validateSetting(this.socket, 'socket'); // someday validate sockets???
+
 		this.mtlDefault = '30.5';
 	}
 
-	getCollars() {
-		const collars = [this.torqueCollar, this.speedCollar];
-		if (this.mtlCollar) {
-			collars.push(this.mtlCollar);
-		}
-		return collars;
-	}
-
-	getCollarValues(includeUnits = false) {
-		const values = [
-			torque[this.torqueCollar],
-			speed[this.speedCollar],
-			'MTL ' + (this.mtlCollar || this.mtlDefault)
-		];
-		if (includeUnits) {
-			values[0] += ' ft-lb';
-			values[1] += ' RPM';
-		}
-		return values;
-	}
-
-	getSetString() {
-		return `PGT [${this.getCollars().join(', ')}]`;
-	}
-
-	getValueString() {
-		return `(${this.getCollarValues(true).join(', ')})`;
-	}
-
 	alterStepBase() {
-		return `${this.getSetString()} ${this.getValueString()}`;
+		const socket = this.socket ? ` - ${this.socket}` : '';
+		return `${getSetString(this)} ${getValueString(this)}${socket}`;
 	}
 
 	alterStepDocx() {
@@ -119,7 +147,7 @@ module.exports = class PgtSet extends StepModule {
 		}
 
 		const setPGT = new docx.TextRun({
-			text: this.getSetString(),
+			text: getSetString(this),
 			bold: true
 		});
 
@@ -129,7 +157,7 @@ module.exports = class PgtSet extends StepModule {
 		}
 		textRuns.push(setPGT);
 
-		let valuesText = this.getValueString();
+		let valuesText = getValueString(this);
 		if (this.socket) {
 			valuesText += ` - ${this.socket}`;
 		}

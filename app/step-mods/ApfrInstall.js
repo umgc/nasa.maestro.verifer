@@ -11,6 +11,28 @@ const validSettings = {
 	yaw: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']
 };
 
+function validateSetting(setting, type) {
+	if (validSettings[type].indexOf(setting) === -1) {
+		throw new Error(`Setting ${setting} is not valid for APFR ${type} joint`);
+	}
+	return setting;
+}
+
+const specialWIFs = ['SSRMS', 'WIFEX'];
+
+function validateWIF(wif) {
+	const standard = /\w+ WIF \d+/;
+	if (specialWIFs.indexOf(wif) !== -1 || standard.test(wif)) {
+		return wif;
+	} else {
+		throw new Error(`WIF "${wif}" is not valid. Must be in ${specialWIFs} or match form "<element> WIF <number>"`);
+	}
+}
+
+function getSettings(instance) {
+	return [instance.clock, instance.pitch, instance.roll, instance.yaw];
+}
+
 module.exports = class ApfrInstall extends StepModule {
 
 	constructor(step, stepYaml) {
@@ -30,27 +52,16 @@ module.exports = class ApfrInstall extends StepModule {
 				return val.trim();
 			});
 
-		this.clock = this.validateSetting(parts[0], 'clock');
-		this.pitch = this.validateSetting(parts[1], 'pitch');
-		this.roll = this.validateSetting(parts[2], 'roll');
-		this.yaw = this.validateSetting(parts[3], 'yaw');
+		this.clock = validateSetting(parts[0], 'clock');
+		this.pitch = validateSetting(parts[1], 'pitch');
+		this.roll = validateSetting(parts[2], 'roll');
+		this.yaw = validateSetting(parts[3], 'yaw');
 
-		this.wif = stepYaml[this.key].wif;
-	}
-
-	validateSetting(setting, type) {
-		if (validSettings[type].indexOf(setting) === -1) {
-			throw new Error(`Setting ${setting} is not valid for APFR ${type} joint`);
-		}
-		return setting;
-	}
-
-	getSettings() {
-		return [this.clock, this.pitch, this.roll, this.yaw];
+		this.wif = validateWIF(stepYaml[this.key].wif);
 	}
 
 	alterStepBase() {
-		return `Install APFR in ${this.wif} [${this.getSettings().join(',')}]`;
+		return `Install APFR in ${this.wif} [${getSettings(this).join(',')}]`;
 	}
 
 	alterStepDocx() {
@@ -72,7 +83,7 @@ module.exports = class ApfrInstall extends StepModule {
 
 		textRuns.push(
 			new docx.TextRun({
-				text: `[${this.getSettings().join(',')}]`,
+				text: `[${getSettings(this).join(',')}]`,
 				bold: true
 			})
 		);
