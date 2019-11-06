@@ -391,4 +391,7 @@ module.exports = class DocxTaskWriter extends TaskWriter {
 		return false;
 	}
 
+	setModuleOutputType() {
+		return 'Docx';
+	}
 };

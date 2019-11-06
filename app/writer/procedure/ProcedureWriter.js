@@ -2,22 +2,17 @@
 
 const fs = require('fs');
 const childProcess = require('child_process');
+const clonedeep = require('lodash/cloneDeep');
+const Abstract = require('../../helpers/Abstract');
 
-module.exports = class ProcedureWriter {
+module.exports = class ProcedureWriter extends Abstract {
 
 	constructor(program, procedure) {
+		super(['writeFile']);
 		this.program = program;
-		this.procedure = procedure;
 
-		const abstractMethods = [
-			'writeFile'
-		];
-
-		for (const fn of abstractMethods) {
-			if (typeof this[fn] !== 'function') {
-				throw new Error(`Abstract method "${fn}" not implemented in class ${this.constructor.name}`);
-			}
-		}
+		// clone for gauranteed idempotency, so one Writer can't impact another
+		this.procedure = clonedeep(procedure);
 	}
 
 	/**

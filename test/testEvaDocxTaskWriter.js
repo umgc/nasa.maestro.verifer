@@ -32,8 +32,8 @@ describe('EvaDocxTaskWriter', function() {
 			assert.deepEqual(taskWriter.taskColumns, ['IV', 'EV1', 'EV3']);
 		});
 		it('should have correct number of rows', function() {
-			assert.equal(taskWriter.numContentRows, 7);
-			assert.equal(taskWriter.numRows, 8);
+			assert.equal(taskWriter.numContentRows, 8);
+			assert.equal(taskWriter.numRows, 9);
 		});
 	});
 

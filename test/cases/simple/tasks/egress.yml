@@ -32,3 +32,15 @@ steps:
       crewB:
         - step: step 12
         - step: step 13
+
+  # Row for testing StepModules
+  - simo:
+      crewA:
+        - pgt.set: B7, CCW2
+        - pgt.set: B1, CCW1, 6" Wobble
+        - pgt.set: A7, CW2, 30.5
+        - pgt.set: B7, CW2, 2.5
+        # - pgt.set: B7, CCW4
+        - apfr.install:
+            settings: 12, PP, F, 6
+            wif: P6 WIF 11

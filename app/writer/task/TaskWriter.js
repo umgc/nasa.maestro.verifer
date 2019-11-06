@@ -1,15 +1,20 @@
 'use strict';
 
 const consoleHelper = require('../../helpers/consoleHelper');
+const Abstract = require('../../helpers/Abstract');
 
-module.exports = class TaskWriter {
+module.exports = class TaskWriter extends Abstract {
 
 	/**
 	 * @param {Task} task
 	 * @param {ProcedureWriter} procedureWriter
 	 */
 	constructor(task, procedureWriter) {
-
+		super([
+			'addImages',
+			'addParagraph',
+			'addBlock'
+		]);
 		this.task = task;
 
 		this.procedureWriter = procedureWriter;
@@ -20,18 +25,6 @@ module.exports = class TaskWriter {
 		this.maxImageHeight = 640; // landscape: 640, portrait can be more like 800
 
 		this.stepNumber = 1;
-
-		const abstractMethods = [
-			'addImages',
-			'addParagraph',
-			'addBlock'
-		];
-
-		for (const fn of abstractMethods) {
-			if (typeof this[fn] !== 'function') {
-				throw new Error(`Abstract method "${fn}" not implemented in class ${this.constructor.name}`);
-			}
-		}
 	}
 
 	fitImageInBox(img, box = {}) {
@@ -149,6 +142,11 @@ module.exports = class TaskWriter {
 
 	insertStep(step, level = 0) {
 		const children = [];
+
+		for (const module of step.modules) {
+			// allow the module to alter this step, changing title, warnings, text, etc
+			step = module.alterStep(this.setModuleOutputType());
+		}
 
 		if (step.images) {
 			children.push(...this.addImages(step.images));
