@@ -89,16 +89,15 @@ function validateSetting(setting, type) {
 function getMtlAndSocket(mtlOrSocket, socketOrNull = null) {
 	let mtl,
 		socket;
-	if (mtlOrSocket) {
-		var mtlMatch = /^\d{1,2}\.\d{1}$/;
-		if (mtlMatch.test(mtlOrSocket)) {
-			if (validSettings.mtl.indexOf(mtlOrSocket) === -1) {
-				throw new Error(`PGT setting ${mtlOrSocket} does not appear to be a valid MTL setting`);
-			}
-			mtl = mtlOrSocket;
-		} else {
-			socket = mtlOrSocket;
+	const mtlMatch = /^\d{1,2}\.\d{1}$/;
+
+	if (mtlOrSocket && mtlMatch.test(mtlOrSocket)) {
+		if (validSettings.mtl.indexOf(mtlOrSocket) === -1) {
+			throw new Error(`PGT setting ${mtlOrSocket} does not appear to be a valid MTL setting`);
 		}
+		mtl = mtlOrSocket;
+	} else if (mtlOrSocket) {
+		socket = mtlOrSocket;
 	}
 	if (socketOrNull) {
 		if (socket) {

@@ -1,25 +1,12 @@
 'use strict';
 
 const TextTransform = require('../writer/TextTransform');
+const Abstract = require('../helpers/Abstract');
 
-module.exports = class StepModule {
+module.exports = class StepModule extends Abstract {
 
 	constructor() {
-		const abstractStaticMethods = [];
-		for (const fn of abstractStaticMethods) {
-			if (typeof this.constructor[fn] !== 'function') {
-				throw new Error(`Abstract static function "${fn}" not implemented in class ${this.constructor.name}`);
-			}
-		}
-
-		const abstractMethods = [
-			'alterStepBase'
-		];
-		for (const fn of abstractMethods) {
-			if (typeof this[fn] !== 'function') {
-				throw new Error(`Abstract method "${fn}" not implemented in class ${this.constructor.name}`);
-			}
-		}
+		super(['alterStepBase']);
 	}
 
 	getOutputTypeFunctions(outputType) {

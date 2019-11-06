@@ -1,17 +1,20 @@
 'use strict';
 
 const consoleHelper = require('../../helpers/consoleHelper');
-// const stepModules = require('../../step-mods/stepModules');
-// const loadedModules = {};
+const Abstract = require('../../helpers/Abstract');
 
-module.exports = class TaskWriter {
+module.exports = class TaskWriter extends Abstract {
 
 	/**
 	 * @param {Task} task
 	 * @param {ProcedureWriter} procedureWriter
 	 */
 	constructor(task, procedureWriter) {
-
+		super([
+			'addImages',
+			'addParagraph',
+			'addBlock'
+		]);
 		this.task = task;
 
 		this.procedureWriter = procedureWriter;
@@ -22,18 +25,6 @@ module.exports = class TaskWriter {
 		this.maxImageHeight = 640; // landscape: 640, portrait can be more like 800
 
 		this.stepNumber = 1;
-
-		const abstractMethods = [
-			'addImages',
-			'addParagraph',
-			'addBlock'
-		];
-
-		for (const fn of abstractMethods) {
-			if (typeof this[fn] !== 'function') {
-				throw new Error(`Abstract method "${fn}" not implemented in class ${this.constructor.name}`);
-			}
-		}
 	}
 
 	fitImageInBox(img, box = {}) {
