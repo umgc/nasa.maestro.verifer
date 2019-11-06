@@ -75,4 +75,56 @@ module.exports = class Duration {
 			.replace('S', this.seconds.toString().padStart(2, '0'));
 		/* eslint-enable no-restricted-properties */
 	}
+
+	/**
+	 * Times change. Sometimes you want a Duration by value not by reference. For example, if you're
+	 * getting the duration for an entire procedure by getting the end time of the last task, and
+	 * then the last task moves to be the first task, then the full procedure time is WAY off. In
+	 * either case (ref or value) the procedure end should be recalculated, but in the interim the
+	 * by-value method is likely to have the procedure end time be _more_ correct.
+	 *
+	 * @return {Duration} Duration object identical to but separate from this Duration object
+	 */
+	clone() {
+		return new Duration({
+			seconds: this.getTotalSeconds(),
+			offset: { seconds: this.offset.getTotalSeconds() }
+		});
+	}
+
+	/**
+	 * Sum one or more Duration objects and get resulting Duration object.
+	 *
+	 * @param {...*}  durations  Array of Duration objects to sum
+	 * @return {Duration}        Returns a Duration object that is the sum of all inputs
+	 */
+	static sum(...durations) {
+		let totalSeconds = 0;
+		for (const d of durations) {
+			if (!(d instanceof Duration)) {
+				console.error(d);
+				throw new Error('all inputs must be instances of Duration');
+			}
+			totalSeconds += d.getTotalSeconds();
+		}
+		return new Duration({ seconds: totalSeconds });
+	}
+
+	/**
+	 * Subtract Duration objects from first Duration object and get resulting Duration object.
+	 *
+	 * @param {...*}  durations  Array of Duration objects to subtract
+	 * @return {Duration}        Returns a Duration object
+	 */
+	static subtract(...durations) {
+		let totalSeconds = durations.shift().getTotalSeconds();
+		for (const d of durations) {
+			if (!(d instanceof Duration)) {
+				console.error(d);
+				throw new Error('all inputs must be instances of Duration');
+			}
+			totalSeconds -= d.getTotalSeconds();
+		}
+		return new Duration({ seconds: totalSeconds });
+	}
 };

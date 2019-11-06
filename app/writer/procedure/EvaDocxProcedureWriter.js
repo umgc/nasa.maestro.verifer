@@ -51,7 +51,9 @@ module.exports = class EvaDocxProcedureWriter extends DocxProcedureWriter {
 			}
 		}
 
-		const timeline = new TimelineWriter(actorTasks);
+		// const timeline = new TimelineWriter(actorTasks);
+		const timeline = new TimelineWriter(this.procedure);
+		timeline.create();
 		const pngPath = path.join(
 			this.program.outputPath,
 			`${this.procedure.filename}.summary.timeline.png`
