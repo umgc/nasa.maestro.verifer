@@ -9,6 +9,7 @@ const Column = require('./Column');
 const Task = require('./Task');
 const SpacewalkValidator = require('../schema/spacewalkValidator');
 const Duration = require('./Duration');
+const TimeSync = require('./TimeSync');
 
 function translatePath(procedureFilePath, taskFileName) {
 	// Look in tasks directory, sister to procedures directory
@@ -381,17 +382,11 @@ module.exports = class Procedure {
 
 			}
 		}
-		const timelineTest = require('../helpers/timeline');
 
-		// console.log(' ------ break ----- ');
-		// timelineTest.verbose(true);
-		timelineTest.updateStartTimes(this.tasks[0]);
-		timelineTest.clean(this.tasks[0]);
-		// timelineTest.print(this.tasks);
-		this.taskEndpoints = timelineTest.calcEndpoints(this.tasks);
-		// console.log(this.taskEndpoints.EV1.first);
-		// console.log(this);
-		// process.exit();
+		this.timeSync = new TimeSync(this.tasks, false);
+		this.timeSync.sync();
+		// console.log(this.timeSync.toString());
+		this.taskEndpoints = this.timeSync.endpoints();
 
 		// Pull in css file if it is defined
 		if (procedureYaml.css) {
