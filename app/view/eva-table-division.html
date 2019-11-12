@@ -1,0 +1,6 @@
+{# Write a row of the procedure table, aka a "division" #}
+<tr>
+	{% for col in division %}
+		<td{% if col.colspan > 1 %} colspan="{{ col.colspan }}"{% endif %}>{{col.content}}</td>
+	{% endfor %}
+</tr>
