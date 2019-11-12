@@ -2,6 +2,13 @@
 
 const consoleHelper = require('../helpers/consoleHelper');
 
+function throwIfNotDuration(duration) {
+	if (!(duration instanceof module.exports)) {
+		console.error(duration);
+		throw new Error('All inputs must be instances of Duration');
+	}
+	return true;
+}
 module.exports = class Duration {
 
 	/**
@@ -101,10 +108,7 @@ module.exports = class Duration {
 	static sum(...durations) {
 		let totalSeconds = 0;
 		for (const d of durations) {
-			if (!(d instanceof Duration)) {
-				console.error(d);
-				throw new Error('all inputs must be instances of Duration');
-			}
+			throwIfNotDuration(d);
 			totalSeconds += d.getTotalSeconds();
 		}
 		return new Duration({ seconds: totalSeconds });
@@ -119,10 +123,7 @@ module.exports = class Duration {
 	static subtract(...durations) {
 		let totalSeconds = durations.shift().getTotalSeconds();
 		for (const d of durations) {
-			if (!(d instanceof Duration)) {
-				console.error(d);
-				throw new Error('all inputs must be instances of Duration');
-			}
+			throwIfNotDuration(d);
 			totalSeconds -= d.getTotalSeconds();
 		}
 		return new Duration({ seconds: totalSeconds });

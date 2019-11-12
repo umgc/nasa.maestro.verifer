@@ -121,13 +121,11 @@ function updateActivityStartTime(activity, stopAt = null) {
 				);
 			}
 
-			// _GUESS_ that this activity's start time is the previous' start time plus duration.
+			// _GUESS_ that this activity's start time is the previous' end time.
 			// This may not be true since we have not walked backwards in the timeline from this
 			// activity verifying each prior activity. That is handled by syncActivity().
-			activity.actorRolesDict[role].startTime = Duration.sum(
-				rolePrevAct.actorRolesDict[role].startTime,
-				rolePrevAct.actorRolesDict[role].duration
-			);
+			activity.actorRolesDict[role].startTime =
+				rolePrevAct.actorRolesDict[role].endTime.clone(); // see Duration.clone() for reason
 
 		// this role does not have an activity prior to this activity
 		} else {
@@ -296,15 +294,24 @@ function syncActivity(activity, stopAt = null) {
 
 }
 
-// TimeSync...because time math is hard
 module.exports = class TimeSync {
 
-	constructor(tasks, beVerbose = false) {
+	/**
+	 * TimeSync...because time math is hard
+	 * @param {...Task} tasks           Array of Task objects to synchronize
+	 * @param {boolean} beVerbose       Set to true when the only prescription is more debug
+	 * @param {boolean} initStartTimes  Set to false to not do an initial run of updateStartTimes().
+	 *                                  This is intended for testing only, to verify that the first
+	 *                                  task passed into updateStartTimes() does not impact result.
+	 */
+	constructor(tasks, beVerbose = false, initStartTimes = true) {
 		this.tasks = tasks;
 		if (beVerbose) {
 			verbose = true;
 		}
-		updateActivityStartTime(this.tasks[0]);
+		if (initStartTimes) {
+			updateActivityStartTime(this.tasks[0]);
+		}
 	}
 
 	/**
@@ -321,7 +328,9 @@ module.exports = class TimeSync {
 			task = this.tasks[0];
 		}
 
-		// Will travers
+		// Will traverse graph doing a rough estimate of start times, without considering how tasks
+		// may need to be synchronized between actors (i.e. actors need to start joint tasks at the
+		// same time)
 		updateActivityStartTime(task);
 	}
 
