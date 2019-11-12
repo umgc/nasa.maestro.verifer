@@ -45,8 +45,8 @@ module.exports = class ProcedureWriter extends Abstract {
 		if (fs.existsSync(this.program.gitPath)) {
 			try {
 				this.gitHash = childProcess
-					.execSync(`cd ${this.program.projectPath} && git rev-parse HEAD`)
-					.toString().trim().slice(0, 8);
+					.execSync(`cd ${this.program.projectPath} && git rev-parse --short HEAD`)
+					.toString().trim();
 			} catch (err) {
 				console.error(err);
 			}
