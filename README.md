@@ -1,20 +1,20 @@
-<h1 align="center">PAT</h1>
+<h1 align="center">Maestro</h1>
 
-<h5 align="center">Procedure generator for space operations</h5>
+<h5 align="center">Composing procedures for space operations</h5>
 
 <div align="center">
-  <a href="https://travis-ci.org/xoperations/pat">
-    <img src="https://travis-ci.org/xoperations/pat.svg?branch=master" alt="Travis CI" />
+  <a href="https://travis-ci.org/xoperations/maestro">
+    <img src="https://travis-ci.org/xoperations/maestro.svg?branch=master" alt="Travis CI" />
   </a>
-  <a href="https://codeclimate.com/github/xOPERATIONS/pat/maintainability">
+  <a href="https://codeclimate.com/github/xOPERATIONS/maestro/maintainability">
     <img src="https://api.codeclimate.com/v1/badges/fea781e4cd69005f6a9c/maintainability" alt="Maintainability" />
   </a>
-  <a href="https://codeclimate.com/github/xOPERATIONS/pat/test_coverage">
+  <a href="https://codeclimate.com/github/xOPERATIONS/maestro/test_coverage">
     <img src="https://api.codeclimate.com/v1/badges/fea781e4cd69005f6a9c/test_coverage" alt="Test Coverage" />
   </a>
 
   <br />
-  <img src="docs/pat-command.gif" alt="PAT in terminal" />
+  <img src="docs/pat-command.gif" alt="maestro, formerly pat, in terminal" />
 
 </div>
 
@@ -22,42 +22,42 @@
 
 ## Purpose
 
-The purpose of PAT is to replace the manual procedure creation process for Extravehicular Activities (EVAs, AKA "spacewalks") by NASA* personnel. The goal of the application is to be able to write EVA procedures as simple YAML files and run `pat build` to generate Word or other documents in a standardized procedure format, similar to the Space Shuttle mission "STS-134" procedures found on page `FS 7-20` of [this document](https://www.nasa.gov/centers/johnson/pdf/539922main_EVA_134_F_A.pdf). More EVAs can be found at the [FOIA archive](https://www.nasa.gov/centers/johnson/news/flightdatafiles/foia_archive.html).
+The purpose of Maestro is to replace the manual procedure creation process for Extravehicular Activities (EVAs, AKA "spacewalks") by NASA* personnel. The goal of the application is to be able to write EVA procedures as simple YAML files and run `maestro compose` to generate Word or other documents in a standardized procedure format, similar to the Space Shuttle mission "STS-134" procedures found on page `FS 7-20` of [this document](https://www.nasa.gov/centers/johnson/pdf/539922main_EVA_134_F_A.pdf). More EVAs can be found at the [FOIA archive](https://www.nasa.gov/centers/johnson/news/flightdatafiles/foia_archive.html).
 
 <sub>_* This is an independent project and is unaffiliated with NASA_</sub>
 
 ## Usage
 
-The `pat build` command can be used within a valid PAT project, such as those listed in the "examples" section below. A PAT project consists of at least:
+The `maestro compose` command can be used within a valid Maestro project, such as those listed in the "examples" section below. A Maestro project consists of at least:
 
 1. A `procedures` directory containing at least one `.yml` file defining a procedure
 2. A `tasks` directory containing the task `.yml` files defined within the procedure file
 
-Running `pat build` will generate an MS Word DOCX procedure file that looks something like this:
+Running `maestro compose` will generate an MS Word DOCX procedure file that looks something like this:
 
 ![image](docs/docx-example.png)
 
 Other formats are also available:
 
-- `pat build --no-eva-docx` prevents generating the default multi-column (EVA) format
-- `pat build --sodf` generates a more serial version of the procedure
-- `pat build --html` generates an HTML version of the EVA format
+- `maestro compose --no-eva-docx` prevents generating the default multi-column (EVA) format
+- `maestro compose --sodf` generates a more serial version of the procedure
+- `maestro compose --html` generates an HTML version of the EVA format
 - Future output will support domain-specific formats
 
 ## Examples
 
-- PAT generating STS-134 procedures using GitLab CI: https://gitlab.com/xOPERATIONS/sts-134
+- Maestro generating STS-134 procedures using GitLab CI: https://gitlab.com/xOPERATIONS/sts-134
 
 ## Installation
 
-PAT is under heavy development. While it's possible to `npm install -g xops-pat` the versions within NPM may be out of date. It's better to do the following:
+Maestro is under heavy development. While it's possible to `npm install -g xops-pat` the versions within NPM may be out of date. It's better to do the following:
 
 ### Install for dev purposes
 
 1. Install Node.JS
 2. Clone this repo, then run `npm install` within it
-3. Setup the `pat` command by doing `npm link`
-4. Test it out on a PAT project
+3. Setup the `maestro` command by doing `npm link`
+4. Test it out on a Maestro project
 
 ## Goals
 
@@ -72,16 +72,16 @@ PAT is under heavy development. While it's possible to `npm install -g xops-pat`
 
 Below are future desired features, in approximate order of priority.
 
-1. High-level procedure editor ([#37](https://github.com/xOPERATIONS/pat/issues/37), currently under development by UMUC students): This will not perform editing of steps, but will allow for reorganization of tasks, adjusting task durations, etc.
-2. Modules ([#42](https://github.com/xOPERATIONS/pat/issues/42)): Pre-built step-generators. Just supply inputs, get the standards-compliant step text
-3. Variables ([#43](https://github.com/xOPERATIONS/pat/issues/43)): Certain values may be repeated many times throughout a procedure. Capture them as variables.
-4. Package/dependency manager ([#21](https://github.com/xOPERATIONS/pat/issues/21)): Allow reuse of common elements (e.g. egressing the airlock) or sharing tasks (two EVAs may carry the same task)
-5. Track state ([#44](https://github.com/xOPERATIONS/pat/issues/44)): During spacewalks, the crew move and reconfigure things. PAT should be able to track this.
+1. High-level procedure editor ([#37](https://github.com/xOPERATIONS/maestro/issues/37), currently under development by UMUC students): This will not perform editing of steps, but will allow for reorganization of tasks, adjusting task durations, etc.
+2. Modules ([#42](https://github.com/xOPERATIONS/maestro/issues/42)): Pre-built step-generators. Just supply inputs, get the standards-compliant step text
+3. Variables ([#43](https://github.com/xOPERATIONS/maestro/issues/43)): Certain values may be repeated many times throughout a procedure. Capture them as variables.
+4. Package/dependency manager ([#21](https://github.com/xOPERATIONS/maestro/issues/21)): Allow reuse of common elements (e.g. egressing the airlock) or sharing tasks (two EVAs may carry the same task)
+5. Track state ([#44](https://github.com/xOPERATIONS/maestro/issues/44)): During spacewalks, the crew move and reconfigure things. Maestro should be able to track this.
 6. Full editor: Edit all steps, handling modules, variables, state, etc, and integrate with GitLab (GitLab is used internally).
 
 ## Definitions
 
-PAT uses several terms like "actors", "roles", and "tasks". These need better definition.
+Maestro uses several terms like "actors", "roles", and "tasks". These need better definition.
 
 ## Videos
 
@@ -97,44 +97,9 @@ See [YAML Definition](docs/yamlDefinition.md) for an overview of YAML file synta
 
 ## Tests
 
-### Unit Testing
+### Unit Testing & linting
 
-**Unit tests require some serious re-work after PAT was overhauled to focus on DOCX generation**.
-
-This directory contains unit tests for the PAT project. Unit tests are
-automatically run by travis-ci after commits are made to this repo, and the
-build status is reported by a badge in the README.md in the project root.
-
-PAT unit tests use the Chai Assertion Library for assertions in unit
-tests. More information here: https://www.chaijs.com/api/bdd/
-
-To manually execute unit tests (which you should do BEFORE committing changes):
-
-```bash
-npm test
-```
-
-Mocha will generate a nice test report for you.
-
-* If any of the unit tests fail, you should fix them.
-* If statement coverage is below 50%, you should add more tests.
-
-### Integration Testing
-
-Run the program with sample YAML files.
-The following samples may be run from within the PAT directory
-- Sample using local files
-`node index.js --input samples/sta-134-eva/main.yml --output sta-134-aqua.html`
-- Sample with CSS on command line
-`node index.js --input samples/sta-134-eva/main.yml --css samples/sta-134-eva/custom.css --output sta-134-aqua.html`
-- Sample with CSS specified in input YAML file
-`node index.js --input samples/sta-134-eva/maincss.yml --output sta-134-aqua.html`
-- Sample with CSS on both command line and within input file
-`node index.js --input samples/sta-134-eva/maincss.yml --css samples/sta-134-eva/custom.css --output sta-134-aqua.html`
-- Sample with docx output
-`node index.js --input samples/sta-134-eva/maincss.yml --css samples/sta-134-eva/custom.css --output sta-134-aqua.html -d`
-Or
-`node index.js --input samples/sta-134-eva/maincss.yml --css samples/sta-134-eva/custom.css --output sta-134-aqua.html -d *outputfile.docx*`
+A pre-commit hook is in place forcing linting, style, and unit testing to all pass prior to making commits.
 
 ## Credits
 

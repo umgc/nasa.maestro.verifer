@@ -113,7 +113,7 @@ function buildProgramArguments(program, args) {
 
 	program
 		.version(ver.currentVersion, '--version')
-		.name('xops')
+		.name('maestro')
 		.description(pjson.description)
 		.option('-v, --verbose', 'Verbosity that can be increased from -v to -vvvv', increaseVerbosity, 0)
 		.allowUnknownOption();
@@ -129,8 +129,8 @@ function buildProgramArguments(program, args) {
 	};
 
 	program
-		.command('build [projectPath]')
-		.description('Build products for PAT project')
+		.command('compose [projectPath]')
+		.description('Build products for a Maestro project')
 		.option('-t, --template <.html>', 'specify a template to use')
 		.option('--html', 'Generate HTML file', null)
 		.option('--sodf', 'Generate SODF style procedure', null)

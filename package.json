@@ -1,11 +1,11 @@
 {
   "name": "xops-pat",
   "version": "3.0.0-rc1",
-  "description": "Procedure generator for space operations",
+  "description": "Composing procedures for space operations",
   "main": "index.js",
   "scripts": {
     "lint": "eslint . --color",
-    "lint-fix": "eslint . --color --fix",
+    "lint:fix": "eslint . --color --fix",
     "test": "mocha",
     "test:colors": "mocha  --colors",
     "test:coverage": "nyc --all --reporter=text --reporter=lcov npm run test"
@@ -15,11 +15,12 @@
     "test:colors"
   ],
   "bin": {
+    "maestro": "./index.js",
     "pat": "./index.js"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/xOPERATIONS/pat.git"
+    "url": "https://github.com/xOPERATIONS/maestro.git"
   },
   "contributors": [
     "James Montalvo",
@@ -43,9 +44,9 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/xOPERATIONS/pat/issues"
+    "url": "https://github.com/xOPERATIONS/maestro/issues"
   },
-  "homepage": "https://github.com/xOPERATIONS/pat#readme",
+  "homepage": "https://github.com/xOPERATIONS/maestro#readme",
   "dependencies": {
     "@svgdotjs/svg.js": "^3.0.13",
     "ajv": "^6.10.2",
