@@ -1,5 +1,4 @@
 .DS_Store
-**/*.html
 **/*.docx
 **/.nyc_output/
 **/coverage/
