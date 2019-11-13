@@ -44,6 +44,18 @@ Other formats are also available:
 - `maestro compose --html` generates an HTML version of the EVA format
 - Future output will support domain-specific formats
 
+### Serving HTML
+
+Ultimately Maestro will include a web application for composing and conducting procedures. For now,
+simply viewing the HTML versions of procedures can be achieved by doing:
+
+```bash
+maestro compose --html           # This generates HTML versions of procedures
+maestro conduct
+```
+
+To specify port, do `maestro conduct --port=8080`.
+
 ## Examples
 
 - Maestro generating STS-134 procedures using GitLab CI: https://gitlab.com/xOPERATIONS/sts-134
