@@ -48,10 +48,10 @@
   },
   "homepage": "https://github.com/xOPERATIONS/maestro#readme",
   "dependencies": {
-    "@svgdotjs/svg.js": "^3.0.13",
+    "@svgdotjs/svg.js": "^3.0.16",
     "ajv": "^6.10.2",
     "colors": "^1.4.0",
-    "commander": "^2.20.1",
+    "commander": "^2.20.3",
     "docx": "^5.0.0-rc7",
     "filenamify": "^4.1.0",
     "image-size": "^0.8.3",
@@ -63,7 +63,7 @@
   },
   "devDependencies": {
     "chai": "^4.2.0",
-    "eslint": "^6.5.1",
+    "eslint": "^6.6.0",
     "eslint-config-wikimedia": "^0.14.3",
     "jsdoc": "^3.6.3",
     "mocha": "^5.2.0",
