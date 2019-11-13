@@ -1,16 +1,8 @@
 'use strict';
 
-// returns a window with a document and an svg root node
-const window = require('svgdom');
-const document = window.document;
-const { SVG, registerWindow } = require('@svgdotjs/svg.js');
 const fs = require('fs');
 const svg2img = require('svg2img');
 const lodashFlatten = require('lodash/flatten');
-// const consoleHelper = require('../helpers/consoleHelper');
-
-// register window and document
-registerWindow(window, document);
 
 let conversionFactor,
 	maxWidth,
@@ -291,7 +283,7 @@ module.exports = class TimelineWriter {
 		/**
 		 * procedure.getColumnsOfActorsFillingRoles() returns 2D array like:
 		 *   [['SSRMS', 'IV'], ['EV1', 'CRONUS'], 'EV2']
-		 *
+		 *~
 		 * Flatten to:
 		 *   [ 'SSRMS', 'IV', 'EV1', 'CRONUS', 'EV2']
 		 *
@@ -335,6 +327,19 @@ module.exports = class TimelineWriter {
 	 * formats, not just SVG, but the code below is SVG-specific.
 	 */
 	create() {
+
+		// svgdom returns 'new Window()'. We don't want to get a reference to the same Window object
+		// on all uses. We want a new window each time. Get the Window constructor and construct our
+		// own new Window.
+		const WindowConstructor = require('svgdom').constructor;
+		const window = new WindowConstructor();
+
+		// When SVG timeline extends generic timeline, move this to top of file
+		const document = window.document;
+		const { SVG, registerWindow } = require('@svgdotjs/svg.js');
+
+		// register window and document
+		registerWindow(window, document);
 
 		// create canvas
 		this.canvas = SVG(document.documentElement);
