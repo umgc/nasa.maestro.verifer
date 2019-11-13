@@ -4,45 +4,6 @@ const fs = require('fs');
 const svg2img = require('svg2img');
 const lodashFlatten = require('lodash/flatten');
 
-let conversionFactor,
-	maxWidth,
-	maxHeight,
-	colWidth,
-	sidebarWidth,
-	leftTextMargin,
-	topTextMargin,
-	totalMinutes,
-	headerRowY,
-	imageHeight,
-	headerTextSize,
-	tickLengthMajor,
-	tickLengthMinor,
-	numColumns;
-
-function handleOptions(options) {
-	maxWidth = options.maxWidth || 950;
-	maxHeight = options.maxHeight || 660;
-	colWidth = options.colWidth || null; // if colWidth not specified, get from on maxWidth
-	sidebarWidth = options.sidebarWidth || 50;
-	leftTextMargin = options.leftTextMargin || 5;
-	topTextMargin = options.topTextMargin || 0;
-	headerRowY = options.headerRowY || 25;
-	headerTextSize = options.headerTextSize || 16;
-	tickLengthMajor = options.tickLengthMajor || 10;
-	tickLengthMinor = options.tickLengthMinor || 5;
-}
-
-const bottomPadding = 5;
-
-/**
- * Scale a number of minutes to pixels
- * @param {number} minutes  Number of minutes
- * @return {number}         Number of pixels
- */
-function minutesToPixels(minutes) {
-	return Math.floor(conversionFactor * minutes);
-}
-
 /**
  * Create a conversion factor for minutes to pixels. If we want to scale 10 minutes to 100 pixels:
  *   minutes * factor = pixels
@@ -52,11 +13,11 @@ function minutesToPixels(minutes) {
  * This function scales for the maximum height of the timeline minus extra stuff above and below
  * (header and footer items)
  *
- * @param {number} totalMinutes  Total number of minutes for this procedure/timeline
- * @return {number}              Converstion factor for minutes-->pixels
+ * @param {TimelineWriter} writer  Reference to TimelineWriter to get its options/settings
+ * @return {number}                Converstion factor for minutes-->pixels
  */
-function getConversionFactor(totalMinutes) {
-	return (maxHeight - bottomPadding - headerRowY) / totalMinutes;
+function getConversionFactor(writer) {
+	return (writer.maxHeight - writer.bottomPadding - writer.headerRowY) / writer.totalMinutes;
 }
 
 function addBox(canvas, opts = {}) {
@@ -132,19 +93,33 @@ function addText(canvas, opts, textFn) {
 
 }
 
-function getColumnLeft(columnIndex) {
-	return sidebarWidth + columnIndex * colWidth;
+function getColumnLeft(writer, columnIndex) {
+	return writer.sidebarWidth + columnIndex * writer.colWidth;
 }
 
-function addActivity(canvas, columnIndex, task, actor) {
+/**
+ * Scale a number of minutes to pixels
+ * @param {TimelineWriter} writer  TimelineWriter to get conversion factor from
+ * @param {number} minutes         Number of minutes
+ * @return {number}                Number of pixels
+ */
+function minutesToPixels(writer, minutes) {
+	return Math.floor(writer.conversionFactor * minutes);
+}
 
-	const xLeft = getColumnLeft(columnIndex);
+function addActivity(writer, columnIndex, task, actor) {
+
+	const canvas = writer.canvas;
+	const xLeft = getColumnLeft(writer, columnIndex);
 
 	const boxOpts = {
-		width: colWidth,
-		height: minutesToPixels(task.actorRolesDict[actor].duration.getTotalMinutes()),
+		width: writer.colWidth,
+		height: minutesToPixels(writer, task.actorRolesDict[actor].duration.getTotalMinutes()),
 		x: xLeft,
-		y: headerRowY + minutesToPixels(task.actorRolesDict[actor].startTime.getTotalMinutes()),
+		y: writer.headerRowY + minutesToPixels(
+			writer,
+			task.actorRolesDict[actor].startTime.getTotalMinutes()
+		),
 		stroke: '#000',
 		fillColor: task.color || '#F0FFFF'
 	};
@@ -152,8 +127,8 @@ function addActivity(canvas, columnIndex, task, actor) {
 	addBox(canvas, boxOpts);
 
 	const textOpts = {
-		x: boxOpts.x + leftTextMargin,
-		y: boxOpts.y + topTextMargin,
+		x: boxOpts.x + writer.leftTextMargin,
+		y: boxOpts.y + writer.topTextMargin,
 		color: '#000',
 		family: 'Arial',
 		size: 12 // potentially adjusted smaller below logic below
@@ -177,13 +152,14 @@ function addActivity(canvas, columnIndex, task, actor) {
 
 }
 
-function addColumnHeader(canvas, columnIndex, headerText) {
+function addColumnHeader(writer, columnIndex, headerText) {
 
-	const xLeft = getColumnLeft(columnIndex);
+	const canvas = writer.canvas;
+	const xLeft = getColumnLeft(writer, columnIndex);
 
 	const boxOpts = {
-		width: colWidth,
-		height: headerRowY,
+		width: writer.colWidth,
+		height: writer.headerRowY,
 		x: xLeft,
 		y: 0,
 		stroke: '#000',
@@ -194,11 +170,11 @@ function addColumnHeader(canvas, columnIndex, headerText) {
 
 	const textOpts = {
 		text: headerText.toUpperCase(),
-		x: xLeft + leftTextMargin + Math.floor(colWidth / 2),
-		y: Math.floor((headerRowY - headerTextSize) / 2),
+		x: xLeft + writer.leftTextMargin + Math.floor(writer.colWidth / 2),
+		y: Math.floor((writer.headerRowY - writer.headerTextSize) / 2),
 		color: '#000',
 		family: 'Arial',
-		size: headerTextSize,
+		size: writer.headerTextSize,
 		weight: 'bold',
 		anchor: 'middle',
 		leading: 0
@@ -208,10 +184,12 @@ function addColumnHeader(canvas, columnIndex, headerText) {
 
 }
 
-function addTimelineMarkings(canvas, numColumns) {
+function addTimelineMarkings(writer) {
+
+	const canvas = writer.canvas;
 
 	// how many half-hour segments to generate
-	const halfHours = Math.ceil(totalMinutes / 30);
+	const halfHours = Math.ceil(writer.totalMinutes / 30);
 
 	for (let i = 0; i <= halfHours; i++) {
 
@@ -223,15 +201,15 @@ function addTimelineMarkings(canvas, numColumns) {
 		const timeString = hours + minutes;
 
 		// line sticks out further from sidebar on hours than on half-hours
-		const tickLength = isHour ? tickLengthMajor : tickLengthMinor;
+		const tickLength = isHour ? writer.tickLengthMajor : writer.tickLengthMinor;
 
 		// start and end coordinates for each line
-		const y = headerRowY + minutesToPixels(i * 30);
-		const rightX = sidebarWidth + (numColumns * colWidth) + tickLength;
-		const leftX = sidebarWidth - tickLength;
+		const y = writer.headerRowY + minutesToPixels(writer, i * 30);
+		const rightX = writer.sidebarWidth + (writer.numColumns * writer.colWidth) + tickLength;
+		const leftX = writer.sidebarWidth - tickLength;
 
 		// right edge of image
-		const rightEdge = (2 * sidebarWidth) + (numColumns * colWidth);
+		const rightEdge = (2 * writer.sidebarWidth) + (writer.numColumns * writer.colWidth);
 
 		// draws a line across the whole timeline, from left sidebar to right sidebar
 		canvas
@@ -267,6 +245,24 @@ function addTimelineMarkings(canvas, numColumns) {
 
 }
 
+/**
+ * Set optional values or defaults
+ * @param {TimelineWriter} writer  Set options or defaults on this TimelineWriter object
+ * @param {Object} options         Options to override defaults
+ */
+function handleOptions(writer, options) {
+	writer.maxWidth = options.maxWidth || 950;
+	writer.maxHeight = options.maxHeight || 660;
+	writer.sidebarWidth = options.sidebarWidth || 50;
+	writer.leftTextMargin = options.leftTextMargin || 5;
+	writer.topTextMargin = options.topTextMargin || 0;
+	writer.headerRowY = options.headerRowY || 25;
+	writer.headerTextSize = options.headerTextSize || 16;
+	writer.tickLengthMajor = options.tickLengthMajor || 10;
+	writer.tickLengthMinor = options.tickLengthMinor || 5;
+	writer.bottomPadding = options.bottomPadding || 5;
+}
+
 module.exports = class TimelineWriter {
 
 	/**
@@ -277,8 +273,8 @@ module.exports = class TimelineWriter {
 	constructor(procedure, options = {}) {
 
 		this.procedure = procedure;
-		totalMinutes = procedure.getActualDuration().getTotalMinutes();
-		handleOptions(options);
+		this.totalMinutes = procedure.getActualDuration().getTotalMinutes();
+		handleOptions(this, options);
 
 		/**
 		 * procedure.getColumnsOfActorsFillingRoles() returns 2D array like:
@@ -307,17 +303,18 @@ module.exports = class TimelineWriter {
 			this.actorToTimelineColumn[actor] = index;
 		});
 
-		numColumns = this.columns.length;
-		colWidth = Math.floor((maxWidth - (2 * sidebarWidth)) / numColumns);
+		this.numColumns = this.columns.length;
+		this.colWidth = Math.floor((this.maxWidth - (2 * this.sidebarWidth)) / this.numColumns);
 
 		// Duration rounded up to the nearest half hour, so last tick-mark and time shows on sidebar
-		const roundMinutesUpToHalfHour = Math.ceil(totalMinutes / 30) * 30;
+		const roundMinutesUpToHalfHour = Math.ceil(this.totalMinutes / 30) * 30;
 
-		// Create pixels-to-minutes conversion factor, used by minutesToPixels function
-		conversionFactor = getConversionFactor(roundMinutesUpToHalfHour);
+		// Create pixels-to-minutes conversion factor, used by minutesToPixels()
+		this.conversionFactor = getConversionFactor(this, roundMinutesUpToHalfHour);
 
 		// bottomPadding gives room for text below line
-		imageHeight = headerRowY + minutesToPixels(roundMinutesUpToHalfHour) + bottomPadding;
+		this.imageHeight = this.headerRowY +
+			minutesToPixels(this, roundMinutesUpToHalfHour) + this.bottomPadding;
 
 	}
 
@@ -345,19 +342,19 @@ module.exports = class TimelineWriter {
 		this.canvas = SVG(document.documentElement);
 
 		// Create the underlying lines and text for the timeline (not tasks themselves)
-		addTimelineMarkings(this.canvas, numColumns);
+		addTimelineMarkings(this);
 
 		// Create the headers for each column
 		this.columns.forEach((actor, index) => {
 			const headerDisplay = this.procedure.getColumnHeaderTextByActor(actor);
-			addColumnHeader(this.canvas, index, headerDisplay);
+			addColumnHeader(this, index, headerDisplay);
 		});
 
 		// Add tasks to the timeline
 		for (const task of this.procedure.tasks) {
 			for (const actor in task.actorRolesDict) {
 				const columnIndex = this.actorToTimelineColumn[actor];
-				addActivity(this.canvas, columnIndex, task, actor);
+				addActivity(this, columnIndex, task, actor);
 			}
 		}
 
@@ -369,8 +366,8 @@ module.exports = class TimelineWriter {
 
 	writePNG(filename, callback) {
 		const dimensions = {
-			width: (2 * sidebarWidth) + (numColumns * colWidth),
-			height: imageHeight,
+			width: (2 * this.sidebarWidth) + (this.numColumns * this.colWidth),
+			height: this.imageHeight,
 			preserveAspectRatio: true
 		};
 		svg2img(
