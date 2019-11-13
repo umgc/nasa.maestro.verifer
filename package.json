@@ -1,6 +1,6 @@
 {
   "name": "xops-pat",
-  "version": "3.0.0-rc1",
+  "version": "4.0.0-rc1",
   "description": "Composing procedures for space operations",
   "main": "index.js",
   "scripts": {
