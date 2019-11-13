@@ -1,0 +1,108 @@
+procedure_name: Complex Times
+
+
+columns:
+
+  - key: IV
+    display: IV/SSRMS
+    actors:
+      - "*"
+      - EV3
+      - EV4
+
+  - key: EV1
+    actors: EV1
+    display: EV1
+
+  - key: EV2
+    actors: EV2
+    display: EV2
+
+tasks:
+
+
+  - file: Double-0.yml
+    roles:
+      crewA: EV1
+      crewB: EV2
+
+  - file: Single-0.yml
+    roles:
+      crewA: EV1
+
+  - file: Single-1.yml
+    roles:
+      crewA: EV1
+
+  - file: Single-2.yml
+    roles:
+      crewA: EV2
+
+  - file: Single-3.yml
+    roles:
+      crewA: EV2
+
+  - file: Double-1.yml
+    roles:
+      crewA: EV3
+      crewB: EV4
+
+  - file: Double-2.yml
+    roles:
+      crewA: EV3
+      crewB: EV1
+
+  - file: Single-4.yml
+    roles:
+      crewA: EV4
+
+  - file: Single-5.yml
+    roles:
+      crewA: EV4
+
+  - file: Triple-0.yml
+    roles:
+      crewA: EV3
+      crewB: EV1
+      crewC: EV2
+
+  - file: Triple-1.yml
+    roles:
+      crewA: EV2
+      crewB: EV3
+      crewC: EV1
+
+  - file: Double-3.yml
+    roles:
+      crewA: EV1
+      crewB: EV3
+
+  - file: Double-4.yml
+    roles:
+      crewA: EV3
+      crewB: EV1
+
+  - file: Single-6.yml
+    roles:
+      crewA: EV3
+
+  - file: Single-7.yml
+    roles:
+      crewA: EV1
+
+  - file: Single-8.yml
+    roles:
+      crewA: EV2
+
+  - file: Single-9.yml
+    roles:
+      crewA: EV2
+
+  - file: Double-5.yml
+    roles:
+      crewA: EV2
+      crewB: EV1
+
+
+
+

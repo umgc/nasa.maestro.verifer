@@ -1,0 +1,25 @@
+title: Triple 1
+
+roles:
+  - name: crewA
+    duration:
+      minutes: 23
+      offset:
+        minutes: 7
+
+  - name: crewB
+    duration:
+      minutes: 53
+      offset:
+        minutes: 3
+
+  - name: crewC
+    duration:
+      minutes: 37
+
+steps:
+
+  - crewA: Do stuff
+  - crewB: Do things
+  - crewC: Do stuff and things
+  - crewD: Do things and stuff

@@ -8,6 +8,8 @@ const filenamify = require('filenamify');
 const Column = require('./Column');
 const Task = require('./Task');
 const SpacewalkValidator = require('../schema/spacewalkValidator');
+const Duration = require('./Duration');
+const TimeSync = require('./TimeSync');
 
 function translatePath(procedureFilePath, taskFileName) {
 	// Look in tasks directory, sister to procedures directory
@@ -111,12 +113,27 @@ module.exports = class Procedure {
 		return keys;
 	}
 
+	getColumnIndex(key) {
+		for (let c = 0; c < this.columns.length; c++) {
+			if (this.columns[c].key === key) {
+				return c;
+			}
+		}
+		throw new Error(`key ${key} not found in columns`);
+	}
+
 	getColumnHeaderText() {
 		const headerTexts = [];
 		for (const column of this.columns) {
 			headerTexts.push(column.display);
 		}
 		return headerTexts;
+	}
+
+	getColumnHeaderTextByActor(actor) {
+		const colKey = this.getActorColumnKey(actor);
+		const colIndex = this.getColumnIndex(colKey);
+		return this.getColumnHeaderText()[colIndex];
 	}
 
 	getActorsInLeadRoles() {
@@ -145,6 +162,16 @@ module.exports = class Procedure {
 		return actorTasks;
 	}
 
+	/**
+	 * From the column definition in this procedure's YAML file, create an array of all defined
+	 * actors. This does NOT mean that other actors/roles are not present in the procedure. They
+	 * just may not have an explicit definition of which column to fall under.
+	 *
+	 * See also getColumnsOfActorsFillingRoles()
+	 *
+	 * @param {boolean} includeWildcard  Whether or not to include a '*' element in the array
+	 * @return {Array}                   Array of actors
+	 */
 	getAllActorsDefinedInColumns(includeWildcard = false) {
 		const allActors = [];
 		for (const col of this.columns) {
@@ -155,6 +182,104 @@ module.exports = class Procedure {
 			}
 		}
 		return allActors;
+	}
+
+	/**
+	 * Creates an array of actors within the columns their steps are displayed. Example:
+	 *
+	 * [
+	 *   ['IV', 'SSRMS'],  <-- first column has two actors
+	 *   ['EV1'],          <-- Second and third column have one actor, but still are in arrays
+	 *   ['EV2']
+	 * ]
+	 *
+	 * Note that actors are only present here if they are _filling roles_. Just because there is a
+	 * step like this:
+	 *
+	 * - step: Do some robotics stuff
+	 *   actor: ROBO
+	 *
+	 * This ^ does not mean that the actor "ROBO" will be present in the array returned by this
+	 * function. For that to happen, "ROBO" must fulfill a role via the procedure YAML file, e.g.:
+	 *
+	 * tasks:
+	 *  - file: some_task.yml
+	 *    roles:
+	 *      a_role_name: ROBO  <-- Within the procedure YAML file "ROBO" is the input to a task role
+	 *
+	 * ALSO NOTE that the returned array _may_ have empty elements, e.g. [<empty>, 'EV1', 'EV2'],
+	 * meaning there are no actors filling roles in the column with index = 0. To remove empty
+	 * elements set includeEmpty = false
+	 *
+	 * @param {boolean} includeEmpty  Whether or not to include empty elements
+	 * @return {Array}                2-dimensional array of actors in columns
+	 */
+	getColumnsOfActorsFillingRoles(includeEmpty = true) {
+
+		/**
+		 * Creates actorColumnIndexes like:
+		 * actorColumnIndexes = {
+		 *   IV: 0,
+		 *   SSRMS: 0,
+		 *   EV1: 1,
+		 *   EV2: 2
+		 * }
+		 */
+		const actorColumnIndexes = {};
+		for (const task of this.tasks) {
+			for (const actor in task.actorRolesDict) {
+				if (!actorColumnIndexes[actor]) {
+					actorColumnIndexes[actor] = task.procedure.getColumnIndex(
+						task.procedure.getActorColumnKey(actor)
+					);
+				}
+			}
+		}
+
+		const columns = [];
+		for (const actor in actorColumnIndexes) {
+			const index = actorColumnIndexes[actor];
+			if (!columns[index]) {
+				columns[index] = [];
+			}
+			columns[index].push(actor);
+		}
+
+		if (includeEmpty) {
+			return columns;
+		}
+
+		// strip out empty columns if desired
+		return columns.filter((cur) => {
+			return Boolean(cur);
+		});
+
+	}
+
+	/**
+	 * Procedures may have intended durations (e.g. common EVA length is 6 hours 30 minutes), but
+	 * the actual duration based upon summing task times may differ.
+	 *
+	 * @return {Duration} Duration object representing end time of last task
+	 */
+	getActualDuration() {
+		let longestEndTime;
+
+		for (const actor in this.taskEndpoints) {
+			const actorEndTime = this.taskEndpoints[actor] // for this actor get first/last task
+				.last // choose the last task
+				.actorRolesDict[actor] // .last points to task; within task, select actor's role
+				.endTime; // get the time this actor finishes this (last) task
+
+			if (!longestEndTime ||
+				actorEndTime.getTotalSeconds() > longestEndTime.getTotalSeconds()
+			) {
+				longestEndTime = actorEndTime;
+			}
+		}
+
+		// return a clone of the longest end time, in case the task moves
+		return longestEndTime.clone();
 	}
 
 	/**
@@ -221,6 +346,47 @@ module.exports = class Procedure {
 			));
 
 		}
+
+		const roleLatestAct = {};
+		for (const currentTask of this.tasks) {
+
+			// tasksDict[task.filename] = task;
+
+			for (const role in currentTask.actorRolesDict) {
+				if (roleLatestAct[role]) {
+
+					// set currentTask's previous task to be the last-added task for this role
+					currentTask.actorRolesDict[role].prevTask = roleLatestAct[role];
+
+					// set the last-added task's _next_ task to be the currentTask
+					roleLatestAct[role].actorRolesDict[role].nextTask = currentTask;
+
+					// start time of this task (for this role) is the end time of the previous task
+					// (for this role)
+					currentTask.actorRolesDict[role].startTime =
+						roleLatestAct[role].actorRolesDict[role].endTime;
+
+				} else {
+					// no previous tasks, initially assume this one starts at time zero
+					currentTask.actorRolesDict[role].startTime = new Duration({ seconds: 0 });
+				}
+
+				// end time of this task (for this role) is the start + duration
+				currentTask.actorRolesDict[role].endTime = Duration.sum(
+					currentTask.actorRolesDict[role].startTime,
+					currentTask.actorRolesDict[role].duration
+				);
+
+				// make the current task be the last added task
+				roleLatestAct[role] = currentTask;
+
+			}
+		}
+
+		this.timeSync = new TimeSync(this.tasks, false);
+		this.timeSync.sync();
+		// console.log(this.timeSync.toString());
+		this.taskEndpoints = this.timeSync.endpoints();
 
 		// Pull in css file if it is defined
 		if (procedureYaml.css) {

@@ -4,7 +4,7 @@ node_js:
   - "12"
 env:
   global:
-    - CC_TEST_REPORTER_ID=c247365a9a7270a8a0e198746a58db6228982a5fcec2f9d94dc081dba241e0a0
+    - CC_TEST_REPORTER_ID=227e6510e078b050107b37dbca1d0d728629339489d2f23452e658692d861245
 branches:
   only:
   - master

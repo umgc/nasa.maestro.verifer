@@ -1,0 +1,20 @@
+title: Double 4
+
+roles:
+  - name: crewA
+    duration:
+      hours: 1
+      minutes: 11
+      offset:
+        minutes: 13
+
+  - name: crewB
+    duration:
+      minutes: 47
+
+steps:
+
+  - crewA: Do stuff
+  - crewB: Do things
+  - crewC: Do stuff and things
+  - crewD: Do things and stuff

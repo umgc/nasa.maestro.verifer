@@ -1,0 +1,19 @@
+title: Double 0
+
+roles:
+  - name: crewA
+    duration:
+      minutes: 29
+      offset:
+        minutes: 17
+
+  - name: crewB
+    duration:
+      minutes: 47
+
+steps:
+
+  - crewA: Do stuff
+  - crewB: Do things
+  - crewC: Do stuff and things
+  - crewD: Do things and stuff
