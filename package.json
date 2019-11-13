@@ -53,6 +53,7 @@
     "colors": "^1.4.0",
     "commander": "^2.20.3",
     "docx": "^5.0.0-rc7",
+    "express": "^4.17.1",
     "filenamify": "^4.1.0",
     "image-size": "^0.8.3",
     "js-yaml": "^3.13.1",
