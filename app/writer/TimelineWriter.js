@@ -4,22 +4,6 @@ const fs = require('fs');
 const svg2img = require('svg2img');
 const lodashFlatten = require('lodash/flatten');
 
-/**
- * Create a conversion factor for minutes to pixels. If we want to scale 10 minutes to 100 pixels:
- *   minutes * factor = pixels
- *   10      * factor = 100     <-- factor of 10
- * Solving for factor:
- *   factor = pixels / minutes
- * This function scales for the maximum height of the timeline minus extra stuff above and below
- * (header and footer items)
- *
- * @param {TimelineWriter} writer  Reference to TimelineWriter to get its options/settings
- * @return {number}                Converstion factor for minutes-->pixels
- */
-function getConversionFactor(writer) {
-	return (writer.maxHeight - writer.bottomPadding - writer.headerRowY) / writer.totalMinutes;
-}
-
 function addBox(canvas, opts = {}) {
 	const required = ['width', 'height', 'x', 'y'];
 	const defaults = {
@@ -306,15 +290,18 @@ module.exports = class TimelineWriter {
 		// Duration rounded up to the nearest half hour, so last tick-mark and time shows on sidebar
 		const roundMinutesUpToHalfHour = Math.ceil(this.totalMinutes / 30) * 30;
 
-		// Create pixels-to-minutes conversion factor, used by minutesToPixels()
-		this.conversionFactor = getConversionFactor(this, roundMinutesUpToHalfHour);
+		this.imageHeight = this.maxHeight;
 
 		// bottomPadding gives room for text below line
-		this.imageHeight = this.headerRowY +
-			minutesToPixels(this, roundMinutesUpToHalfHour) + this.bottomPadding;
+		const contentHeight = this.imageHeight - this.headerRowY - this.bottomPadding;
+
+		// Create a conversion factor for minutes to pixels, minutesToPixels(). If we want to scale
+		// 10 minutes to 200 pixels, then we want to be able to say "how many pixels should 1 minute
+		// be?" This is answered by minutes * conversionFactor = pixels. To get the conversion
+		// factor we take the total number of minutes and the total content size.
+		this.conversionFactor = contentHeight / roundMinutesUpToHalfHour;
 
 		this.imageWidth = (2 * this.sidebarWidth) + (this.numColumns * this.colWidth);
-
 	}
 
 	/**
