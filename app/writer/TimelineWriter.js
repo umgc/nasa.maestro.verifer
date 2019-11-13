@@ -338,7 +338,7 @@ module.exports = class TimelineWriter {
 		registerWindow(window, document);
 
 		// create canvas
-		this.canvas = SVG(document.documentElement);
+		this.canvas = SVG(document.documentElement).size(this.imageWidth, this.imageHeight);
 
 		// Create the underlying lines and text for the timeline (not tasks themselves)
 		addTimelineMarkings(this);
