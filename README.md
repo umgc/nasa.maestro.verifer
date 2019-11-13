@@ -47,10 +47,10 @@ Other formats are also available:
 ### Serving HTML
 
 Ultimately Maestro will include a web application for composing and conducting procedures. For now,
-simply viewing the HTML versions of procedures can be done by doing:
+simply viewing the HTML versions of procedures can be achieved by doing:
 
 ```bash
-maestro compose --html  # Generate HTML versions of procedures
+maestro compose --html           # This generates HTML versions of procedures
 maestro conduct
 ```
 
