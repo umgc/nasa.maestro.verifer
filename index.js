@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 
 /**
- * This file contains the program entry point for PAT
+ * This file contains the command line entry point for Maestro
  */
 
 'use strict';
 
-const pat = require('./pat.js');
+const maestro = require('./maestro.js');
 
 (function() {
-	pat.run(process.argv);
+	maestro.run(process.argv);
 }());
