@@ -208,9 +208,6 @@ function addTimelineMarkings(writer) {
 		const rightX = writer.sidebarWidth + (writer.numColumns * writer.colWidth) + tickLength;
 		const leftX = writer.sidebarWidth - tickLength;
 
-		// right edge of image
-		const rightEdge = (2 * writer.sidebarWidth) + (writer.numColumns * writer.colWidth);
-
 		// draws a line across the whole timeline, from left sidebar to right sidebar
 		canvas
 			.line(
@@ -238,7 +235,7 @@ function addTimelineMarkings(writer) {
 		addText(canvas, textOptions);
 
 		// right sidebar marking text
-		textOptions.x = rightEdge - 28; // same text, just shift the x coordinate
+		textOptions.x = writer.imageWidth - 28; // same text, just shift the x coordinate
 		addText(canvas, textOptions);
 
 	}
@@ -316,6 +313,8 @@ module.exports = class TimelineWriter {
 		this.imageHeight = this.headerRowY +
 			minutesToPixels(this, roundMinutesUpToHalfHour) + this.bottomPadding;
 
+		this.imageWidth = (2 * this.sidebarWidth) + (this.numColumns * this.colWidth);
+
 	}
 
 	/**
@@ -366,7 +365,7 @@ module.exports = class TimelineWriter {
 
 	writePNG(filename, callback) {
 		const dimensions = {
-			width: (2 * this.sidebarWidth) + (this.numColumns * this.colWidth),
+			width: this.imageWidth,
 			height: this.imageHeight,
 			preserveAspectRatio: true
 		};
