@@ -2,7 +2,9 @@
     "definitions": {
         "step": {
             "oneOf": [
-                {"type": "string"},
+                {
+                    "type": "string"
+                },
                 {
                     "type": "array",
                     "items": {
@@ -10,27 +12,36 @@
                         "properties": {
                             "step": {
                                 "oneOf": [
-                                    {"type": "string"},
+                                    {
+                                        "type": "string"
+                                    },
                                     {
                                         "type": "array",
-                                        "items": {"type": "string"}
+                                        "items": {
+                                            "type": "string"
+                                        }
                                     }
                                 ]
                             },
                             "images": {
                                 "oneOf": [
-                                    {"type": "string"},
                                     {
-                                        "type": "array",
-                                        "items": {"type": "string"}
+                                        "type": "string"
                                     },
                                     {
                                         "type": "array",
                                         "items": {
-                                            "type": "object"
-                                            ,
+                                            "type": "string"
+                                        }
+                                    },
+                                    {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
                                             "properties": {
-                                                "path": { "type": "string" },
+                                                "path": {
+                                                    "type": "string"
+                                                },
                                                 "width": {
                                                     "type": "number",
                                                     "pattern": "^[0-9]+$"
@@ -44,50 +55,74 @@
                                     }
                                 ]
                             },
-                            "title": {"type": "string"},
+                            "title": {
+                                "type": "string"
+                            },
                             "checkboxes": {
                                 "oneOf": [
-                                    {"type": "string"},
+                                    {
+                                        "type": "string"
+                                    },
                                     {
                                         "type": "array",
-                                        "items": {"type": "string"}
+                                        "items": {
+                                            "type": "string"
+                                        }
                                     }
                                 ]
                             },
-                            "substeps": { "$ref": "#/definitions/step" },
+                            "substeps": {
+                                "$ref": "#/definitions/step"
+                            },
                             "warning": {
                                 "oneOf": [
-                                    {"type": "string"},
+                                    {
+                                        "type": "string"
+                                    },
                                     {
                                         "type": "array",
-                                        "items": {"type": "string"}
+                                        "items": {
+                                            "type": "string"
+                                        }
                                     }
                                 ]
                             },
                             "caution": {
                                 "oneOf": [
-                                    {"type": "string"},
+                                    {
+                                        "type": "string"
+                                    },
                                     {
                                         "type": "array",
-                                        "items": {"type": "string"}
+                                        "items": {
+                                            "type": "string"
+                                        }
                                     }
                                 ]
                             },
                             "comment": {
                                 "oneOf": [
-                                    {"type": "string"},
+                                    {
+                                        "type": "string"
+                                    },
                                     {
                                         "type": "array",
-                                        "items": {"type": "string"}
+                                        "items": {
+                                            "type": "string"
+                                        }
                                     }
                                 ]
                             },
                             "note": {
                                 "oneOf": [
-                                    {"type": "string"},
+                                    {
+                                        "type": "string"
+                                    },
                                     {
                                         "type": "array",
-                                        "items": {"type": "string"}
+                                        "items": {
+                                            "type": "string"
+                                        }
                                     }
                                 ]
                             }
@@ -99,7 +134,9 @@
     },
     "type": "object",
     "properties": {
-        "title": { "type": "string" },
+        "title": {
+            "type": "string"
+        },
         "roles": {
             "type": "array",
             "items": {
@@ -138,9 +175,11 @@
                         }
                     }
                 },
-                "required": ["name", "duration"]
+                "required": [
+                    "name",
+                    "duration"
+                ]
             }
-
         },
         "steps": {
             "type": "array",
@@ -149,12 +188,20 @@
                 "properties": {
                     "simo": {
                         "type": "object",
-                        "additionalProperties": { "$ref": "#/definitions/step" }
+                        "additionalProperties": {
+                            "$ref": "#/definitions/step"
+                        }
                     }
                 },
-                "additionalProperties": { "$ref": "#/definitions/step" }
+                "additionalProperties": {
+                    "$ref": "#/definitions/step"
+                }
             }
         }
     },
-    "required": ["title", "roles", "steps"]
+    "required": [
+        "title",
+        "roles",
+        "steps"
+    ]
 }

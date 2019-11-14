@@ -1,16 +1,24 @@
 {
     "type": "object",
     "properties": {
-        "procedure_name": { "type": "string" },
+        "procedure_name": {
+            "type": "string"
+        },
         "actors": {
             "type": "array",
             "items": {
                 "type": "object",
                 "properties": {
-                    "id": { "type": "string"},
-                    "name": { "type": "string"}
+                    "id": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    }
                 },
-                "required": ["id"]
+                "required": [
+                    "id"
+                ]
             }
         },
         "tasks": {
@@ -18,17 +26,28 @@
             "items": {
                 "type": "object",
                 "properties": {
-                    "file": { "type": "string"},
-                    "roles": { "type": "object"}
+                    "file": {
+                        "type": "string"
+                    },
+                    "roles": {
+                        "type": "object"
+                    }
                 },
                 "anyOf": [
                     {
-                        "required": ["file"]
+                        "required": [
+                            "file"
+                        ]
                     }
                 ]
             }
         },
-        "css": {"type": "string"}
+        "css": {
+            "type": "string"
+        }
     },
-    "required": ["procedure_name", "tasks"]
+    "required": [
+        "procedure_name",
+        "tasks"
+    ]
 }
