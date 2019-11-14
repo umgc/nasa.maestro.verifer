@@ -138,6 +138,10 @@ All items must be of the type: `object` with following properties:
 
 ## steps
 
+An array of steps that make up the task. Each step is either a single actor, or a "simo", which represents multiple
+actors which perform a step simultaneously. Each entry in the array can be visualized as a row (consisting of multiple
+steps) in the output table.
+
 `steps`
 
 - is **required**
@@ -155,6 +159,11 @@ All items must be of the type: `object` with following properties:
 | `simo`   | object | Optional |
 
 #### simo
+
+An array of actors. A simo represents multiple actors whom preform steps simultaneously. This is rendered in the table
+as aligning the first step for each actor in the array of steps. This can be visualized in the table as a single row
+(consisting of multiple steps), with entries for each column associated with the actors identified in the array. Each
+simo consists of an array of actors that perform steps simultaneously.
 
 `simo`
 

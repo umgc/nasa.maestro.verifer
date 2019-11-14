@@ -20,6 +20,9 @@
 
 ## actors
 
+Array of actors that will be participating in the spacewalk. Actors are rendered as columns in the outputted table.
+Each entry in the array consists of a role, and an optional name.
+
 `actors`
 
 - is optional
@@ -50,6 +53,9 @@ All items must be of the type: `object` with following properties:
 
 #### name
 
+(POSSIBLY INACCURATE: This is likely moved into the 'columns' array) The actor's name. If present, the name is placed
+in parentheses and appended to the role as the column header.
+
 `name`
 
 - is optional
@@ -60,6 +66,8 @@ All items must be of the type: `object` with following properties:
 `string`
 
 ## css
+
+DEPRECATED. Not really relevant to current Maestro.
 
 `css`
 
@@ -85,6 +93,8 @@ All items must be of the type: `object` with following properties:
 
 ## tasks
 
+An array of tasks that make up the EVA/spacewalk. Each entry in the array is a file.
+
 `tasks`
 
 - is **required**
@@ -104,6 +114,9 @@ All items must be of the type: `object` with following properties:
 
 #### file
 
+Relative path from this file to a file which represents a tasks to be completed during the procedure. Used for
+re-usability.
+
 `file`
 
 - is optional
@@ -114,6 +127,8 @@ All items must be of the type: `object` with following properties:
 `string`
 
 #### roles
+
+The roles required to be filled for the task. This will map to the roles in the task file.
 
 `roles`
 
