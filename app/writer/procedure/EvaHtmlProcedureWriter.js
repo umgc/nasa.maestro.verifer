@@ -1,7 +1,10 @@
 'use strict';
 
+const path = require('path');
+
 const HtmlProcedureWriter = require('./HtmlProcedureWriter');
 const EvaHtmlTaskWriter = require('../task/EvaHtmlTaskWriter');
+const TimelineWriter = require('../TimelineWriter');
 
 module.exports = class EvaHtmlProcedureWriter extends HtmlProcedureWriter {
 
@@ -13,6 +16,22 @@ module.exports = class EvaHtmlProcedureWriter extends HtmlProcedureWriter {
 	// getRightTabPosition() {}
 	// getPageSize() {}
 	// getPageMargins() {}
+
+	renderIntro() {
+
+		const timeline = new TimelineWriter(this.procedure);
+		timeline.create();
+
+		const svgFilename = `${this.procedure.filename}.summary.timeline.svg`;
+		timeline.writeSVG(path.join(
+			this.program.outputPath,
+			svgFilename
+		));
+
+		this.content += `<h2>${this.procedure.name} - Summary Timeline</h2>`;
+		this.content += `<img src="${svgFilename}" />`;
+
+	}
 
 	renderTask(task) {
 
