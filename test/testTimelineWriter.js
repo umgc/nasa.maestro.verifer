@@ -8,7 +8,7 @@ const path = require('path');
 const assert = require('chai').assert;
 // const PNG = require('pngjs').PNG; // attempted to use for PNG checking. See writePNG() below.
 
-const TimelineWriter = require('../app/writer/TimelineWriter');
+const TimelineWriter = require('../app/writer/timeline/TimelineWriter');
 const Procedure = require('../app/model/Procedure');
 
 const tests = [

@@ -7,7 +7,7 @@ const fs = require('fs');
 const DocxProcedureWriter = require('./DocxProcedureWriter');
 const EvaDocxTaskWriter = require('../task/EvaDocxTaskWriter');
 // const consoleHelper = require('../../helpers/consoleHelper');
-const TimelineWriter = require('../TimelineWriter');
+const TimelineWriter = require('../timeline/TimelineWriter');
 
 module.exports = class EvaDocxProcedureWriter extends DocxProcedureWriter {
 

@@ -4,7 +4,7 @@ const path = require('path');
 
 const HtmlProcedureWriter = require('./HtmlProcedureWriter');
 const EvaHtmlTaskWriter = require('../task/EvaHtmlTaskWriter');
-const TimelineWriter = require('../TimelineWriter');
+const TimelineWriter = require('../timeline/TimelineWriter');
 
 module.exports = class EvaHtmlProcedureWriter extends HtmlProcedureWriter {
 
