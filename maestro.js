@@ -149,6 +149,7 @@ function doCompose() {
 			if (program.html) {
 				console.log('Creating EVA HTML format');
 				const evaHtml = new EvaHtmlProcedureWriter(program, procedure);
+				evaHtml.renderIntro();
 				evaHtml.renderTasks();
 				evaHtml.writeFile(path.join(
 					program.outputPath,
