@@ -13,8 +13,11 @@
 	<title>{{title}}</title>
 </head>
 <body>
-	{{content}}
-	{{footer}}
-	{% include "app.njk" %}
+	{% include "overview.html" %}
+	<div id="content">
+		{{content}}
+		{{footer}}
+	</div>
+	<script>{% include "timeline.js" %}</script>
 </body>
 </html>
