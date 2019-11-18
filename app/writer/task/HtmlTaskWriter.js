@@ -117,7 +117,7 @@ module.exports = class HtmlTaskWriter extends TaskWriter {
 	}
 
 	addCheckStepText(stepText, level) {
-		return this.addStepText(`☐ ${stepText}`, { level: level });
+		return this.addStepText(`<label><input class="step" type="checkbox" />${stepText}</label>`, { level: level });
 	}
 
 	addTitleText(step) {
