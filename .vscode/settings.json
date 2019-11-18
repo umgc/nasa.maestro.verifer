@@ -1,6 +1,5 @@
 {
     "editor.rulers": [100],
-    "workbench.colorCustomizations": {
-        "editorRuler.foreground": "#a6ff94"
-    }    
+    "eslint.autoFixOnSave": true,
+    "files.insertFinalNewline": true
 }
