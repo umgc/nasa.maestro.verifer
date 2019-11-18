@@ -1,4 +1,8 @@
 {
+	"env": {
+		"browser": true,
+		"node": true
+	},
 	"extends": [
 		// Based upon Wikimedia Foundation guidelines [1]. Why WMF? It's
 		// maintained by a good-enough democracy that will probably make better
