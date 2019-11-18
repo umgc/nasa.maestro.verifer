@@ -71,6 +71,11 @@ Maestro is under heavy development. While it's possible to `npm install -g xops-
 3. Setup the `maestro` command by doing `npm link`
 4. Test it out on a Maestro project
 
+### Development and Testing
+
+* There is a git commit hook that runs eslint and tests against your code. Any failures will prevent a commit.
+* If you use [VS Code](https://code.visualstudio.com/), we recommend installing the [eslint extension](https://github.com/microsoft/vscode-eslint) to see linting messages in your editor as you work.
+
 ## Goals
 
 1. Procedures can represent multiple actors performing actions in parallel
