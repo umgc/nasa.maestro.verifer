@@ -85,7 +85,7 @@ module.exports = class HtmlTaskWriter extends TaskWriter {
 	 * ! TBD a description
 	 * @param {*} stepText        Text to turn into a step
 	 * @param {*} options         options = { level: 0, actors: [], columnKey: "" }
-	 * @return {docx.Paragraph}   DOCX paragraph object
+	 * @return {string}
 	 */
 	addStepText(stepText, options = {}) {
 		if (!options.level) {
