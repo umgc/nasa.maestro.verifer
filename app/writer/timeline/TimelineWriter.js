@@ -81,16 +81,6 @@ function getColumnLeft(writer, columnIndex) {
 	return writer.sidebarWidth + columnIndex * writer.colWidth;
 }
 
-/**
- * Scale a number of minutes to pixels
- * @param {TimelineWriter} writer  TimelineWriter to get conversion factor from
- * @param {number} minutes         Number of minutes
- * @return {number}                Number of pixels
- */
-function minutesToPixels(writer, minutes) {
-	return Math.floor(writer.conversionFactor * minutes);
-}
-
 function addActivity(writer, columnIndex, task, actor) {
 
 	const canvas = writer.canvas;
@@ -98,10 +88,9 @@ function addActivity(writer, columnIndex, task, actor) {
 
 	const boxOpts = {
 		width: writer.colWidth,
-		height: minutesToPixels(writer, task.actorRolesDict[actor].duration.getTotalMinutes()),
+		height: writer.minutesToPixels(task.actorRolesDict[actor].duration.getTotalMinutes()),
 		x: xLeft,
-		y: writer.headerRowY + minutesToPixels(
-			writer,
+		y: writer.headerRowY + writer.minutesToPixels(
 			task.actorRolesDict[actor].startTime.getTotalMinutes()
 		),
 		stroke: '#000',
@@ -188,7 +177,7 @@ function addTimelineMarkings(writer) {
 		const tickLength = isHour ? writer.tickLengthMajor : writer.tickLengthMinor;
 
 		// start and end coordinates for each line
-		const y = writer.headerRowY + minutesToPixels(writer, i * 30);
+		const y = writer.headerRowY + writer.minutesToPixels(i * 30);
 		const rightX = writer.sidebarWidth + (writer.numColumns * writer.colWidth) + tickLength;
 		const leftX = writer.sidebarWidth - tickLength;
 
@@ -367,5 +356,14 @@ module.exports = class TimelineWriter {
 				callback(dimensions);
 			}
 		);
+	}
+
+	/**
+	 * Scale a number of minutes to pixels
+	 * @param {number} minutes         Number of minutes
+	 * @return {number}                Number of pixels
+	 */
+	minutesToPixels(minutes) {
+		return Math.floor(this.conversionFactor * minutes);
 	}
 };

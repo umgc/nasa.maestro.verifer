@@ -16,14 +16,29 @@ const tests = [
 		file: 'cases/simple/procedures/proc.yml',
 		expected: {
 			columns: ['EV1', 'EV3'],
-			actorToTimelineColumn: { EV1: 0, EV3: 1 }
+			actorToTimelineColumn: { EV1: 0, EV3: 1 },
+			minutesToPixels: {
+				0: 0,
+				30: 630,
+				60: 1260,
+				90: 1890,
+				120: 2520
+			}
 		}
 	},
 	{
 		file: 'cases/complex-times/procedures/proc.yml',
 		expected: {
 			columns: ['EV3', 'EV4', 'EV1', 'EV2'],
-			actorToTimelineColumn: { EV3: 0, EV4: 1, EV1: 2, EV2: 3 }
+			actorToTimelineColumn: { EV3: 0, EV4: 1, EV1: 2, EV2: 3 },
+			minutesToPixels: {
+				0: 0,
+				30: 42,
+				60: 84,
+				90: 125, // note rounding here
+				120: 168,
+				150: 210
+			}
 		}
 	}
 ];
@@ -109,6 +124,18 @@ describe('TimelineWriter', function() {
 
 			it(`should create expected SVG for ${test.file}`, function() {
 				assert.strictEqual(msg, goodMsg); // see NOTE above
+			});
+		}
+	});
+
+	describe('minutesToPixels()', function() {
+		for (const test of tests) {
+			it(`should give expected pixels for ${test.file}`, function() {
+				for (const input in test.expected.minutesToPixels) {
+					const actualOutput = test.timeline.minutesToPixels(input);
+					const expectedOutput = test.expected.minutesToPixels[input];
+					assert.strictEqual(actualOutput, expectedOutput);
+				}
 			});
 		}
 	});
