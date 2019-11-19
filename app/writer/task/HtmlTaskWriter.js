@@ -106,18 +106,25 @@ module.exports = class HtmlTaskWriter extends TaskWriter {
 			const isPrimeActor = actorToColumnIntersect.length > 0;
 
 			if (!isPrimeActor) {
-				actorText = `<strong>${options.actors[0]}: </strong>`;
+				actorText = options.actors[0];
 			}
 		}
 
 		// added class li-level-${options.level} really just as a way to remind that
 		// some handling of this will be necessary
-		return `<li class="li-level-${options.level}">
-			${actorText}${this.textTransform.transform(stepText).join('')}</li>`;
+		return nunjucksEnvironment.render('step-text.html', {
+			level: options.level,
+			actorText,
+			stepText: this.textTransform.transform(stepText).join('')
+		});
 	}
 
-	addCheckStepText(stepText, level) {
-		return this.addStepText(`<label><input class="step" type="checkbox" />${stepText}</label>`, { level: level });
+	addCheckStepText(stepText, level, parent) {
+		return nunjucksEnvironment.render('checkbox-step-text.html', {
+			parent,
+			stepText: this.textTransform.transform(stepText).join(''),
+			level
+		});
 	}
 
 	addTitleText(step) {

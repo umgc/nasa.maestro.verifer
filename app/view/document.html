@@ -11,11 +11,15 @@
 	{% include "css.njk" %}
 
 	<title>{{title}}</title>
-	<!-- momentjs is used for date parsing -->
+	<!-- momentjs is used for datetime parsing -->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment-duration-format/2.3.2/moment-duration-format.min.js"></script>
 </head>
 <body>
+	<script>
+		// globally track all tasks as parsed from the yaml by `maestro`
+		const tasks = [];
+	</script>
 	{% include "overview.html" %}
 	<div id="content">
 		{{content}}

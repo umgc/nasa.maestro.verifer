@@ -12,21 +12,34 @@ const petSpan = document.querySelector('span#pet');
 const timerButton = document.querySelector('button#timer');
 const timerSpan = document.querySelector('span#start-stop');
 
+/**
+PET timer logic
+*/
+
 let timerRunning = false;
+// used to accomplish the blinking colon effect when the timer is running
+let showColon = true;
 const timerInterval = 1000;
 const pet = moment.duration();
 
 timerButton.onclick = () => {
 	timerRunning = !timerRunning;
 	timerSpan.textContent = timerRunning ? 'Stop' : 'Start';
+	petSpan.textContent = pet.format('HH:mm', { trim: false });
+	showColon = false;
 };
 
 setInterval(() => {
 	if (timerRunning) {
 		pet.add(timerInterval, 'milliseconds');
-		petSpan.textContent = pet.format('HH:mm', { trim: false });
+		petSpan.textContent = pet.format(`HH${showColon ? ':' : ' '}mm`, { trim: false });
+		showColon = !showColon;
 	}
 }, timerInterval);
+
+/**
+Step click logic
+*/
 
 // all the step checkboxes
 const stepInputs = document.querySelectorAll('input.step');

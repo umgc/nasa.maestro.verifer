@@ -23,6 +23,8 @@ module.exports = class EvaHtmlTaskWriter extends HtmlTaskWriter {
 		this.numContentRows = task.concurrentSteps.length;
 		this.numRows = this.numContentRows + 1;
 
+		// this.embedTask = this.embedTask.bind(this);
+
 		// this.divisionIndex = 0;
 
 		this.tableContents = '';
@@ -108,4 +110,28 @@ module.exports = class EvaHtmlTaskWriter extends HtmlTaskWriter {
 		return steps;
 	}
 
+	embedTask(task) {
+		// TODO: what if we hashed each checkbox / pertinent info in the step for faster lookup?
+		// we could also drop that hash in the input for each checkbox to facilitate timing calcs
+		console.log(task);
+		// https://stackoverflow.com/a/11616993
+		const cache = [];
+		return nunjucksEnvironment.render(
+			'embedded-task.html',
+			{
+				task: JSON.stringify(task, (key, value) => {
+					if (typeof value === 'object' && value !== null) {
+						if (cache.indexOf(value) !== -1) {
+							// Duplicate reference found, discard key
+							return;
+						}
+						// Store value in our collection
+						cache.push(value);
+					}
+					return value;
+				})
+			}
+		);
+
+	}
 };
