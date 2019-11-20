@@ -14,7 +14,7 @@
   </a>
 
   <br />
-  <img src="docs/pat-command.gif" alt="maestro, formerly pat, in terminal" />
+  <img src="docs/maestro-command.gif" alt="maestro in terminal" />
 
 </div>
 
