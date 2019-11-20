@@ -1,4 +1,4 @@
-/* global moment */
+/* global moment, tasks */
 'use strict';
 
 /**
@@ -16,12 +16,13 @@ const timerSpan = document.querySelector('span#start-stop');
 PET timer logic
 */
 
-let timerRunning = false;
 // used to accomplish the blinking colon effect when the timer is running
 let showColon = true;
-const timerInterval = 1000;
-const pet = moment.duration();
 
+// manage the timer itself
+const pet = moment.duration();
+const timerInterval = 1000;
+let timerRunning = false;
 timerButton.onclick = () => {
 	timerRunning = !timerRunning;
 	timerSpan.textContent = timerRunning ? 'Stop' : 'Start';
@@ -36,6 +37,16 @@ setInterval(() => {
 		showColon = !showColon;
 	}
 }, timerInterval);
+
+/**
+Initialize timeline info
+*/
+
+// const durationMap = new Map();
+// const concurrentSteps = document.querySelectorAll('');
+console.log(tasks);
+// iterate through all steps, use them as a key with a value of the task being used
+// then when a step is checked/unchecked, just use the map to determine which task changed
 
 /**
 Step click logic
