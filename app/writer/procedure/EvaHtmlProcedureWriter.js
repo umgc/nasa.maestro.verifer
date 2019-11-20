@@ -1,10 +1,8 @@
 'use strict';
 
-const path = require('path');
-
 const HtmlProcedureWriter = require('./HtmlProcedureWriter');
 const EvaHtmlTaskWriter = require('../task/EvaHtmlTaskWriter');
-const TimelineWriter = require('../timeline/TimelineWriter');
+const HtmlTimelineWriter = require('../timeline/HtmlTimelineWriter');
 
 module.exports = class EvaHtmlProcedureWriter extends HtmlProcedureWriter {
 
@@ -19,17 +17,10 @@ module.exports = class EvaHtmlProcedureWriter extends HtmlProcedureWriter {
 
 	renderIntro() {
 
-		const timeline = new TimelineWriter(this.procedure);
-		timeline.create();
+		const timeline = new HtmlTimelineWriter(this.procedure);
+		const html = timeline.create();
 
-		const svgFilename = `${this.procedure.filename}.summary.timeline.svg`;
-		timeline.writeSVG(path.join(
-			this.program.outputPath,
-			svgFilename
-		));
-
-		this.content += `<h2>${this.procedure.name} - Summary Timeline</h2>`;
-		this.content += `<img src="${svgFilename}" />`;
+		this.content += `<h2>${this.procedure.name} - Summary Timeline</h2>${html}`;
 
 	}
 

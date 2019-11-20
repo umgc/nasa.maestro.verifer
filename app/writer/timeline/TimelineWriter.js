@@ -77,6 +77,12 @@ function addText(canvas, opts, textFn) {
 
 }
 
+/**
+ * Get x-coordinate of the left edge of a column in pixels
+ * @param {TimelineWriter} writer  Instance of TimelineWriter
+ * @param {number} columnIndex     Index of the column
+ * @return {number}             Pixels of the left edge of the column
+ */
 function getColumnLeft(writer, columnIndex) {
 	return writer.sidebarWidth + columnIndex * writer.colWidth;
 }
@@ -84,18 +90,17 @@ function getColumnLeft(writer, columnIndex) {
 function addActivity(writer, columnIndex, task, actor) {
 
 	const canvas = writer.canvas;
-	const xLeft = getColumnLeft(writer, columnIndex);
 
 	const boxOpts = {
 		width: writer.colWidth,
 		height: writer.minutesToPixels(task.actorRolesDict[actor].duration.getTotalMinutes()),
-		x: xLeft,
+		x: getColumnLeft(writer, columnIndex),
 		y: writer.headerRowY + writer.minutesToPixels(
 			task.actorRolesDict[actor].startTime.getTotalMinutes()
-		),
-		stroke: '#000',
-		fillColor: task.color || '#F0FFFF'
+		)
 	};
+	boxOpts.stroke = '#000';
+	boxOpts.fillColor = task.color || '#F0FFFF';
 
 	addBox(canvas, boxOpts);
 
@@ -366,4 +371,5 @@ module.exports = class TimelineWriter {
 	minutesToPixels(minutes) {
 		return Math.floor(this.conversionFactor * minutes);
 	}
+
 };
