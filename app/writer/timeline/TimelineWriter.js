@@ -3,41 +3,24 @@
 const fs = require('fs');
 const svg2img = require('svg2img');
 const lodashFlatten = require('lodash/flatten');
+const objectHelper = require('../../helpers/objectHelper');
 
 function addBox(canvas, opts = {}) {
-	const required = ['width', 'height', 'x', 'y'];
-	const defaults = {
+	objectHelper.requireProps(opts, ['width', 'height', 'x', 'y']);
+	objectHelper.defaults(opts, {
 		stroke: '#000',
 		fillColor: '#000'
-	};
-	for (const prop of required) {
-		if (opts[prop] === null) {
-			throw new Error(`Function requires ${prop} property of options argument`);
-		}
-	}
-	for (const prop in defaults) {
-		if (opts[prop] === null) {
-			opts[prop] = defaults[prop];
-		}
-	}
+	});
 
 	canvas
-		.rect(
-			opts.width,
-			opts.height
-		)
+		.rect(opts.width, opts.height)
 		.stroke(opts.stroke)
-		.move(
-			opts.x,
-			opts.y
-		)
+		.move(opts.x, opts.y)
 		.fill(opts.fillColor);
 }
 
 function addText(canvas, opts, textFn) {
-
-	// set option defaults
-	const defaults = {
+	objectHelper.defaults(opts, {
 		text: '<placeholder text>',
 		x: 0,
 		y: 0,
@@ -47,25 +30,14 @@ function addText(canvas, opts, textFn) {
 		weight: 'normal',
 		anchor: 'start',
 		leading: 1.3
-	};
-
-	// todo Make an app/helpers/defaults.js to do this. Could also use npm package 'defaults' but
-	// todo this is so straightforward it seems better to limit dependencies
-	for (const prop in defaults) {
-		if (typeof opts[prop] === 'undefined') {
-			opts[prop] = defaults[prop];
-		}
-	}
+	});
 
 	const text = textFn || opts.text;
 
 	// Add the text to the canvas
 	canvas
 		.text(text)
-		.move(
-			opts.x,
-			opts.y
-		)
+		.move(opts.x, opts.y)
 		.font({
 			fill: opts.color,
 			family: opts.family,
@@ -77,36 +49,30 @@ function addText(canvas, opts, textFn) {
 
 }
 
+/**
+ * Get x-coordinate of the left edge of a column in pixels
+ * @param {TimelineWriter} writer  Instance of TimelineWriter
+ * @param {number} columnIndex     Index of the column
+ * @return {number}             Pixels of the left edge of the column
+ */
 function getColumnLeft(writer, columnIndex) {
 	return writer.sidebarWidth + columnIndex * writer.colWidth;
-}
-
-/**
- * Scale a number of minutes to pixels
- * @param {TimelineWriter} writer  TimelineWriter to get conversion factor from
- * @param {number} minutes         Number of minutes
- * @return {number}                Number of pixels
- */
-function minutesToPixels(writer, minutes) {
-	return Math.floor(writer.conversionFactor * minutes);
 }
 
 function addActivity(writer, columnIndex, task, actor) {
 
 	const canvas = writer.canvas;
-	const xLeft = getColumnLeft(writer, columnIndex);
 
 	const boxOpts = {
 		width: writer.colWidth,
-		height: minutesToPixels(writer, task.actorRolesDict[actor].duration.getTotalMinutes()),
-		x: xLeft,
-		y: writer.headerRowY + minutesToPixels(
-			writer,
+		height: writer.minutesToPixels(task.actorRolesDict[actor].duration.getTotalMinutes()),
+		x: getColumnLeft(writer, columnIndex),
+		y: writer.headerRowY + writer.minutesToPixels(
 			task.actorRolesDict[actor].startTime.getTotalMinutes()
-		),
-		stroke: '#000',
-		fillColor: task.color || '#F0FFFF'
+		)
 	};
+	boxOpts.stroke = '#000';
+	boxOpts.fillColor = task.color || '#F0FFFF';
 
 	addBox(canvas, boxOpts);
 
@@ -188,18 +154,13 @@ function addTimelineMarkings(writer) {
 		const tickLength = isHour ? writer.tickLengthMajor : writer.tickLengthMinor;
 
 		// start and end coordinates for each line
-		const y = writer.headerRowY + minutesToPixels(writer, i * 30);
+		const y = writer.headerRowY + writer.minutesToPixels(i * 30);
 		const rightX = writer.sidebarWidth + (writer.numColumns * writer.colWidth) + tickLength;
 		const leftX = writer.sidebarWidth - tickLength;
 
 		// draws a line across the whole timeline, from left sidebar to right sidebar
 		canvas
-			.line(
-				leftX,
-				y,
-				rightX,
-				y
-			)
+			.line(leftX, y, rightX, y)
 			.stroke({
 				width: 1,
 				color: 'black'
@@ -308,6 +269,8 @@ module.exports = class TimelineWriter {
 	 * Generate the actual timeline SVG. This is broken into its own function rather than being done
 	 * in the constructor because the construct will likely be generalized for multiple timeline
 	 * formats, not just SVG, but the code below is SVG-specific.
+	 *
+	 * @return {string} SVG's XML
 	 */
 	create() {
 
@@ -344,6 +307,7 @@ module.exports = class TimelineWriter {
 			}
 		}
 
+		return this.canvas.svg();
 	}
 
 	writeSVG(filename) {
@@ -368,4 +332,14 @@ module.exports = class TimelineWriter {
 			}
 		);
 	}
+
+	/**
+	 * Scale a number of minutes to pixels
+	 * @param {number} minutes         Number of minutes
+	 * @return {number}                Number of pixels
+	 */
+	minutesToPixels(minutes) {
+		return Math.floor(this.conversionFactor * minutes);
+	}
+
 };

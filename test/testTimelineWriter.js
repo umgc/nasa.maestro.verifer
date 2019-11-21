@@ -8,54 +8,14 @@ const path = require('path');
 const assert = require('chai').assert;
 // const PNG = require('pngjs').PNG; // attempted to use for PNG checking. See writePNG() below.
 
-const TimelineWriter = require('../app/writer/TimelineWriter');
-const Procedure = require('../app/model/Procedure');
-
-const tests = [
-	{
-		file: 'cases/simple/procedures/proc.yml',
-		expected: {
-			columns: ['EV1', 'EV3'],
-			actorToTimelineColumn: { EV1: 0, EV3: 1 }
-		}
-	},
-	{
-		file: 'cases/complex-times/procedures/proc.yml',
-		expected: {
-			columns: ['EV3', 'EV4', 'EV1', 'EV2'],
-			actorToTimelineColumn: { EV3: 0, EV4: 1, EV1: 2, EV2: 3 }
-		}
-	}
-];
-
-function createProcedure(filepath) {
-	const procedure = new Procedure();
-	const err = procedure.populateFromFile(filepath);
-	if (err) {
-		throw new Error(err);
-	}
-	return procedure;
-}
-
-for (const test of tests) {
-	const filepath = path.join(__dirname, test.file);
-
-	// create the procedure associated with this file
-	test.procedure = createProcedure(filepath);
-
-	// Create Procedure.toJSON() to handle circular refs, then use it to determine idempotency here
-	// create it again, for use in idempotency tests
-	// test.expected.untouchedProcedure = createProcedure(test.file);
-
-	test.timeline = new TimelineWriter(test.procedure);
-
-	test.buildDir = path.join(filepath, '../../build');
-}
+const TimelineWriter = require('../app/writer/timeline/TimelineWriter');
+const TimelineWriterTester = require('./helpers/TimelineWriterTester');
+const tester = new TimelineWriterTester(TimelineWriter);
 
 describe('TimelineWriter', function() {
 
 	describe('constructor', function() {
-		for (const test of tests) {
+		for (const test of tester.tests) {
 			it(`should setup columns for ${test.file}`, function() {
 				assert.deepEqual(test.timeline.columns, test.expected.columns);
 				assert.deepEqual(
@@ -67,22 +27,11 @@ describe('TimelineWriter', function() {
 	});
 
 	describe('create()', function() {
-		for (const test of tests) {
-
-			test.timeline.create();
-			const firstSVG = test.timeline.canvas.svg();
-
-			test.timeline.create();
-			const secondSVG = test.timeline.canvas.svg();
-
-			it(`should be idempotent for ${test.file}`, function() {
-				assert.equal(firstSVG, secondSVG);
-			});
-		}
+		tester.testCreate();
 	});
 
 	describe('writeSVG()', function() {
-		for (const test of tests) {
+		for (const test of tester.tests) {
 
 			// in case 'create()' tests haven't been run yet
 			if (!test.timeline.canvas) {
@@ -113,6 +62,18 @@ describe('TimelineWriter', function() {
 		}
 	});
 
+	describe('minutesToPixels()', function() {
+		for (const test of tester.tests) {
+			it(`should give expected pixels for ${test.file}`, function() {
+				for (const input in test.expected.minutesToPixels) {
+					const actualOutput = test.timeline.minutesToPixels(input);
+					const expectedOutput = test.expected.minutesToPixels[input];
+					assert.strictEqual(actualOutput, expectedOutput);
+				}
+			});
+		}
+	});
+
 	/**
 	 * This works locally, but fails when run in Travis CI. Perhaps the PNGs created in Travis are
 	 * generated using different compression libraries. To attempt to get around this, pngjs was
@@ -120,7 +81,7 @@ describe('TimelineWriter', function() {
 	 * effort was given). The code below assumes pngjs is installed, but it may have been removed
 	 * as a dependency at this point.
 	describe('writePNG()', function() {
-		for (const test of tests) {
+		for (const test of tester.tests) {
 
 			// in case 'create()' tests haven't been run yet
 			if (!test.timeline.canvas) {
