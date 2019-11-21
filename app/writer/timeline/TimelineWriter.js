@@ -302,6 +302,8 @@ module.exports = class TimelineWriter {
 	 * Generate the actual timeline SVG. This is broken into its own function rather than being done
 	 * in the constructor because the construct will likely be generalized for multiple timeline
 	 * formats, not just SVG, but the code below is SVG-specific.
+	 *
+	 * @return {string} SVG's XML
 	 */
 	create() {
 
@@ -338,6 +340,7 @@ module.exports = class TimelineWriter {
 			}
 		}
 
+		return this.canvas.svg();
 	}
 
 	writeSVG(filename) {

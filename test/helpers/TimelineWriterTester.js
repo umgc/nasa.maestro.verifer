@@ -3,12 +3,11 @@
 
 'use strict';
 
-const fs = require('fs');
 const path = require('path');
 const assert = require('chai').assert;
 // const PNG = require('pngjs').PNG; // attempted to use for PNG checking. See writePNG() below.
 
-const Procedure = require('../app/model/Procedure');
+const Procedure = require('../../app/model/Procedure');
 
 const tests = [
 	{
@@ -51,21 +50,6 @@ function createProcedure(filepath) {
 	return procedure;
 }
 
-for (const test of tests) {
-	const filepath = path.join(__dirname, test.file);
-
-	// create the procedure associated with this file
-	test.procedure = createProcedure(filepath);
-
-	// Create Procedure.toJSON() to handle circular refs, then use it to determine idempotency here
-	// create it again, for use in idempotency tests
-	// test.expected.untouchedProcedure = createProcedure(test.file);
-
-	test.timeline = new TimelineWriter(test.procedure);
-
-	test.buildDir = path.join(filepath, '../../build');
-}
-
 module.exports = class TimelineWriterTester {
 
 	constructor(TimelineWriterClass) {
@@ -87,6 +71,24 @@ module.exports = class TimelineWriterTester {
 			test.buildDir = path.join(filepath, '../../build');
 		}
 
+	}
+
+	testCreate() {
+		for (const test of this.tests) {
+
+			const first = test.timeline.create();
+
+			it(`should return a string of non-trivial length for ${test.file}`, function() {
+				assert.isString(first);
+				assert.isAtLeast(first.length, 20);
+			});
+
+			const second = test.timeline.create();
+
+			it(`should be idempotent for ${test.file}`, function() {
+				assert.equal(first, second);
+			});
+		}
 	}
 
 };
