@@ -3,41 +3,24 @@
 const fs = require('fs');
 const svg2img = require('svg2img');
 const lodashFlatten = require('lodash/flatten');
+const objectHelper = require('../../helpers/objectHelper');
 
 function addBox(canvas, opts = {}) {
-	const required = ['width', 'height', 'x', 'y'];
-	const defaults = {
+	objectHelper.requireProps(opts, ['width', 'height', 'x', 'y']);
+	objectHelper.defaults(opts, {
 		stroke: '#000',
 		fillColor: '#000'
-	};
-	for (const prop of required) {
-		if (opts[prop] === null) {
-			throw new Error(`Function requires ${prop} property of options argument`);
-		}
-	}
-	for (const prop in defaults) {
-		if (opts[prop] === null) {
-			opts[prop] = defaults[prop];
-		}
-	}
+	});
 
 	canvas
-		.rect(
-			opts.width,
-			opts.height
-		)
+		.rect(opts.width, opts.height)
 		.stroke(opts.stroke)
-		.move(
-			opts.x,
-			opts.y
-		)
+		.move(opts.x, opts.y)
 		.fill(opts.fillColor);
 }
 
 function addText(canvas, opts, textFn) {
-
-	// set option defaults
-	const defaults = {
+	objectHelper.defaults(opts, {
 		text: '<placeholder text>',
 		x: 0,
 		y: 0,
@@ -47,25 +30,14 @@ function addText(canvas, opts, textFn) {
 		weight: 'normal',
 		anchor: 'start',
 		leading: 1.3
-	};
-
-	// todo Make an app/helpers/defaults.js to do this. Could also use npm package 'defaults' but
-	// todo this is so straightforward it seems better to limit dependencies
-	for (const prop in defaults) {
-		if (typeof opts[prop] === 'undefined') {
-			opts[prop] = defaults[prop];
-		}
-	}
+	});
 
 	const text = textFn || opts.text;
 
 	// Add the text to the canvas
 	canvas
 		.text(text)
-		.move(
-			opts.x,
-			opts.y
-		)
+		.move(opts.x, opts.y)
 		.font({
 			fill: opts.color,
 			family: opts.family,
@@ -188,12 +160,7 @@ function addTimelineMarkings(writer) {
 
 		// draws a line across the whole timeline, from left sidebar to right sidebar
 		canvas
-			.line(
-				leftX,
-				y,
-				rightX,
-				y
-			)
+			.line(leftX, y, rightX, y)
 			.stroke({
 				width: 1,
 				color: 'black'

@@ -10,7 +10,7 @@ const nunjucksEnvironment = new nunjucks.Environment(
 	{ autoescape: false }
 );
 
-function addActivity(writer, columnIndex, task, actor) {
+function getActivity(writer, columnIndex, task, actor) {
 
 	const opts = {
 		width: writer.colWidth,
@@ -50,7 +50,7 @@ function addActivity(writer, columnIndex, task, actor) {
 
 }
 
-function addTimelineMarkings(writer) {
+function getTimelineMarkings(writer) {
 
 	/*
     <div style="display:inline-block; vertical-align:top;">
@@ -101,19 +101,8 @@ module.exports = class HtmlTimelineWriter extends TimelineWriter {
 	 */
 	create() {
 
-		this.columnHtml = [];
-		for (let c = 0; c < this.numColumns; c++) {
-			this.columnHtml = [];
-		}
-
 		// Create the underlying lines and text for the timeline (not tasks themselves)
-		const timelineMarkings = addTimelineMarkings(this);
-
-		// Create the headers for each column
-		// const columnHeaders = [];
-		// this.columns.forEach((actor, index) => {
-		// columnHeaders.push(this.procedure.getColumnHeaderTextByActor(actor));
-		// });
+		const timelineMarkings = getTimelineMarkings(this);
 
 		const columnDisplay = [];
 
@@ -130,7 +119,7 @@ module.exports = class HtmlTimelineWriter extends TimelineWriter {
 				}
 
 				columnDisplay[columnIndex].activityBlocks.push(
-					addActivity(this, columnIndex, task, actor)
+					getActivity(this, columnIndex, task, actor)
 				);
 			}
 		}
