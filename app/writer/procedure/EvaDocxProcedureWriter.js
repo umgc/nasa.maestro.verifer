@@ -7,7 +7,7 @@ const fs = require('fs');
 const DocxProcedureWriter = require('./DocxProcedureWriter');
 const EvaDocxTaskWriter = require('../task/EvaDocxTaskWriter');
 // const consoleHelper = require('../../helpers/consoleHelper');
-const TimelineWriter = require('../timeline/TimelineWriter');
+const SvgTimelineWriter = require('../timeline/SvgTimelineWriter');
 
 module.exports = class EvaDocxProcedureWriter extends DocxProcedureWriter {
 
@@ -51,8 +51,7 @@ module.exports = class EvaDocxProcedureWriter extends DocxProcedureWriter {
 			}
 		}
 
-		// const timeline = new TimelineWriter(actorTasks);
-		const timeline = new TimelineWriter(this.procedure);
+		const timeline = new SvgTimelineWriter(this.procedure);
 		timeline.create();
 		const pngPath = path.join(
 			this.program.outputPath,
