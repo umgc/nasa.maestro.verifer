@@ -32,12 +32,16 @@
 	}
 
 	table.gridtable td {
-		border-width: 2px;
+		border-left: 2px solid #666666;
+		border-right: 2px solid #666666;
+		border-bottom: 1px solid #AAAAAA;
 		padding: 8px;
-		border-style: solid;
-		border-color: #666666;
 		background-color: #ffffff;
 		width: {{100 // procedure.actors.length}}%;
+	}
+
+	tbody > tr:last-of-type {
+		border-bottom: 2px solid #666666;
 	}
 
 	ul {
