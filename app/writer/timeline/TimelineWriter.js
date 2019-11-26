@@ -83,10 +83,14 @@ module.exports = class TimelineWriter {
 	/**
 	 * Scale a number of minutes to pixels
 	 * @param {number} minutes         Number of minutes
+	 * @param {boolean} round          Whether or not to floor the result
 	 * @return {number}                Number of pixels
 	 */
-	minutesToPixels(minutes) {
-		return Math.floor(this.conversionFactor * minutes);
+	minutesToPixels(minutes, round = true) {
+		if (round) {
+			return Math.floor(this.conversionFactor * minutes);
+		}
+		return this.conversionFactor * minutes;
 	}
 
 };

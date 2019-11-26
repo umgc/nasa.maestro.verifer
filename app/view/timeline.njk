@@ -1,8 +1,12 @@
 <div class='timeline'>
     <div class="column-pet">
+        <div class='column-header'></div>
         <div class='timeline-markings align-right'>
-            {% for timelineMarking in timelineMarkings.left %}
-                {{ timelineMarking }}
+            {% for timelineMarking in timelineMarkings %}
+                <div class="timeline-marking" style="height: {{ timelineMarking.blockHeight }}px">
+                    <div class="half-hour-increment">{{ timelineMarking.timeString }}</div>
+                    <div class="tick"></div>
+                </div>
             {% endfor %}
         </div>
     </div>
@@ -19,9 +23,13 @@
         </div>
     {% endfor %}
     <div class="column-pet">
+        <div class='column-header'></div>
         <div class='timeline-markings'>
-            {% for timelineMarking in timelineMarkings.right %}
-                {{ timelineMarking }}
+            {% for timelineMarking in timelineMarkings %}
+                <div class="timeline-marking" style="height: {{ timelineMarking.blockHeight }}px">
+                    <div class="tick"></div>
+                    <div class="half-hour-increment">{{ timelineMarking.timeString }}</div>
+                </div>
             {% endfor %}
         </div>
     </div>
