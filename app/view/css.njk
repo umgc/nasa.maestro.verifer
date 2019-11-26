@@ -1,6 +1,10 @@
 <style type="text/css">
 	@media print{@page {size: landscape}}
 
+	* {
+		box-sizing: border-box;
+	}
+
 	body {
 		font-family: Arial,sans-serif;
 		margin: auto;
@@ -145,9 +149,21 @@
 		text-align: center;
 	}
 
-	.timeline > div {
-		display:inline-block;
-		vertical-align: top;
+	.timeline {
+		max-width: 960px;
+		display: flex;
+	}
+
+	.column-pet {
+	}
+
+	.column-ev {
+		border-left: 1px solid #000;
+		border-right: 1px solid #000;
+	}
+
+	.column-ev:last-of-type {
+		border-left: 0px;
 	}
 
 	.column-header {
@@ -162,6 +178,10 @@
 		margin-top: 10px;
 		font-family: Arial;
 		font-size: 12px;
+	}
+
+	.task-title {
+		padding-left: 6px;
 	}
 
 	.align-right {

@@ -1,24 +1,24 @@
 <div class='timeline'>
-    <div>
+    <div class="column-pet">
         <div class='timeline-markings align-right'>
         {% for timelineMarking in timelineMarkings.left %}
             {{ timelineMarking }}
         {% endfor %}
         </div>
     </div>
-{% for column in columnDisplay %}
-    <div>
-        <div class='column-header' style='width: {{ columnWidth }}px'>
-            {{ column.header }}
+    {% for column in columnDisplay %}
+        <div class="column-ev">
+            <div class='column-header' style='width: {{ columnWidth }}px'>
+                {{ column.header }}
+            </div>
+            <div style='width: {{ columnWidth }}px'>
+            {% for activityBlock in column.activityBlocks %}
+                {{ activityBlock }}
+            {% endfor %}
+            </div>
         </div>
-        <div style='width: {{ columnWidth }}px'>
-        {% for activityBlock in column.activityBlocks %}
-            {{ activityBlock }}
-        {% endfor %}
-        </div>
-    </div>
-{% endfor %}
-    <div>
+    {% endfor %}
+    <div class="column-pet">
         <div class='timeline-markings'>
         {% for timelineMarking in timelineMarkings.right %}
             {{ timelineMarking }}
