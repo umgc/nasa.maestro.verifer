@@ -10,6 +10,11 @@ const nunjucksEnvironment = new nunjucks.Environment(
 	{ autoescape: false }
 );
 
+nunjucksEnvironment.addFilter('simplify', (str) => {
+	// remove any non a-Z, 0-9 chars, lowercase
+	return str.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+});
+
 function getActivity(writer, columnIndex, task, actor) {
 
 	const opts = {

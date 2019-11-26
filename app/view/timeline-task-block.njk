@@ -2,6 +2,8 @@
      style='height: {{ height }}px;
         background-color: {{ fillColor }};
         font-size: {{ textSize }}px;'>
-    <span class='task-title'>{{ title }}</span>
-    <span class='task-duration'>({{ duration }})</span>
+    <a href="#{{ title | simplify }}">
+        <span class='task-title'>{{ title }}</span>
+        <span class='task-duration'>({{ duration }})</span>
+    </a>
 </div>
