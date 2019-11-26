@@ -13,7 +13,6 @@ const nunjucksEnvironment = new nunjucks.Environment(
 function getActivity(writer, columnIndex, task, actor) {
 
 	const opts = {
-		width: writer.colWidth,
 		height: writer.minutesToPixels(task.actorRolesDict[actor].duration.getTotalMinutes())
 	};
 	opts.height--; // remove a pixel for the thickness of the border

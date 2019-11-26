@@ -150,20 +150,26 @@
 	}
 
 	.timeline {
+		margin: 0 auto;
 		max-width: 960px;
 		display: flex;
 	}
 
 	.column-pet {
+		width: 70px;
 	}
 
 	.column-ev {
-		border-left: 1px solid #000;
+		width: 425px;
+	}
+
+	.activity-blocks {
 		border-right: 1px solid #000;
 	}
 
-	.column-ev:last-of-type {
-		border-left: 0px;
+	/* only draw the left border in the first EV column */
+	.activity-blocks-0 {
+		border-left: 1px solid #000;
 	}
 
 	.column-header {
