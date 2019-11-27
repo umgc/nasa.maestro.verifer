@@ -100,11 +100,14 @@ module.exports = class EvaHtmlTaskWriter extends HtmlTaskWriter {
 		return steps;
 	}
 
+	/**
+	 * Write a Task model into the resulting HTML doc
+	 * @param {Task} task
+	 * @return {string}
+	 */
 	embedTask(task) {
-		// TODO: what if we hashed each checkbox / pertinent info in the step for faster lookup?
-		// we could also drop that hash in the input for each checkbox to facilitate timing calcs
-
-		// how we're avoiding circular references while stringifying https://stackoverflow.com/a/11616993
+		// how we're avoiding circular references while stringifying:
+		// https://stackoverflow.com/a/11616993
 		const cache = [];
 		return nunjucks.render(
 			'embedded-task.html',
@@ -122,6 +125,5 @@ module.exports = class EvaHtmlTaskWriter extends HtmlTaskWriter {
 				})
 			}
 		);
-
 	}
 };
