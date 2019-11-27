@@ -1,19 +1,8 @@
 'use strict';
 
-const path = require('path');
 const TimelineWriter = require('./TimelineWriter');
 
-const nunjucks = require('nunjucks');
-
-const nunjucksEnvironment = new nunjucks.Environment(
-	new nunjucks.FileSystemLoader(path.join(__dirname, '../../view')),
-	{ autoescape: false }
-);
-
-nunjucksEnvironment.addFilter('simplify', (str) => {
-	// remove any non a-Z, 0-9 chars, lowercase
-	return str.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-});
+const nunjucks = require('../../helpers/nunjucks');
 
 function getActivity(writer, columnIndex, task, actor) {
 
@@ -41,7 +30,7 @@ function getActivity(writer, columnIndex, task, actor) {
 	// if (boxOpts.height > 10) {
 	// }
 
-	return nunjucksEnvironment.render('timeline-task-block.njk', opts);
+	return nunjucks.render('timeline-task-block.njk', opts);
 
 }
 
@@ -102,7 +91,7 @@ module.exports = class HtmlTimelineWriter extends TimelineWriter {
 				);
 			}
 		}
-		const html = nunjucksEnvironment.render('timeline.njk', {
+		const html = nunjucks.render('timeline.njk', {
 			columnDisplay: columnDisplay,
 			columnWidth: this.columnWidth,
 			timelineMarkings: timelineMarkings

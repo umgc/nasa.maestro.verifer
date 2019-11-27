@@ -4,12 +4,7 @@ const fs = require('fs');
 const path = require('path');
 
 const getImageFileDimensions = require('image-size');
-const nunjucks = require('nunjucks');
-const nunjucksEnvironment = new nunjucks.Environment(
-	new nunjucks.FileSystemLoader(path.join(__dirname, '../../view')),
-	{ autoescape: false }
-);
-
+const nunjucks = require('../../helpers/nunjucks');
 const consoleHelper = require('../../helpers/consoleHelper');
 const TaskWriter = require('./TaskWriter');
 const TextTransform = require('../TextTransform');
@@ -50,7 +45,7 @@ module.exports = class HtmlTaskWriter extends TaskWriter {
 				});
 			}
 
-			const image = nunjucksEnvironment.render('image.html', {
+			const image = nunjucks.render('image.html', {
 				path: imageMeta.path,
 				width: imageSize.width,
 				height: imageSize.height
@@ -71,7 +66,7 @@ module.exports = class HtmlTaskWriter extends TaskWriter {
 
 	addBlock(blockType, blockLines) {
 
-		const blockTable = nunjucksEnvironment.render('block-table.html', {
+		const blockTable = nunjucks.render('block-table.html', {
 			blockType: blockType,
 			blockLines: blockLines.map((line) => {
 				return this.textTransform.transform(line).join('');
@@ -112,7 +107,7 @@ module.exports = class HtmlTaskWriter extends TaskWriter {
 
 		// added class li-level-${options.level} really just as a way to remind that
 		// some handling of this will be necessary
-		return nunjucksEnvironment.render('step-text.html', {
+		return nunjucks.render('step-text.html', {
 			level: options.level,
 			actorText,
 			stepText: this.textTransform.transform(stepText).join('')
@@ -120,7 +115,7 @@ module.exports = class HtmlTaskWriter extends TaskWriter {
 	}
 
 	addCheckStepText(stepText, level, parent) {
-		return nunjucksEnvironment.render('checkbox-step-text.html', {
+		return nunjucks.render('checkbox-step-text.html', {
 			parent,
 			stepText: this.textTransform.transform(stepText).join(''),
 			level
@@ -128,7 +123,7 @@ module.exports = class HtmlTaskWriter extends TaskWriter {
 	}
 
 	addTitleText(step) {
-		const subtaskTitle = nunjucksEnvironment.render('subtask-title.html', {
+		const subtaskTitle = nunjucks.render('subtask-title.html', {
 			title: step.title.toUpperCase().trim(),
 			duration: step.duration.format('H:M')
 		});

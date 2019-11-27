@@ -1,14 +1,6 @@
 'use strict';
 
-const path = require('path');
-
-const nunjucks = require('nunjucks');
-
-const nunjucksEnvironment = new nunjucks.Environment(
-	new nunjucks.FileSystemLoader(path.join(__dirname, '../../view')),
-	{ autoescape: false }
-);
-
+const nunjucks = require('../../helpers/nunjucks');
 const HtmlTaskWriter = require('./HtmlTaskWriter');
 const EvaDivisionWriter = require('./EvaDivisionWriter');
 
@@ -41,7 +33,7 @@ module.exports = class EvaHtmlTaskWriter extends HtmlTaskWriter {
 			columnNames.push(this.procedure.columnToDisplay[columnKeys[c]]);
 		}
 
-		const tableHeaderHtml = nunjucksEnvironment.render(
+		const tableHeaderHtml = nunjucks.render(
 			// path.join(__dirname, '..', '..', 'view', 'eva-task-table-header.html'),
 			'eva-task-table-header.html',
 			{
@@ -78,7 +70,7 @@ module.exports = class EvaHtmlTaskWriter extends HtmlTaskWriter {
 			}
 		}
 
-		const tableDivision = nunjucksEnvironment.render(
+		const tableDivision = nunjucks.render(
 			'eva-table-division.html',
 			{
 				division: columnSettings
@@ -114,7 +106,7 @@ module.exports = class EvaHtmlTaskWriter extends HtmlTaskWriter {
 
 		// how we're avoiding circular references while stringifying https://stackoverflow.com/a/11616993
 		const cache = [];
-		return nunjucksEnvironment.render(
+		return nunjucks.render(
 			'embedded-task.html',
 			{
 				task: JSON.stringify(task, (key, value) => {
