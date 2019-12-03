@@ -283,13 +283,13 @@ module.exports = class Procedure {
 	}
 
 	/**
-		 * Populates data, reading in the specified file.
-		 *
-		 * @param {*} fileName The full path to the YAML file
-		 *
-		 * @throws {Error} if an error is encountered parsing the file.
-		 * @return {Error|null}
-		 */
+	 * Populates data, reading in the specified file.
+	 *
+	 * @param {*} fileName The full path to the YAML file
+	 *
+	 * @throws {Error} if an error is encountered parsing the file.
+	 * @return {Error|null}
+	 */
 	populateFromFile(fileName) {
 
 		this.procedureFile = fileName;
