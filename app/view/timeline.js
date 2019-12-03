@@ -19,6 +19,12 @@ PET timer logic
 // used to accomplish the blinking colon effect when the timer is running
 let showColon = true;
 
+function getFormat(showSeconds = true) {
+	const colon = showColon ? ':' : ' ';
+	const seconds = showSeconds ? `${colon}ss` : '';
+	return `HH${colon}mm${seconds}`;
+}
+
 // manage the timer itself
 const pet = moment.duration();
 const timerInterval = 1000;
@@ -26,14 +32,14 @@ let timerRunning = false;
 timerButton.onclick = () => {
 	timerRunning = !timerRunning;
 	timerSpan.textContent = timerRunning ? 'Stop' : 'Start';
-	petSpan.textContent = pet.format('HH:mm', { trim: false });
+	petSpan.textContent = pet.format(getFormat(), { trim: false });
 	showColon = false;
 };
 
 setInterval(() => {
 	if (timerRunning) {
 		pet.add(timerInterval, 'milliseconds');
-		petSpan.textContent = pet.format(`HH${showColon ? ':' : ' '}mm`, { trim: false });
+		petSpan.textContent = pet.format(getFormat(), { trim: false });
 		showColon = !showColon;
 	}
 }, timerInterval);
@@ -87,7 +93,7 @@ durationSpans.forEach((s) => {
 	totalDuration.add(subtaskDuration);
 });
 
-totalDurationSpan.textContent = `(${totalDuration.format('HH:mm', { trim: false })})`;
+totalDurationSpan.textContent = `(${totalDuration.format(getFormat(false), { trim: false })})`;
 
 // initialize the overview header
 setProgress();
