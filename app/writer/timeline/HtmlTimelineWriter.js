@@ -2,7 +2,7 @@
 
 const TimelineWriter = require('./TimelineWriter');
 
-const nunjucks = require('../../helpers/nunjucks');
+const nunjucks = require('../../model/nunjucksEnvironment');
 
 function getActivity(writer, columnIndex, task, actor) {
 

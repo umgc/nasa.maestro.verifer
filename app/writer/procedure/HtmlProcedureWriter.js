@@ -3,7 +3,7 @@
 const path = require('path');
 const fs = require('fs');
 
-const nunjucks = require('../../helpers/nunjucks');
+const nunjucks = require('../../model/nunjucksEnvironment');
 const consoleHelper = require('../../helpers/consoleHelper');
 const ProcedureWriter = require('./ProcedureWriter');
 

@@ -1,6 +1,6 @@
 'use strict';
 
-const nunjucks = require('../../helpers/nunjucks');
+const nunjucks = require('../../model/nunjucksEnvironment');
 const HtmlTaskWriter = require('./HtmlTaskWriter');
 const EvaDivisionWriter = require('./EvaDivisionWriter');
 const jsonHelper = require('../../helpers/JsonHelper');

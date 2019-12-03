@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 
 const getImageFileDimensions = require('image-size');
-const nunjucks = require('../../helpers/nunjucks');
+const nunjucks = require('../../model/nunjucksEnvironment');
 const consoleHelper = require('../../helpers/consoleHelper');
 const TaskWriter = require('./TaskWriter');
 const TextTransform = require('../TextTransform');
