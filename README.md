@@ -7,10 +7,10 @@
     <img src="https://travis-ci.org/xoperations/maestro.svg?branch=master" alt="Travis CI" />
   </a>
   <a href="https://codeclimate.com/github/xOPERATIONS/maestro/maintainability">
-    <img src="https://api.codeclimate.com/v1/badges/fea781e4cd69005f6a9c/maintainability" alt="Maintainability" />
+    <img src="https://api.codeclimate.com/v1/badges/b5bf9f5a0208eb91bf53/maintainability" alt="Maintainability" />
   </a>
   <a href="https://codeclimate.com/github/xOPERATIONS/maestro/test_coverage">
-    <img src="https://api.codeclimate.com/v1/badges/fea781e4cd69005f6a9c/test_coverage" alt="Test Coverage" />
+    <img src="https://api.codeclimate.com/v1/badges/b5bf9f5a0208eb91bf53/test_coverage" alt="Test Coverage" />
   </a>
 
   <br />
