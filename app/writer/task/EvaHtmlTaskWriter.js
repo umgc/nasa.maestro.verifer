@@ -3,7 +3,7 @@
 const nunjucks = require('../../helpers/nunjucks');
 const HtmlTaskWriter = require('./HtmlTaskWriter');
 const EvaDivisionWriter = require('./EvaDivisionWriter');
-
+const jsonHelper = require('../../helpers/JsonHelper');
 module.exports = class EvaHtmlTaskWriter extends HtmlTaskWriter {
 
 	constructor(task, procedureWriter) {
@@ -106,24 +106,9 @@ module.exports = class EvaHtmlTaskWriter extends HtmlTaskWriter {
 	 * @return {string}
 	 */
 	embedTask(task) {
-		// how we're avoiding circular references while stringifying:
-		// https://stackoverflow.com/a/11616993
-		const cache = [];
 		return nunjucks.render(
 			'embedded-task.html',
-			{
-				task: JSON.stringify(task, (key, value) => {
-					if (typeof value === 'object' && value !== null) {
-						if (cache.indexOf(value) !== -1) {
-							// Duplicate reference found, discard key
-							return;
-						}
-						// Store value in our collection
-						cache.push(value);
-					}
-					return value;
-				})
-			}
+			{ task: jsonHelper.stringifyNoDuplicates(task, true) }
 		);
 	}
 };
