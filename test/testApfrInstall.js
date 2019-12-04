@@ -52,18 +52,17 @@ const badSettings = [
 const tester = new StepModuleTester('apfr.install');
 tester.addGoodInputs(goodSettings);
 tester.addBadInputs(badSettings);
-tester.generateModules();
 
 describe('ApfrInstall', function() {
 	describe('constructor', function() {
-		tester.testConstructor(goodSettings, badSettings);
+		tester.testConstructor();
 	});
 
 	describe('alterStepBase()', function() {
-		tester.testAlterStepBase(goodSettings);
+		tester.testAlterStepBase();
 	});
 
 	describe('alterStepDocx()', function() {
-		tester.testAlterStepDocx(goodSettings);
+		tester.testAlterStepDocx();
 	});
 });

@@ -4,6 +4,8 @@
   "description": "Composing procedures for space operations",
   "main": "index.js",
   "scripts": {
+    "pre-commit-msg": "node ./test/helpers/preCommitMsg.js",
+    "pre-commit-lint-complete": "node ./test/helpers/preCommitMsg.js lint",
     "lint": "eslint . --color",
     "lint:fix": "eslint . --color --fix",
     "test": "mocha",
@@ -11,7 +13,9 @@
     "test:coverage": "nyc --all --reporter=text --reporter=lcov npm run test"
   },
   "pre-commit": [
+    "pre-commit-msg",
     "lint",
+    "pre-commit-lint-complete",
     "test:colors"
   ],
   "bin": {
@@ -69,8 +73,10 @@
     "jsdoc": "^3.6.3",
     "mocha": "^5.2.0",
     "mocha-junit-reporter": "^1.23.1",
+    "node-resemble-js": "^0.2.0",
     "nyc": "^14.1.1",
     "pre-commit": "^1.2.2",
+    "puppeteer": "^2.0.0",
     "sinon": "^7.5.0"
   }
 }

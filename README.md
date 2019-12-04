@@ -113,6 +113,18 @@ See [YAML Definition](docs/yamlDefinition.md) for an overview of YAML file synta
 
 ## Tests
 
+```sh
+npm t
+```
+
+### Puppeteer
+
+This repo uses [puppeteer](https://github.com/puppeteer/puppeteer) to perform snapshot testing. Installing Puppeteer (as part of `npm i`) will automatically handle downloading Chromium to perform the actual rendering.
+
+#### Red Hat Enterprise Linux 7 Troubleshooting
+
+If you're on RHEL 7, you may run into "No usable sandbox!" errors. If so, follow the instructions [here](https://github.com/puppeteer/puppeteer/blob/master/docs/troubleshooting.md#alternative-setup-setuid-sandbox) to move a sandbox executable to a location on your `$PATH`.
+
 ### Unit Testing & linting
 
 A pre-commit hook is in place forcing linting, style, and unit testing to all pass prior to making commits.
