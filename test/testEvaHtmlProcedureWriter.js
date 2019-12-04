@@ -14,14 +14,14 @@ const Procedure = require('../app/model/Procedure');
 const EvaHtmlProcedureWriter = require('../app/writer/procedure/EvaHtmlProcedureWriter');
 
 const tests = [
-	'simple/procedures/proc.yml',
-	'complex-times/procedures/proc.yml'
+	{ file: 'simple/procedures/proc.yml', mismatchThreshold: 1.48 },
+	{ file: 'complex-times/procedures/proc.yml', mismatchThreshold: 1.9 }
 ];
 
 describe('EvaHtmlProcedureWriter', function() {
 	for (const test of tests) {
 		const procedure = new Procedure();
-		const procedureFile = path.join(__dirname, 'cases', test);
+		const procedureFile = path.join(__dirname, 'cases', test.file);
 
 		const err = procedure.populateFromFile(procedureFile);
 		if (err) {
@@ -39,7 +39,7 @@ describe('EvaHtmlProcedureWriter', function() {
 		procWriter.renderTasks();
 		procWriter.writeFile(htmlPath);
 
-		describe(`compare full-page screenshot for ${test}`, function() {
+		describe(`compare full-page screenshot for ${test.file}`, function() {
 
 			before(async function() {
 				this.timeout(10000);
@@ -69,7 +69,7 @@ describe('EvaHtmlProcedureWriter', function() {
 				//
 				// NOTE: the value chosen below is deliberately bracketing the current worst-case
 				// test. It can be moved up or down as makes sense.
-				const mismatchThreshold = 1.48;
+				const mismatch = test.mismatchThreshold;
 
 				// allow the size of the image to vary by a small percentage
 				const sizeDifferenceThreshold = 0;
@@ -80,8 +80,8 @@ describe('EvaHtmlProcedureWriter', function() {
 						const actualMatch = parseFloat(data.misMatchPercentage);
 						assert.isAtMost(
 							actualMatch,
-							mismatchThreshold,
-							`Screenshot mismatch of ${actualMatch}% should be less than ${mismatchThreshold}%`
+							mismatch,
+							`Screenshot mismatch of ${actualMatch}% should be less than ${mismatch}%`
 						);
 
 						const actualSizeDifference = data.isSameDimensions ?
