@@ -1,9 +1,9 @@
-<div style='width: {{ width }}px;
-    height: {{ height }}px;
-    background-color: {{ fillColor }};
-    border: solid {{ stroke }} 1px;
-    font-size: {{ textSize }}px;
-    {% if marginTop %}margin-top: {{ marginTop }}px; {% endif %}'>
-    <span class='task-title'>{{ title }}</span>
-    <span class='task-duration'>({{ duration }})</span>
+<div class="task-block"
+     style='height: {{ height }}px;
+        background-color: {{ fillColor }};
+        font-size: {{ textSize }}px;'>
+    <a href="#{{ title | idattr }}">
+        <span class='task-title'>{{ title }}</span>
+        <span class='task-duration'>({{ duration }})</span>
+    </a>
 </div>

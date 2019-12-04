@@ -36,8 +36,8 @@ module.exports = class EvaHtmlProcedureWriter extends HtmlProcedureWriter {
 		this.content += taskWriter.setTaskTableHeader();
 		this.content += taskWriter.writeDivisions().join('');
 		this.content += '</table>';
+		this.content += taskWriter.embedTask(task);
 
 		// this.genFooter() <-- not done in HTML like DOCX
 	}
-
 };

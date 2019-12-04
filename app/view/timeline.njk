@@ -1,28 +1,36 @@
 <div class='timeline'>
-    <div>
+    <div class="column-pet">
+        <div class='column-header'></div>
         <div class='timeline-markings align-right'>
-        {% for timelineMarking in timelineMarkings.left %}
-            {{ timelineMarking }}
-        {% endfor %}
+            {% for timelineMarking in timelineMarkings %}
+                <div class="timeline-marking" style="height: {{ timelineMarking.blockHeight }}px">
+                    <div class="half-hour-increment">{{ timelineMarking.timeString }}</div>
+                    <div class="tick"></div>
+                </div>
+            {% endfor %}
         </div>
     </div>
-{% for column in columnDisplay %}
-    <div>
-        <div class='column-header' style='width: {{ columnWidth }}px'>
-            {{ column.header }}
+    {% for column in columnDisplay %}
+        <div class="column-ev">
+            <div class='column-header'>
+                {{ column.header }}
+            </div>
+            <div class="activity-blocks activity-blocks-{{ loop.index0 }}">
+                {% for activityBlock in column.activityBlocks %}
+                    {{ activityBlock }}
+                {% endfor %}
+            </div>
         </div>
-        <div style='width: {{ columnWidth }}px'>
-        {% for activityBlock in column.activityBlocks %}
-            {{ activityBlock }}
-        {% endfor %}
-        </div>
-    </div>
-{% endfor %}
-    <div>
+    {% endfor %}
+    <div class="column-pet">
+        <div class='column-header'></div>
         <div class='timeline-markings'>
-        {% for timelineMarking in timelineMarkings.right %}
-            {{ timelineMarking }}
-        {% endfor %}
+            {% for timelineMarking in timelineMarkings %}
+                <div class="timeline-marking" style="height: {{ timelineMarking.blockHeight }}px">
+                    <div class="tick"></div>
+                    <div class="half-hour-increment">{{ timelineMarking.timeString }}</div>
+                </div>
+            {% endfor %}
         </div>
     </div>
 </div>

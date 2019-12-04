@@ -26,13 +26,22 @@ describe('TimelineWriter', function() {
 
 	describe('minutesToPixels()', function() {
 		for (const test of tester.tests) {
-			it(`should give expected pixels for ${test.file}`, function() {
-				for (const input in test.expected.minutesToPixels) {
-					const actualOutput = test.timeline.minutesToPixels(input);
-					const expectedOutput = test.expected.minutesToPixels[input];
-					assert.strictEqual(actualOutput, expectedOutput);
-				}
-			});
+			for (const input in test.expected.minutesToPixels) {
+
+				it(`should get rounded pixels for ${test.file} and ${input} minutes`, function() {
+					assert.strictEqual(
+						test.timeline.minutesToPixels(input), // actual with rounding
+						test.expected.minutesToPixels[input][0] // expected
+					);
+				});
+
+				it(`should get un-rounded pixels for ${test.file} and ${input} minutes`, function() {
+					assert.strictEqual(
+						test.timeline.minutesToPixels(input, false), // actual no round
+						test.expected.minutesToPixels[input][1] // expected
+					);
+				});
+			}
 		}
 	});
 

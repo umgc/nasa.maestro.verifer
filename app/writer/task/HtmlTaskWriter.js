@@ -4,12 +4,7 @@ const fs = require('fs');
 const path = require('path');
 
 const getImageFileDimensions = require('image-size');
-const nunjucks = require('nunjucks');
-const nunjucksEnvironment = new nunjucks.Environment(
-	new nunjucks.FileSystemLoader(path.join(__dirname, '../../view')),
-	{ autoescape: false }
-);
-
+const nunjucks = require('../../model/nunjucksEnvironment');
 const consoleHelper = require('../../helpers/consoleHelper');
 const TaskWriter = require('./TaskWriter');
 const TextTransform = require('../TextTransform');
@@ -50,7 +45,7 @@ module.exports = class HtmlTaskWriter extends TaskWriter {
 				});
 			}
 
-			const image = nunjucksEnvironment.render('image.html', {
+			const image = nunjucks.render('image.html', {
 				path: imageMeta.path,
 				width: imageSize.width,
 				height: imageSize.height
@@ -71,7 +66,7 @@ module.exports = class HtmlTaskWriter extends TaskWriter {
 
 	addBlock(blockType, blockLines) {
 
-		const blockTable = nunjucksEnvironment.render('block-table.html', {
+		const blockTable = nunjucks.render('block-table.html', {
 			blockType: blockType,
 			blockLines: blockLines.map((line) => {
 				return this.textTransform.transform(line).join('');
@@ -85,7 +80,7 @@ module.exports = class HtmlTaskWriter extends TaskWriter {
 	 * ! TBD a description
 	 * @param {*} stepText        Text to turn into a step
 	 * @param {*} options         options = { level: 0, actors: [], columnKey: "" }
-	 * @return {docx.Paragraph}   DOCX paragraph object
+	 * @return {string}
 	 */
 	addStepText(stepText, options = {}) {
 		if (!options.level) {
@@ -106,22 +101,29 @@ module.exports = class HtmlTaskWriter extends TaskWriter {
 			const isPrimeActor = actorToColumnIntersect.length > 0;
 
 			if (!isPrimeActor) {
-				actorText = `<strong>${options.actors[0]}: </strong>`;
+				actorText = options.actors[0];
 			}
 		}
 
 		// added class li-level-${options.level} really just as a way to remind that
 		// some handling of this will be necessary
-		return `<li class="li-level-${options.level}">
-			${actorText}${this.textTransform.transform(stepText).join('')}</li>`;
+		return nunjucks.render('step-text.html', {
+			level: options.level,
+			actorText,
+			stepText: this.textTransform.transform(stepText).join('')
+		});
 	}
 
-	addCheckStepText(stepText, level) {
-		return this.addStepText(`☐ ${stepText}`, { level: level });
+	addCheckStepText(stepText, level, parent) {
+		return nunjucks.render('checkbox-step-text.html', {
+			parent,
+			stepText: this.textTransform.transform(stepText).join(''),
+			level
+		});
 	}
 
 	addTitleText(step) {
-		const subtaskTitle = nunjucksEnvironment.render('subtask-title.html', {
+		const subtaskTitle = nunjucks.render('subtask-title.html', {
 			title: step.title.toUpperCase().trim(),
 			duration: step.duration.format('H:M')
 		});

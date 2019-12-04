@@ -1,17 +1,9 @@
 'use strict';
 
-const path = require('path');
-
-const nunjucks = require('nunjucks');
-
-const nunjucksEnvironment = new nunjucks.Environment(
-	new nunjucks.FileSystemLoader(path.join(__dirname, '../../view')),
-	{ autoescape: false }
-);
-
+const nunjucks = require('../../model/nunjucksEnvironment');
 const HtmlTaskWriter = require('./HtmlTaskWriter');
 const EvaDivisionWriter = require('./EvaDivisionWriter');
-
+const jsonHelper = require('../../helpers/JsonHelper');
 module.exports = class EvaHtmlTaskWriter extends HtmlTaskWriter {
 
 	constructor(task, procedureWriter) {
@@ -41,7 +33,7 @@ module.exports = class EvaHtmlTaskWriter extends HtmlTaskWriter {
 			columnNames.push(this.procedure.columnToDisplay[columnKeys[c]]);
 		}
 
-		const tableHeaderHtml = nunjucksEnvironment.render(
+		const tableHeaderHtml = nunjucks.render(
 			// path.join(__dirname, '..', '..', 'view', 'eva-task-table-header.html'),
 			'eva-task-table-header.html',
 			{
@@ -78,7 +70,7 @@ module.exports = class EvaHtmlTaskWriter extends HtmlTaskWriter {
 			}
 		}
 
-		const tableDivision = nunjucksEnvironment.render(
+		const tableDivision = nunjucks.render(
 			'eva-table-division.html',
 			{
 				division: columnSettings
@@ -108,4 +100,15 @@ module.exports = class EvaHtmlTaskWriter extends HtmlTaskWriter {
 		return steps;
 	}
 
+	/**
+	 * Write a Task model into the resulting HTML doc
+	 * @param {Task} task
+	 * @return {string}
+	 */
+	embedTask(task) {
+		return nunjucks.render(
+			'embedded-task.html',
+			{ task: jsonHelper.stringifyNoDuplicates(task, true) }
+		);
+	}
 };

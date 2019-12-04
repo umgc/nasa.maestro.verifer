@@ -1,23 +1,14 @@
 'use strict';
 
-const path = require('path');
 const TimelineWriter = require('./TimelineWriter');
 
-const nunjucks = require('nunjucks');
-
-const nunjucksEnvironment = new nunjucks.Environment(
-	new nunjucks.FileSystemLoader(path.join(__dirname, '../../view')),
-	{ autoescape: false }
-);
+const nunjucks = require('../../model/nunjucksEnvironment');
 
 function getActivity(writer, columnIndex, task, actor) {
 
 	const opts = {
-		width: writer.colWidth,
-		height: writer.minutesToPixels(task.actorRolesDict[actor].duration.getTotalMinutes())
+		height: writer.minutesToPixels(task.actorRolesDict[actor].duration.getTotalMinutes(), false)
 	};
-	opts.height--; // remove a pixel for the thickness of the border
-	opts.marginTop = -1; // make this box overlap the previous box by 1px (accounting for border px)
 	opts.stroke = '#000';
 	opts.fillColor = task.color || '#F0FFFF';
 
@@ -25,13 +16,6 @@ function getActivity(writer, columnIndex, task, actor) {
 	opts.duration = task.actorRolesDict[actor].duration.format('H:M');
 
 	opts.textSize = 12; // potentially adjusted smaller by logic below
-
-	if (task.actorRolesDict[actor].prevTask) {
-		const minutesGap =
-			task.actorRolesDict[actor].startTime.getTotalMinutes() -
-			task.actorRolesDict[actor].prevTask.actorRolesDict[actor].endTime.getTotalMinutes();
-		opts.marginTop += writer.minutesToPixels(minutesGap);
-	}
 
 	if (opts.height < 16) {
 		opts.textSize = 8;
@@ -46,28 +30,17 @@ function getActivity(writer, columnIndex, task, actor) {
 	// if (boxOpts.height > 10) {
 	// }
 
-	return nunjucksEnvironment.render('timeline-task-block.njk', opts);
+	return nunjucks.render('timeline-task-block.njk', opts);
 
 }
 
 function getTimelineMarkings(writer) {
 
-	/*
-    <div style="display:inline-block; vertical-align:top;">
-        <div class='activity-column' style='width: 70px; text-align: right;'>
-            <div style="height: 60px;">00:00 —</div>
-            <div style="height: 60px;">00:30 —</div>
-            <div style="height: 60px;">01:00 —</div>
-            <div style="height: 60px;">01:30 —</div>
-        </div>
-    </div>
-	*/
-
 	// how many half-hour segments to generate
 	const halfHours = Math.ceil(writer.totalMinutes / 30);
-	const blockHeight = writer.minutesToPixels(30);
+	const blockHeight = writer.minutesToPixels(30, false);
 
-	const timelineMarkings = { left: [], right: [] };
+	const timelineMarkings = [];
 
 	for (let i = 0; i <= halfHours; i++) {
 
@@ -78,12 +51,7 @@ function getTimelineMarkings(writer) {
 		const minutes = isHour ? ':00' : ':30';
 		const timeString = hours + minutes;
 
-		// todo: SVG aspect not yet implemented in HTML
-		// line sticks out further from sidebar on hours than on half-hours
-		// const tickLength = isHour ? writer.tickLengthMajor : writer.tickLengthMinor;
-
-		timelineMarkings.left.push(`<div style="height: ${blockHeight}px;">${timeString} —</div>`);
-		timelineMarkings.right.push(`<div style="height: ${blockHeight}px;">— ${timeString}</div>`);
+		timelineMarkings.push({ blockHeight, timeString });
 	}
 
 	return timelineMarkings;
@@ -123,7 +91,7 @@ module.exports = class HtmlTimelineWriter extends TimelineWriter {
 				);
 			}
 		}
-		const html = nunjucksEnvironment.render('timeline.njk', {
+		const html = nunjucks.render('timeline.njk', {
 			columnDisplay: columnDisplay,
 			columnWidth: this.columnWidth,
 			timelineMarkings: timelineMarkings
