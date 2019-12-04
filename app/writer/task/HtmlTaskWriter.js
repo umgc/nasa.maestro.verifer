@@ -145,4 +145,8 @@ module.exports = class HtmlTaskWriter extends TaskWriter {
 		return '</ol>';
 	}
 
+	setModuleOutputType() {
+		return 'Html';
+	}
+
 };

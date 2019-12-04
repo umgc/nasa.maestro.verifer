@@ -61,7 +61,8 @@ module.exports = class ApfrInstall extends StepModule {
 	}
 
 	alterStepBase() {
-		return `Install APFR in ${this.wif} [${getSettings(this).join(',')}]`;
+		this.step.text = `Install APFR in ${this.wif} [${getSettings(this).join(',')}]`;
+		return this.step;
 	}
 
 	alterStepDocx() {

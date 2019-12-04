@@ -66,15 +66,13 @@ module.exports = class StepModuleTester {
 		this.badInputs.push(...inputs);
 	}
 
-	generateModules() {
-		for (const setting of this.goodInputs) {
-			const step = new Step();
-			step.populateFromYaml(setting.actual);
-			setting.module = new this.ModuleClass(
-				step,
-				setting.actual
-			);
-		}
+	generateModule(setting) {
+		const step = new Step();
+		step.populateFromYaml(setting.actual);
+		return new this.ModuleClass(
+			step,
+			setting.actual
+		);
 	}
 
 	testConstructor() {
@@ -91,9 +89,10 @@ module.exports = class StepModuleTester {
 
 		for (const setting of this.goodInputs) {
 			const propNames = Object.keys(setting.expected.properties).join('/');
+			const module = this.generateModule(setting);
 			it(`should set ${propNames} for setting ${JSON.stringify(setting.actual)}`, function() {
 				for (const prop in setting.expected.properties) {
-					assert.equal(setting.module[prop], setting.expected.properties[prop]);
+					assert.equal(module[prop], setting.expected.properties[prop]);
 				}
 			});
 		}
@@ -101,9 +100,10 @@ module.exports = class StepModuleTester {
 
 	testAlterStepBase() {
 		for (const setting of this.goodInputs) {
+			const module = this.generateModule(setting);
 			it(`should create basic string version from input ${JSON.stringify(setting.actual)}`, function() {
 				assert.equal(
-					setting.module.alterStepBase(),
+					module.alterStepBase().text, // alterStepBase() returns this.step
 					setting.expected.alterStepBase
 				);
 			});
@@ -112,7 +112,7 @@ module.exports = class StepModuleTester {
 
 	testAlterStepDocx() {
 		for (const setting of this.goodInputs) {
-			const docxOutput = setting.module.alterStepDocx();
+			const docxOutput = this.generateModule(setting).alterStepDocx();
 			it(`should return a Step when settings ${JSON.stringify(setting.actual)}`, function() {
 				assert.instanceOf(docxOutput, Step);
 			});
@@ -123,4 +123,5 @@ module.exports = class StepModuleTester {
 			});
 		}
 	}
+
 };

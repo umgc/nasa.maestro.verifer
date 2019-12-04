@@ -136,7 +136,8 @@ module.exports = class PgtSet extends StepModule {
 
 	alterStepBase() {
 		const socket = this.socket ? ` - ${this.socket}` : '';
-		return `${getSetString(this)} ${getValueString(this)}${socket}`;
+		this.step.text = `${getSetString(this)} ${getValueString(this)}${socket}`;
+		return this.step;
 	}
 
 	alterStepDocx() {

@@ -3,7 +3,7 @@
 const nunjucks = require('../../model/nunjucksEnvironment');
 const HtmlTaskWriter = require('./HtmlTaskWriter');
 const EvaDivisionWriter = require('./EvaDivisionWriter');
-const jsonHelper = require('../../helpers/JsonHelper');
+const jsonHelper = require('../../helpers/jsonHelper');
 module.exports = class EvaHtmlTaskWriter extends HtmlTaskWriter {
 
 	constructor(task, procedureWriter) {
