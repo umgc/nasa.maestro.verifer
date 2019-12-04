@@ -9,7 +9,6 @@ const path = require('path');
 const fs = require('fs');
 const pjson = require('./package.json');
 
-const ver = require('./app/helpers/versionHelper');
 const consoleHelper = require('./app/helpers/consoleHelper');
 
 const Procedure = require('./app/model/Procedure');
@@ -172,7 +171,7 @@ function doCompose() {
 function buildProgramArguments(program, args) {
 
 	program
-		.version(ver.currentVersion, '--version')
+		.version(pjson.version, '--version')
 		.name('maestro')
 		.description(pjson.description)
 		.option('-v, --verbose', 'Verbosity that can be increased from -v to -vvvv', increaseVerbosity, 0)
