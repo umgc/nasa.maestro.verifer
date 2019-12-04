@@ -13,66 +13,93 @@ const Procedure = require('../app/model/Procedure');
 
 const EvaHtmlProcedureWriter = require('../app/writer/procedure/EvaHtmlProcedureWriter');
 
+const tests = [
+	{ file: 'simple/procedures/proc.yml', mismatchThreshold: 1.48 },
+	{ file: 'complex-times/procedures/proc.yml', mismatchThreshold: 1.9 }
+];
+
 describe('EvaHtmlProcedureWriter', function() {
-	const procedure = new Procedure();
-	const procedureFile = path.join(__dirname, 'cases/simple/procedures/proc.yml');
+	for (const test of tests) {
+		const procedure = new Procedure();
+		const procedureFile = path.join(__dirname, 'cases', test.file);
 
-	const err = procedure.populateFromFile(procedureFile);
-	if (err) {
-		throw new Error(err);
+		const err = procedure.populateFromFile(procedureFile);
+		if (err) {
+			throw new Error(err);
+		}
+		// const procedureClone = clonedeep(procedure);
+
+		const buildDir = path.join(procedureFile, '../../build');
+		const htmlPath = path.join(buildDir, `${procedure.filename}.html`);
+		const expectedPath = path.join(buildDir, `${procedure.filename}.html.jpg`);
+		const testPath = path.join(buildDir, `test${procedure.filename}.html.jpg`);
+
+		const procWriter = new EvaHtmlProcedureWriter({}, procedure);
+		procWriter.renderIntro();
+		procWriter.renderTasks();
+		procWriter.writeFile(htmlPath);
+
+		describe(`compare full-page screenshot for ${test.file}`, function() {
+
+			before(async function() {
+				this.timeout(10000);
+
+				const browser = await puppeteer.launch();
+				const page = await browser.newPage();
+				await page.goto(`file://${htmlPath}`);
+
+				// Or use raw HTML rather than pulling from file. Pulling from file also tests
+				// EvaHtmlProcedureWriter.writeFile() though.
+				// await page.setContent( /* raw html string */);
+
+				await page.screenshot({
+					path: testPath,
+					fullPage: true
+				});
+				await browser.close();
+			});
+
+			it(`should create expected screenshot of webpage for ${procedure.filename}.html`, function(done) {
+
+				// Screenshots must match within % below.
+				// Ideally this would be an exact match or something really low like 0.01%, but due
+				// to difference in fonts on Windows vs Linux an exact match isn't possible. We want
+				// to use Arial, at least for now, due to complying with SODF standards, but that
+				// is a proprietary font. It can be installed on Linux but is not by default.
+				//
+				// NOTE: the value chosen below is deliberately bracketing the current worst-case
+				// test. It can be moved up or down as makes sense.
+				const mismatch = test.mismatchThreshold;
+
+				// allow the size of the image to vary by a small percentage
+				const sizeDifferenceThreshold = 0;
+
+				resemble(expectedPath)
+					.compareTo(testPath)
+					.onComplete(function(data) {
+						const actualMatch = parseFloat(data.misMatchPercentage);
+						assert.isAtMost(
+							actualMatch,
+							mismatch,
+							`Screenshot mismatch of ${actualMatch}% should be less than ${mismatch}%`
+						);
+
+						const actualSizeDifference = data.isSameDimensions ?
+							0 :
+							Math.abs(data.dimensionDifference.width) +
+							Math.abs(data.dimensionDifference.height);
+
+						assert.isAtMost(
+							actualSizeDifference,
+							sizeDifferenceThreshold,
+							`Screenshot size difference of ${actualSizeDifference}px should be less than ${sizeDifferenceThreshold}px`
+						);
+						done();
+					});
+
+			});
+
+		});
 	}
-	// const procedureClone = clonedeep(procedure);
-
-	const buildDir = path.join(procedureFile, '../../build');
-	const htmlPath = path.join(buildDir, `${procedure.filename}.html`);
-	const expectedPath = path.join(buildDir, `${procedure.filename}.html.jpg`);
-	const testPath = path.join(buildDir, `test${procedure.filename}.html.jpg`);
-
-	const procWriter = new EvaHtmlProcedureWriter({}, procedure);
-	procWriter.renderIntro();
-	procWriter.renderTasks();
-	procWriter.writeFile(htmlPath);
-
-	describe('compare full-page screenshot', function() {
-
-		before(async function() {
-			this.timeout(10000);
-
-			const browser = await puppeteer.launch();
-			const page = await browser.newPage();
-			await page.goto(`file://${htmlPath}`);
-
-			// Or use raw HTML rather than pulling from file. Pulling from file also tests
-			// EvaHtmlProcedureWriter.writeFile() though.
-			// await page.setContent( /* raw html string */);
-
-			await page.screenshot({
-				path: testPath,
-				fullPage: true
-			});
-			await browser.close();
-		});
-
-		it(`should create expected screenshot of webpage for ${procedure.filename}.html`, function(done) {
-
-			// Screenshots must match within % below.
-			// Ideally this would be an exact match or something really low like 0.01%, but due to
-			// apparent difference between generating screenshots on Windows vs Linux (or desktop vs
-			// Travis CI) an exact match doesn't appear possible.
-			const mismatchThreshold = 1.99;
-
-			resemble(expectedPath).compareTo(testPath).onComplete(function(data) {
-				const actualMatch = parseFloat(data.misMatchPercentage);
-				assert.isAtMost(
-					actualMatch,
-					mismatchThreshold,
-					`Screenshot mismatch of ${actualMatch}% should be less than ${mismatchThreshold}%`
-				);
-				done();
-			});
-
-		});
-
-	});
 
 });
