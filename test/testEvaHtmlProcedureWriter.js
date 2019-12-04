@@ -62,11 +62,11 @@ describe('EvaHtmlProcedureWriter', function() {
 			const mismatchThreshold = 1.99;
 
 			resemble(expectedPath).compareTo(testPath).onComplete(function(data) {
-				console.log(typeof data.misMatchPercentage);
+				const actualMatch = parseFloat(data.misMatchPercentage);
 				assert.isAtMost(
-					parseFloat(data.misMatchPercentage),
+					actualMatch,
 					mismatchThreshold,
-					`Screenshot should match within ${mismatchThreshold}%`
+					`Screenshot mismatch of ${actualMatch}% should be less than ${mismatchThreshold}%`
 				);
 				done();
 			});
