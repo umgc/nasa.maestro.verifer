@@ -7,7 +7,7 @@ const filenamify = require('filenamify');
 
 const Column = require('./Column');
 const Task = require('./Task');
-const SpacewalkValidator = require('../schema/spacewalkValidator');
+const validateSchema = require('../schema/validateSchema');
 const Duration = require('./Duration');
 const TimeSync = require('./TimeSync');
 
@@ -299,23 +299,21 @@ module.exports = class Procedure {
 			return new Error(`Could not find file ${fileName}`);
 		}
 
-		// Validate the input file
-		const spacewalkValidator = new SpacewalkValidator();
+		const procedureDefinition = YAML.safeLoad(fs.readFileSync(fileName, 'utf8'));
+
+		// Load and validate the input file
 		try {
-			spacewalkValidator.validateProcedureSchemaFile(fileName);
+			validateSchema('procedure', procedureDefinition);
 		} catch (err) {
 			return err;
 		}
 
-		// Load the YAML File
-		const procedureYaml = YAML.safeLoad(fs.readFileSync(fileName, 'utf8'));
-
 		// Save the procedure Name
-		this.name = procedureYaml.procedure_name;
+		this.name = procedureDefinition.procedure_name;
 		this.filename = filenamify(this.name.replace(/\s+/g, '_'));
 
-		if (procedureYaml.columns) {
-			for (var columnYaml of procedureYaml.columns) {
+		if (procedureDefinition.columns) {
+			for (var columnYaml of procedureDefinition.columns) {
 				this.columns.push(new Column(columnYaml));
 			}
 		}
@@ -324,18 +322,18 @@ module.exports = class Procedure {
 		this.columnToDisplay = mapColumnKeyToDisplay(this.columns);
 
 		// Save the tasks
-		for (const proceduresTaskInstance of procedureYaml.tasks) {
+		for (const proceduresTaskInstance of procedureDefinition.tasks) {
 
 			// Since the task file is in relative path to the procedure
 			// file, need to translate it!
 			const taskFileName = translatePath(fileName, proceduresTaskInstance.file);
+			const taskDefinition = YAML.safeLoad(fs.readFileSync(taskFileName, 'utf8'));
 
 			try {
-				spacewalkValidator.validateTaskSchemaFile(taskFileName);
+				validateSchema('task', taskDefinition);
 			} catch (err) {
 				return err;
 			}
-			const taskDefinition = YAML.safeLoad(fs.readFileSync(taskFileName, 'utf8'));
 
 			// Save the task!
 			this.tasks.push(new Task(
@@ -389,8 +387,8 @@ module.exports = class Procedure {
 		this.taskEndpoints = this.timeSync.endpoints();
 
 		// Pull in css file if it is defined
-		if (procedureYaml.css) {
-			const cssFileName = translatePath(fileName, procedureYaml.css);
+		if (procedureDefinition.css) {
+			const cssFileName = translatePath(fileName, procedureDefinition.css);
 			if (!fs.existsSync(cssFileName)) {
 				throw new Error(`Could not find css file ${cssFileName}`);
 			}

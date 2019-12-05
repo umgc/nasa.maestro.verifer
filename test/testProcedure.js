@@ -224,10 +224,8 @@ describe('Procedure constructor - Negative Testing', function() {
                 `;
 
 			sinon.stub(fs, 'existsSync').withArgs(filename).returns(true);
-			const readFileSync = sinon.stub(fs, 'readFileSync');
-			readFileSync.withArgs(sinon.match(filename)).returns(yamlString);
-			readFileSync.withArgs(sinon.match('procedureSchema.json')).returns(procedureSchema);
-			readFileSync.withArgs(sinon.match('taskSchema.json')).returns(taskSchema);
+			sinon.stub(fs, 'readFileSync')
+				.withArgs(sinon.match(filename, 'utf8')).returns(yamlString);
 
 			const procedure = new Procedure();
 			const err = procedure.populateFromFile(filename);
