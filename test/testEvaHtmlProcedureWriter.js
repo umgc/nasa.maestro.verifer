@@ -15,8 +15,8 @@ const Procedure = require('../app/model/Procedure');
 const EvaHtmlProcedureWriter = require('../app/writer/procedure/EvaHtmlProcedureWriter');
 
 const tests = [
-	{ file: 'simple/procedures/proc.yml', mismatchThreshold: 1.48 },
-	{ file: 'complex-times/procedures/proc.yml', mismatchThreshold: 1.9 }
+	{ file: 'simple/procedures/proc.yml', mismatchThreshold: 1.57 },
+	{ file: 'complex-times/procedures/proc.yml', mismatchThreshold: 1.94 }
 ];
 
 describe('EvaHtmlProcedureWriter', function() {
