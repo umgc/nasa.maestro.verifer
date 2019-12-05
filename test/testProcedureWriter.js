@@ -7,6 +7,7 @@ const childProcess = require('child_process');
 const path = require('path');
 const assert = require('chai').assert;
 
+const CommanderProgram = require('../app/model/CommanderProgram');
 const Procedure = require('../app/model/Procedure');
 
 const EvaDocxProcedureWriter = require('../app/writer/procedure/EvaDocxProcedureWriter');
@@ -22,7 +23,7 @@ describe('ProcedureWriter', function() {
 
 	// using an EvaDocxProcedureWriter because the abstract ProcedureWriter isn't meant to be used
 	// on its own
-	const procWriter = new EvaDocxProcedureWriter({}, procedure);
+	const procWriter = new EvaDocxProcedureWriter(new CommanderProgram(), procedure);
 
 	describe('getGitHash', function() {
 
@@ -33,7 +34,7 @@ describe('ProcedureWriter', function() {
 			const currentGitHash = childProcess
 				.execSync('git rev-parse --short HEAD')
 				.toString().trim();
-			assert.equal(procWriter.getGitHash(), currentGitHash);
+			assert.equal(procWriter.program.getGitHash(), currentGitHash);
 		});
 	});
 });

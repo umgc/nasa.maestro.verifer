@@ -9,6 +9,7 @@ const assert = require('chai').assert;
 const puppeteer = require('puppeteer');
 const resemble = require('node-resemble-js');
 
+const CommanderProgram = require('../app/model/CommanderProgram');
 const Procedure = require('../app/model/Procedure');
 
 const EvaHtmlProcedureWriter = require('../app/writer/procedure/EvaHtmlProcedureWriter');
@@ -34,7 +35,7 @@ describe('EvaHtmlProcedureWriter', function() {
 		const expectedPath = path.join(buildDir, `${procedure.filename}.html.jpg`);
 		const testPath = path.join(buildDir, `test${procedure.filename}.html.jpg`);
 
-		const procWriter = new EvaHtmlProcedureWriter({}, procedure);
+		const procWriter = new EvaHtmlProcedureWriter(new CommanderProgram(), procedure);
 		procWriter.renderIntro();
 		procWriter.renderTasks();
 		procWriter.writeFile(htmlPath);

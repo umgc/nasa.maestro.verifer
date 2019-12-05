@@ -54,9 +54,9 @@ module.exports = class HtmlProcedureWriter extends ProcedureWriter {
 			programName: this.program.fullName,
 			programURL: this.program.repoURL,
 			procedureName: this.procedure.name,
-			gitDate: this.getGitDate(),
-			gitHash: this.getGitHash(),
-			gitUncommitted: this.getGitUncommittedChanges()
+			gitDate: this.program.getGitDate(),
+			gitHash: this.program.getGitHash(),
+			gitUncommitted: this.program.getGitUncommittedChanges()
 		});
 	}
 

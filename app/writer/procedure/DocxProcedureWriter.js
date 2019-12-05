@@ -103,9 +103,9 @@ module.exports = class DocxProcedureWriter extends ProcedureWriter {
 		// procFooter.addRun(leftFooterText);
 		// procFooter.addRun(rightFooterText);
 
-		const gitDate = this.getGitDate();
-		const gitHash = this.getGitHash();
-		const gitUncommitted = this.getGitUncommittedChanges();
+		const gitDate = this.program.getGitDate();
+		const gitHash = this.program.getGitHash();
+		const gitUncommitted = this.program.getGitUncommittedChanges();
 
 		const children = [new docx.TextRun(`${gitDate} (version: ${gitHash})`)];
 		if (gitUncommitted) {
