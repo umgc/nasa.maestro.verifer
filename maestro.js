@@ -16,10 +16,6 @@ const EvaDocxProcedureWriter = require('./app/writer/procedure/EvaDocxProcedureW
 const SodfDocxProcedureWriter = require('./app/writer/procedure/SodfDocxProcedureWriter');
 const EvaHtmlProcedureWriter = require('./app/writer/procedure/EvaHtmlProcedureWriter');
 
-function increaseVerbosity(dummyValue, previous) {
-	return previous + 1;
-}
-
 function pathMustExist(path, createIfMissing = false) {
 	try {
 		fs.statSync(path);
@@ -119,9 +115,6 @@ function doCompose() {
 				return;
 			}
 
-			console.logIfVerbose(program, 2, 4);
-			console.logIfVerbose(procedure, 1, 3);
-
 			if (program.evaDocx) {
 				console.log('Creating EVA format');
 				const eva = new EvaDocxProcedureWriter(program, procedure);
@@ -174,18 +167,7 @@ function buildProgramArguments(program, args) {
 		.version(pjson.version, '--version')
 		.name('maestro')
 		.description(pjson.description)
-		.option('-v, --verbose', 'Verbosity that can be increased from -v to -vvvv', increaseVerbosity, 0)
 		.allowUnknownOption();
-
-	console.logIfVerbose = function(msg, verbosityThreshold = 0, fullObjVerbosityThreshold = 4) {
-		if (program.verbose >= verbosityThreshold) {
-			if (program.verbose >= fullObjVerbosityThreshold) {
-				msg = JSON.stringify(msg, null, 4);
-			}
-			console.log('');
-			console.log(msg);
-		}
-	};
 
 	const handleProjectPath = function(projectPath) {
 		if (projectPath) {
@@ -205,7 +187,6 @@ function buildProgramArguments(program, args) {
 		.option('--no-eva-docx', 'Don\'t generate the default EVA DOCX file', null)
 		.option('-c, --css <.css>', 'CSS to append to generated HTML', null)
 		.action(function(projectPath, options) {
-			console.logIfVerbose(options, 3);
 			program.projectPath = handleProjectPath(projectPath);
 
 			program.sodf = options.sodf;
@@ -290,6 +271,7 @@ module.exports = {
 	 * @param   {*} args Command line arguments
 	 */
 	run: function(args) {
+
 		program.fullName = `Maestro v${pjson.version}`;
 		program.repoURL = pjson.repository.url;
 
