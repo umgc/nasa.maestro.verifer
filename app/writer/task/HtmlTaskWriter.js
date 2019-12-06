@@ -8,6 +8,7 @@ const nunjucks = require('../../model/nunjucksEnvironment');
 const consoleHelper = require('../../helpers/consoleHelper');
 const TaskWriter = require('./TaskWriter');
 const TextTransform = require('../TextTransform');
+const settings = require('../../settings');
 
 module.exports = class HtmlTaskWriter extends TaskWriter {
 
@@ -46,7 +47,7 @@ module.exports = class HtmlTaskWriter extends TaskWriter {
 			}
 
 			const image = nunjucks.render('image.html', {
-				path: imageMeta.path,
+				path: settings.htmlImagePrefix + imageMeta.path,
 				width: imageSize.width,
 				height: imageSize.height
 			});

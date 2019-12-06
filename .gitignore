@@ -6,3 +6,4 @@
 *.sw*
 **/api-docs/
 test/cases/**/build
+build/*

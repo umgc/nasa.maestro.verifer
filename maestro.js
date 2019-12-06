@@ -1,7 +1,3 @@
-/**
- * High-level functions for eva-tasklist
- */
-
 'use strict';
 
 const CommanderProgram = require('./app/model/CommanderProgram');

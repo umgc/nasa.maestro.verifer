@@ -128,7 +128,11 @@ module.exports = class CommanderProgram extends Program {
 
 				const express = require('express');
 				const app = express();
-				app.use(express.static('build'));
+
+				app.use('/build', express.static(path.join(this.projectPath, 'build')));
+				app.use('/procedures', express.static(path.join(this.projectPath, 'procedures')));
+				app.use('/tasks', express.static(path.join(this.projectPath, 'tasks')));
+				app.use('/maestro', express.static(path.resolve(__dirname, '../../build')));
 
 				const htmlFiles = fs.readdirSync(this.outputPath).filter((filename) => {
 					return filename.endsWith('.html');
