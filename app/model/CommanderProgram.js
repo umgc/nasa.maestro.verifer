@@ -216,7 +216,7 @@ module.exports = class CommanderProgram extends Program {
 
 				// Parse the input file
 				const procedure = new Procedure();
-				const err = procedure.populateFromFile(procedureFile);
+				const err = procedure.addProcedureDefinitionFromFile(procedureFile);
 
 				// Check if an error occurred
 				if (err) {

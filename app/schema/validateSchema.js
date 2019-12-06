@@ -22,7 +22,9 @@ class SchemaValidationError extends Error {
  * @param {string} type              Either 'task' or 'procedure' to pick schema to validate against
  * @param {Object} objectToValidate  A JS object, probably from parsed JSON/YAML. Not a YAML/JSON
  *                                   string
- * @return {*}
+ * @return {boolean}                 Returns boolean true if passes validation. Throws exception if
+ *                                   doesn't pass
+ * @throws SchemaValidationError when validation fails
  */
 module.exports = function(type, objectToValidate) {
 	if (Object.keys(schemas).indexOf(type) === -1) {
@@ -31,6 +33,7 @@ module.exports = function(type, objectToValidate) {
 	}
 
 	// Validate
+	// ajv.validate returns boolean, with errors in ajv.errors if applicable
 	var valid = ajv.validate(schemas[type], objectToValidate);
 	if (!valid) {
 		throw new SchemaValidationError('Schema Validation Failed', ajv.errors);

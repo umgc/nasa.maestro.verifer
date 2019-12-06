@@ -24,7 +24,7 @@ describe('EvaHtmlProcedureWriter', function() {
 		const procedure = new Procedure();
 		const procedureFile = path.join(__dirname, 'cases', test.file);
 
-		const err = procedure.populateFromFile(procedureFile);
+		const err = procedure.addProcedureDefinitionFromFile(procedureFile);
 		if (err) {
 			throw new Error(err);
 		}

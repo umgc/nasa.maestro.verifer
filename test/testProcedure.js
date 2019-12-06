@@ -97,7 +97,7 @@ describe('Procedure constructor - Positive Testing', function() {
 
 			const procedure = new Procedure();
 
-			const err = procedure.populateFromFile(filename);
+			const err = procedure.addProcedureDefinitionFromFile(filename);
 
 			if (err) {
 				console.log(err);
@@ -151,7 +151,7 @@ describe('Procedure constructor - Negative Testing', function() {
 		it('should throw error if file doesn\'t exist', async() => {
 
 			const procedure = new Procedure();
-			const err = procedure.populateFromFile('wrong.txt');
+			const err = procedure.addProcedureDefinitionFromFile('wrong.txt');
 			expect(err).to.exist; // eslint-disable-line no-unused-expressions
 
 		});
@@ -170,7 +170,7 @@ describe('Procedure constructor - Negative Testing', function() {
 			readFileSync.withArgs(sinon.match('taskSchema.json')).returns(taskSchema);
 
 			const procedure = new Procedure();
-			const err = procedure.populateFromFile(filename);
+			const err = procedure.addProcedureDefinitionFromFile(filename);
 			expect(err).to.exist; // eslint-disable-line no-unused-expressions
 
 		});
@@ -199,7 +199,7 @@ describe('Procedure constructor - Negative Testing', function() {
 			readFileSync.withArgs(sinon.match('taskSchema.json')).returns(taskSchema);
 
 			const procedure = new Procedure();
-			const err = procedure.populateFromFile(filename);
+			const err = procedure.addProcedureDefinitionFromFile(filename);
 
 			/* eslint-disable no-unused-expressions */
 			expect(err).to.exist;
@@ -228,7 +228,7 @@ describe('Procedure constructor - Negative Testing', function() {
 				.withArgs(sinon.match(filename, 'utf8')).returns(yamlString);
 
 			const procedure = new Procedure();
-			const err = procedure.populateFromFile(filename);
+			const err = procedure.addProcedureDefinitionFromFile(filename);
 
 			/* eslint-disable no-unused-expressions */
 			expect(err).to.exist;

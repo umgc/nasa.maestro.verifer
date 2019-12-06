@@ -75,6 +75,8 @@ module.exports = class Procedure {
 		this.tasks = [];
 		this.css = '';
 		this.actorToColumn = {};
+
+		this.taskDefinitions = {};
 	}
 
 	/**
@@ -284,36 +286,48 @@ module.exports = class Procedure {
 
 	/**
 	 * Populates data, reading in the specified file.
-	 *
-	 * @param {*} fileName The full path to the YAML file
-	 *
-	 * @throws {Error} if an error is encountered parsing the file.
+	 * @param {string} fileName The full path to the YAML file
 	 * @return {Error|null}
 	 */
-	populateFromFile(fileName) {
-
+	addProcedureDefinitionFromFile(fileName) {
 		this.procedureFile = fileName;
 
-		// Check if the file exists
 		if (!fs.existsSync(fileName)) {
 			return new Error(`Could not find file ${fileName}`);
 		}
 
-		const procedureDefinition = YAML.safeLoad(fs.readFileSync(fileName, 'utf8'));
+		const procDef = YAML.safeLoad(fs.readFileSync(fileName, 'utf8'));
+
+		const err = this.addProcedureDefinition(procDef);
+		if (err) {
+			return err;
+		}
+
+		this.loadTaskDefinitionsFromFiles();
+		this.setupTimeSync();
+		this.setupCustomCSS();
+	}
+
+	/**
+	 *
+	 * @param {Object} procDef  Procedure definition in JS object form (not YAML/JSON string)
+	 * @return {null|SchemaValidationError}  If schema validation errors found, returns err object
+	 */
+	addProcedureDefinition(procDef) {
 
 		// Load and validate the input file
 		try {
-			validateSchema('procedure', procedureDefinition);
+			validateSchema('procedure', procDef);
 		} catch (err) {
 			return err;
 		}
 
 		// Save the procedure Name
-		this.name = procedureDefinition.procedure_name;
+		this.name = procDef.procedure_name;
 		this.filename = filenamify(this.name.replace(/\s+/g, '_'));
 
-		if (procedureDefinition.columns) {
-			for (var columnYaml of procedureDefinition.columns) {
+		if (procDef.columns) {
+			for (var columnYaml of procDef.columns) {
 				this.columns.push(new Column(columnYaml));
 			}
 		}
@@ -321,36 +335,111 @@ module.exports = class Procedure {
 		this.actorToColumn = mapActorToColumn(this.columns);
 		this.columnToDisplay = mapColumnKeyToDisplay(this.columns);
 
-		// Save the tasks
-		for (const proceduresTaskInstance of procedureDefinition.tasks) {
+		this.procedureDefinition = procDef;
+		this.proceduresTaskInstances = {};
 
-			// Since the task file is in relative path to the procedure
-			// file, need to translate it!
-			const taskFileName = translatePath(fileName, proceduresTaskInstance.file);
-			const taskDefinition = YAML.safeLoad(fs.readFileSync(taskFileName, 'utf8'));
-
-			try {
-				validateSchema('task', taskDefinition);
-			} catch (err) {
-				return err;
-			}
-
-			// Save the task!
-			this.tasks.push(new Task(
-				taskDefinition, // all the task info from the task file (steps, etc)
-				proceduresTaskInstance, // info about task from procedure file
-				this.getColumnKeys(),
-				this
-			));
-
+		for (const task of this.procedureDefinition.tasks) {
+			this.proceduresTaskInstances[task.file] = task;
 		}
 
+		return null;
+	}
+
+	/**
+	 * @throws Error if this.procedureDefinition not set. Run this.addProcedureDefinition() first.
+	 */
+	loadTaskDefinitionsFromFiles() {
+
+		if (!this.procedureDefinition) {
+			throw new Error('populate() requires "procedureDefinition" set');
+		}
+
+		const taskDefinitions = {};
+
+		for (const task of this.procedureDefinition.tasks) {
+			// Since the task file is in relative path to the procedure
+			// file, need to translate it!
+			const taskFileName = translatePath(this.procedureFile, task.file);
+			taskDefinitions[task.file] = YAML.safeLoad(fs.readFileSync(taskFileName, 'utf8'));
+		}
+
+		this.addTaskDefinitions(taskDefinitions);
+	}
+
+	/**
+	 * @param {Object} taskDefs  Object map of task file names to task definitions, in JS object
+	 *                           form (not YAML/JSON string). Example:
+	 *                           var taskDefs = {
+	 *                             'my-task.yml': {
+	 *                               title: 'sometitle',
+	 *                               roles: [...],
+	 *                               steps: [...]
+	 *                             },
+	 *                             'another-task.yml': { ... }, ...
+	 *                           }
+	 * @return {null|SchemaValidationError}  If schema validation errors found, returns err object
+	 */
+	addTaskDefinitions(taskDefs) {
+
+		for (const taskFile in taskDefs) {
+			const err = this.updateTaskDefinition(taskFile, taskDefs[taskFile]);
+			if (err) {
+				return err;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * @param {string} taskFile              Task filename, as written in procedure file.
+	 * @param {Object} taskDef               Single task definition. JS object not YAML/JSON string.
+	 * @return {null|SchemaValidationError}  If schema validation errors found, returns err object
+	 */
+	updateTaskDefinition(taskFile, taskDef) {
+
+		if (!this.proceduresTaskInstances) {
+			throw new Error('populate() requires "proceduresTaskInstances" set');
+		}
+
+		// info about task from procedure file
+		const proceduresTaskInstance = this.proceduresTaskInstances[taskFile];
+
+		try {
+			validateSchema('task', taskDef);
+		} catch (err) {
+			return err;
+		}
+
+		// Create task model
+		this.tasks.push(new Task(
+			taskDef,
+			proceduresTaskInstance,
+			this.getColumnKeys(),
+			this
+		));
+
+		// Save the raw definition
+		this.taskDefinitions[taskFile] = taskDef;
+
+		return null;
+
+	}
+
+	setupTimeSync() {
+
+		if (!this.procedureDefinition || !this.taskDefinitions) {
+			throw new Error('populate() requires "procedureDefinition" and "taskDefinitions" set');
+		}
+
+		// For each role, make a pointer to the latest (most recent) activity
 		const roleLatestAct = {};
+
+		// Loop over all tasks and all roles within those tasks
 		for (const currentTask of this.tasks) {
-
-			// tasksDict[task.filename] = task;
-
 			for (const role in currentTask.actorRolesDict) {
+
+				// If the role has a defined latest activity
 				if (roleLatestAct[role]) {
 
 					// set currentTask's previous task to be the last-added task for this role
@@ -365,7 +454,8 @@ module.exports = class Procedure {
 						roleLatestAct[role].actorRolesDict[role].endTime;
 
 				} else {
-					// no previous tasks, initially assume this one starts at time zero
+					// No latest (aka previous) activity for this role, so initially assume this
+					// activity starts at time zero
 					currentTask.actorRolesDict[role].startTime = new Duration({ seconds: 0 });
 				}
 
@@ -383,19 +473,25 @@ module.exports = class Procedure {
 
 		this.timeSync = new TimeSync(this.tasks, false);
 		this.timeSync.sync();
-		// console.log(this.timeSync.toString());
 		this.taskEndpoints = this.timeSync.endpoints();
 
+	}
+
+	/**
+	 * ! FIXME: THIS IS DEPRECATED AND SHOULD BE REMOVED ON THE NEXT COMMIT
+	 */
+	setupCustomCSS() {
+
+		const fileName = this.procedureFile;
+
 		// Pull in css file if it is defined
-		if (procedureDefinition.css) {
-			const cssFileName = translatePath(fileName, procedureDefinition.css);
+		if (this.procedureDefinition.css) {
+			const cssFileName = translatePath(fileName, this.procedureDefinition.css);
 			if (!fs.existsSync(cssFileName)) {
 				throw new Error(`Could not find css file ${cssFileName}`);
 			}
 			this.css = fs.readFileSync(cssFileName);
 		}
-
-		return null;
 	}
 
 };

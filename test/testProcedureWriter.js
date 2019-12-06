@@ -16,7 +16,7 @@ describe('ProcedureWriter', function() {
 	const procedure = new Procedure();
 	const procedureFile = path.join(__dirname, 'cases/simple/procedures/proc.yml');
 
-	const err = procedure.populateFromFile(procedureFile);
+	const err = procedure.addProcedureDefinitionFromFile(procedureFile);
 	if (err) {
 		throw new Error(err);
 	}
