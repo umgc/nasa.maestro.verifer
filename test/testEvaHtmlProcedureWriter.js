@@ -61,6 +61,7 @@ describe('EvaHtmlProcedureWriter', function() {
 			});
 
 			it(`should create expected screenshot of webpage for ${procedure.filename}.html`, function(done) {
+				this.timeout(10000);
 
 				// Screenshots must match within % below.
 				// Ideally this would be an exact match or something really low like 0.01%, but due
