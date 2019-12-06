@@ -363,7 +363,7 @@ module.exports = class Procedure {
 			taskDefinitions[task.file] = YAML.safeLoad(fs.readFileSync(taskFileName, 'utf8'));
 		}
 
-		this.addTaskDefinitions(taskDefinitions);
+		this.updateTaskDefinitions(taskDefinitions);
 	}
 
 	/**
@@ -379,7 +379,7 @@ module.exports = class Procedure {
 	 *                           }
 	 * @return {null|SchemaValidationError}  If schema validation errors found, returns err object
 	 */
-	addTaskDefinitions(taskDefs) {
+	updateTaskDefinitions(taskDefs) {
 
 		for (const taskFile in taskDefs) {
 			const err = this.updateTaskDefinition(taskFile, taskDefs[taskFile]);

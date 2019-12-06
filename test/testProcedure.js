@@ -12,13 +12,61 @@ const YAML = require('js-yaml');
 
 const Procedure = require('../app/model/Procedure');
 
-/**
- * Positive testing for procedure
- */
-describe('Procedure constructor - Positive Testing', function() {
-	describe('Normal Input', () => {
+function commonExpectations(procedure) {
+	expect(procedure).to.exist; // eslint-disable-line no-unused-expressions
+
+	expect(procedure.name).to.be.a('string');
+	expect(procedure.name).to.equal('Test Procedure 1');
+
+	expect(procedure.tasks).to.be.an('array');
+	expect(procedure.tasks).to.have.all.keys(0);
+
+	expect(procedure.tasks[0].title).to.be.a('string');
+	expect(procedure.tasks[0].title).to.equal('Egress');
+
+	expect(procedure.tasks[0].rolesDict.crewA.actor).to.equal('EV1');
+	expect(procedure.tasks[0].rolesDict.crewA.duration.format('H:M')).to.equal('00:25');
+
+	expect(procedure.tasks[0].concurrentSteps).to.be.an('array');
+	expect(procedure.tasks[0].concurrentSteps).to.have.all.keys(0);
+
+	// eslint-disable-next-line no-unused-expressions
+	expect(procedure.tasks[0].concurrentSteps[0].EV1).to.exist;
+	expect(procedure.tasks[0].concurrentSteps[0].EV1).to.be.an('array');
+	expect(procedure.tasks[0].concurrentSteps[0].EV1).to.have.all.keys(0);
+
+	expect(procedure.tasks[0].concurrentSteps[0].EV1[0].text).to.be.a('string');
+	expect(procedure.tasks[0].concurrentSteps[0].EV1[0].text).to.equal('Go Outside');
+}
+
+const procedureDefinition1 = {
+	// eslint-disable-next-line camelcase
+	procedure_name: 'Test Procedure 1',
+	columns: [
+		{ key: 'IV', display: 'IV/SSRMS/MCC', actors: '*' },
+		{ key: 'EV1', display: 'EV1', actors: 'EV1' },
+		{ key: 'EV2', display: 'EV2', actors: 'EV2' }
+	],
+	tasks: [
+		{ file: 'egress.yml', roles: { crewA: 'EV1', crewB: 'EV2' } }
+	]
+};
+
+const egressTaskDefinition = {
+	title: 'Egress',
+	roles: [
+		{ name: 'crewA', description: 'TBD', duration: { minutes: 25 } }
+	],
+	steps: [
+		{ crewA: [{ step: 'Go Outside' }] }
+	]
+};
+
+describe('Procedure', function() {
+
+	describe('addProcedureDefinitionFromFile() - positive testing (normal input)', () => {
 		const yamlString = `
-            procedure_name: Foo Procedure 1
+            procedure_name: Test Procedure 1
 
             columns:
                 - key: IV
@@ -104,39 +152,11 @@ describe('Procedure constructor - Positive Testing', function() {
 			}
 			expect(err).to.not.exist; // eslint-disable-line no-unused-expressions
 
-			expect(procedure).to.exist; // eslint-disable-line no-unused-expressions
-
-			expect(procedure.name).to.be.a('string');
-			expect(procedure.name).to.equal('Foo Procedure 1');
-
-			expect(procedure.tasks).to.be.an('array');
-			expect(procedure.tasks).to.have.all.keys(0);
-
-			expect(procedure.tasks[0].title).to.be.a('string');
-			expect(procedure.tasks[0].title).to.equal('Egress');
-
-			expect(procedure.tasks[0].rolesDict.crewA.actor).to.equal('EV1');
-			expect(procedure.tasks[0].rolesDict.crewA.duration.format('H:M')).to.equal('00:25');
-
-			expect(procedure.tasks[0].concurrentSteps).to.be.an('array');
-			expect(procedure.tasks[0].concurrentSteps).to.have.all.keys(0);
-
-			// eslint-disable-next-line no-unused-expressions
-			expect(procedure.tasks[0].concurrentSteps[0].EV1).to.exist;
-			expect(procedure.tasks[0].concurrentSteps[0].EV1).to.be.an('array');
-			expect(procedure.tasks[0].concurrentSteps[0].EV1).to.have.all.keys(0);
-
-			expect(procedure.tasks[0].concurrentSteps[0].EV1[0].text).to.be.a('string');
-			expect(procedure.tasks[0].concurrentSteps[0].EV1[0].text).to.equal('Go Outside');
+			commonExpectations(procedure);
 		});
 	});
-});
 
-/**
- * Negative testing for createFromFile
- */
-describe('Procedure constructor - Negative Testing', function() {
-	describe('Bad Input', () => {
+	describe('addProcedureDefinitionFromFile() - negative testing (bad input)', () => {
 
 		afterEach(() => {
 			sinon.restore();
@@ -236,6 +256,52 @@ describe('Procedure constructor - Negative Testing', function() {
 			expect(err.validationErrors).to.not.be.empty;
 			/* eslint-enable no-unused-expressions */
 
+		});
+	});
+
+	describe('addProcedureDefinition()', function() {
+
+		it('should properly populate the procedure', async() => {
+
+			const procedure = new Procedure();
+
+			const procErr = procedure.addProcedureDefinition(procedureDefinition1);
+			if (procErr) {
+				console.log(procErr);
+			}
+
+			const taskErr = procedure.updateTaskDefinition(
+				procedureDefinition1.tasks[0].file,
+				egressTaskDefinition
+			);
+
+			expect(procErr).to.not.exist; // eslint-disable-line no-unused-expressions
+			expect(taskErr).to.not.exist; // eslint-disable-line no-unused-expressions
+
+			commonExpectations(procedure);
+		});
+	});
+
+	// same as above but wrapping the task definition in an object mapping filename --> definition
+	describe('updateTaskDefinitions()', function() {
+		it('should properly populate the procedure', async() => {
+			const procedure = new Procedure();
+
+			const procErr = procedure.addProcedureDefinition(procedureDefinition1);
+			if (procErr) {
+				console.log(procErr);
+			}
+
+			const taskFileName = procedureDefinition1.tasks[0].file;
+			const taskDefinitions = {};
+			taskDefinitions[taskFileName] = egressTaskDefinition;
+
+			const taskErr = procedure.updateTaskDefinitions(taskDefinitions);
+
+			expect(procErr).to.not.exist; // eslint-disable-line no-unused-expressions
+			expect(taskErr).to.not.exist; // eslint-disable-line no-unused-expressions
+
+			commonExpectations(procedure);
 		});
 	});
 });
