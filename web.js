@@ -5,14 +5,14 @@ const maestro = {
 };
 
 // const models = [
-// 'Column'
+// 'Column',
 // 'ConcurrentStep',
 // 'Duration',
 // 'Procedure',
-// 'Step'
+// 'Step',
 // 'Task',
 // 'TaskRole',
-// 'TimeSync'
+// 'TimeSync',
 // 'WebProgram'
 // ];
 // for (const model of models) {
@@ -24,9 +24,15 @@ const maestro = {
 
 // ! FIXME: the stuff above fails. Webpack doesn't seem to like the template literals in require
 
-// maestro.Procedure = require('./app/model/Procedure'); // fails with ajv (schema validator) error
+maestro.Column = require('./app/model/Column');
+maestro.ConcurrentStep = require('./app/model/ConcurrentStep');
+maestro.Duration = require('./app/model/Duration');
+maestro.Procedure = require('./app/model/Procedure');
 maestro.Step = require('./app/model/Step');
 maestro.Task = require('./app/model/Task');
+maestro.TaskRole = require('./app/model/TaskRole');
+maestro.TimeSync = require('./app/model/TimeSync');
+maestro.WebProgram = require('./app/model/WebProgram');
 
 const stepModules = [
 	'ApfrInstall',
@@ -35,7 +41,6 @@ const stepModules = [
 	'stepModules'
 ];
 for (const stepMod of stepModules) {
-	console.log(stepMod);
 	maestro[stepMod] = require(`./app/step-mods/${stepMod}`);
 }
 

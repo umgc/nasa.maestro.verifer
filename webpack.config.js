@@ -3,9 +3,9 @@ const webpack = require('webpack');
 
 module.exports = {
 
-	mode: 'development',
+	// mode: 'development',
 
-	target: 'web',
+	// target: 'web',
 
 	// or --> entry: { editor: 'editor.js', execute: 'execute.js' }
 	entry: './web.js',
@@ -24,15 +24,15 @@ module.exports = {
 		// The following modules don't make sense in the browser context. Replace them with dummies
 		// or replacements that provide functionality in the browser.
 		new webpack.NormalModuleReplacementPlugin(
-			/fs/,
+			/^fs$/,
 			path.resolve(__dirname, './app/mocks/fs.js')
 		),
 		new webpack.NormalModuleReplacementPlugin(
-			/child_process/,
+			/^child_process$/,
 			path.resolve(__dirname, './app/mocks/child_process.js')
 		),
 		new webpack.NormalModuleReplacementPlugin(
-			/.*envHelper/,
+			/^.*\/envHelper$/,
 			path.resolve(__dirname, './app/mocks/envHelper.js')
 		)
 	]
