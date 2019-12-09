@@ -1,9 +1,13 @@
 'use strict';
 
+const Duration = require('./Duration');
 const ConcurrentStep = require('./ConcurrentStep.js');
 const TaskRole = require('./TaskRole.js');
 const consoleHelper = require('../helpers/consoleHelper');
 
+function timeSyncRequired(task) {
+	task.procedure.timeSync.updateStartTimesRequired = true;
+}
 module.exports = class Task {
 
 	/**
@@ -149,6 +153,74 @@ module.exports = class Task {
 		}
 
 		return this.columnIndexes;
+	}
+
+	/**
+	 * Set the start time of this task for a particular role. Also updates end time if duration is
+	 * set.
+	 *
+	 * @param {string} actor    Role for which to adjust start time, e.g. "crewA"
+	 * @param {Duration} time  Duration object specifying start time
+	 * @return {Task}          Return this task for method chaining
+	 */
+	setStartTimeForRole(actor, time) {
+		this.actorRolesDict[actor].startTime = time;
+		timeSyncRequired(this); // this time updated, may affect other times
+
+		if (this.actorRolesDict[actor].duration) {
+			this.actorRolesDict[actor].endTime = Duration.sum(
+				this.actorRolesDict[actor].startTime,
+				this.actorRolesDict[actor].duration
+			);
+		}
+		return this;
+	}
+
+	/**
+	 * Set the start time of this task for a particular role. Also updates start time if duration is
+	 * set.
+	 *
+	 * @param {string} actor    Role for which to adjust end time, e.g. "crewA"
+	 * @param {Duration} time  Duration object specifying end time
+	 * @return {Task}          Return this task for method chaining
+	 */
+	setEndTimeForRole(actor, time) {
+		this.actorRolesDict[actor].endTime = time.clone();
+		timeSyncRequired(this); // this time updated, may affect other times
+
+		if (this.actorRolesDict[actor].duration) {
+			this.actorRolesDict[actor].startTime = Duration.subtract(
+				this.actorRolesDict[actor].endTime,
+				this.actorRolesDict[actor].duration
+			);
+		}
+		return this;
+	}
+
+	/**
+	 * Set the duration of this task for a particular role. Also updates start time if end time is
+	 * set, or end time if start time is set.
+	 *
+	 * @param {string} actor       Role for which to adjust end time, e.g. "crewA"
+	 * @param {Duration} duration  Duration object specifying duration
+	 * @return {Task}              Return this task for method chaining
+	 */
+	setDurationForRole(actor, duration) {
+		this.actorRolesDict[actor].duration = duration.clone();
+		timeSyncRequired(this); // this time updated, may affect other times
+
+		if (this.actorRolesDict[actor].startTime) {
+			this.actorRolesDict[actor].endTime = Duration.sum(
+				this.actorRolesDict[actor].startTime,
+				this.actorRolesDict[actor].duration
+			);
+		} else if (this.actorRolesDict[actor].endTime) {
+			this.actorRolesDict[actor].startTime = Duration.subtract(
+				this.actorRolesDict[actor].endTime,
+				this.actorRolesDict[actor].duration
+			);
+		}
+		return this;
 	}
 
 };

@@ -32,3 +32,9 @@ const maestro = {
 maestro.app = new maestro.WebProgram();
 
 window.maestro = maestro;
+
+console.log(`     __  ______    _____________________  ____
+    /  |/  /   |  / ____/ ___/_  __/ __ \\/ __ \\
+   / /|_/ / /| | / __/  \\__ \\ / / / /_/ / / / /
+  / /  / / ___ |/ /___ ___/ // / / _, _/ /_/ /
+ /_/  /_/_/  |_/_____//____//_/ /_/ |_|\\____/ v${maestro.app.version}`);

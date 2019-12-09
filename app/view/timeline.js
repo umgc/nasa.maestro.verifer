@@ -1,4 +1,4 @@
-/* global moment, tasks */
+/* global moment */
 'use strict';
 
 /**
@@ -50,7 +50,7 @@ Initialize timeline info
 
 // const durationMap = new Map();
 // const concurrentSteps = document.querySelectorAll('');
-console.log(tasks);
+
 // iterate through all steps, use them as a key with a value of the task being used
 // then when a step is checked/unchecked, just use the map to determine which task changed
 

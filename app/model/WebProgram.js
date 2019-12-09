@@ -15,27 +15,34 @@ module.exports = class WebProgram extends Program {
 
 		this.procedure = new Procedure();
 
-		fetch(encodeURI(`procedures/${procedureFilename}`))
-			.then((response) => {
-				return response.text();
-			})
-			.then((text, reject) => {
-				const err = this.procedure.addProcedureDefinition(YAML.safeLoad(text));
-				if (err) {
-					reject(new Error(err));
-				} else {
-					console.log('Procedure loaded. See maestro.app.procedure');
-					const taskLoadPromises = [];
-					for (const task of this.procedure.procedureDefinition.tasks) {
-						taskLoadPromises.push(this.loadTask(task.file));
-					}
-					Promise.all(taskLoadPromises).then((values) => {
-						console.log(values);
-						this.procedure.setupTimeSync();
-					});
-				}
-			});
+		return new Promise((resolveOuter, rejectOuter) => {
 
+			fetch(encodeURI(`procedures/${procedureFilename}`))
+				.then((response) => {
+					return response.text();
+				})
+				.then((text, reject) => {
+					const err = this.procedure.addProcedureDefinition(YAML.safeLoad(text));
+					if (err) {
+						reject(new Error(err));
+					} else {
+						console.log('Procedure loaded. See maestro.app.procedure');
+						const taskLoadPromises = [];
+						for (const task of this.procedure.procedureDefinition.tasks) {
+							taskLoadPromises.push(this.loadTask(task.file));
+						}
+						Promise.all(taskLoadPromises)
+							.then(() => {
+								this.procedure.setupTimeSync();
+								resolveOuter();
+							})
+							.catch((error) => {
+								rejectOuter(error);
+							});
+					}
+				});
+
+		});
 	}
 
 	loadTask(taskFilename) {
