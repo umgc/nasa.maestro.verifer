@@ -1,6 +1,12 @@
 'use strict';
 
+/**
+ * NOTE: Below is deliberately over-exposing modules for now. This is intended for exploring how
+ *       Maestro will be used in browser.
+ */
 const maestro = {
+
+	YAML: require('js-yaml'),
 
 	// models
 	Column: require('./app/model/Column'),
@@ -17,9 +23,12 @@ const maestro = {
 	ApfrInstall: require('./app/step-mods/ApfrInstall'),
 	PgtSet: require('./app/step-mods/PgtSet'),
 	StepModule: require('./app/step-mods/StepModule'),
-	stepModules: require('./app/step-mods/stepModules')
+	stepModules: require('./app/step-mods/stepModules'),
 
-	// EvaHtmlProcedureWriter: require('./app/writer/procedure/EvaHtmlProcedureWriter')
+	// writers
+	EvaHtmlProcedureWriter: require('./app/writer/procedure/EvaHtmlProcedureWriter')
 };
+
+maestro.app = new maestro.WebProgram();
 
 window.maestro = maestro;
