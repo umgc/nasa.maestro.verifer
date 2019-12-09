@@ -3,9 +3,9 @@ const webpack = require('webpack');
 
 module.exports = {
 
-	// mode: 'development',
+	mode: 'development',
 
-	// target: 'web',
+	target: 'web',
 
 	// or --> entry: { editor: 'editor.js', execute: 'execute.js' }
 	entry: './web.js',

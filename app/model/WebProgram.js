@@ -25,9 +25,14 @@ module.exports = class WebProgram extends Program {
 					reject(new Error(err));
 				} else {
 					console.log('Procedure loaded. See maestro.app.procedure');
+					const taskLoadPromises = [];
 					for (const task of this.procedure.procedureDefinition.tasks) {
-						this.loadTask(task.file);
+						taskLoadPromises.push(this.loadTask(task.file));
 					}
+					Promise.all(taskLoadPromises).then((values) => {
+						console.log(values);
+						this.procedure.setupTimeSync();
+					});
 				}
 			});
 
@@ -35,19 +40,27 @@ module.exports = class WebProgram extends Program {
 
 	loadTask(taskFilename) {
 		if (!this.procedure) {
-			throw new Error('Must load procedure for loading tasks');
+			return Promise.reject(new Error('Must load procedure for loading tasks'));
 		}
 
-		fetch(encodeURI(`tasks/${taskFilename}`))
-			.then((response) => {
-				return response.text();
-			})
-			.then((text) => {
-				this.procedure.updateTaskDefinition(
-					taskFilename,
-					YAML.safeLoad(text)
-				);
-			});
+		return new Promise((resolve, reject) => {
+			fetch(encodeURI(`tasks/${taskFilename}`))
+				.then((response) => {
+					return response.text();
+				})
+				.then((text) => {
+					const err = this.procedure.updateTaskDefinition(
+						taskFilename,
+						YAML.safeLoad(text)
+					);
+					if (err) {
+						reject(new Error(err));
+					} else {
+						resolve(true);
+					}
+				});
+
+		});
 	}
 
 };
