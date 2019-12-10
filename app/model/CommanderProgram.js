@@ -211,60 +211,63 @@ module.exports = class CommanderProgram extends Program {
 				console.log(`Unable to scan procedures directory: ${err}`);
 				process.exit();
 			}
-			files.forEach((file) => {
-				console.log(`Generating procedure from ${file}`);
-
-				const procedureFile = path.join(this.procedurePath, file);
-
-				// Parse the input file
-				const procedure = new Procedure();
-				const err = procedure.addProcedureDefinitionFromFile(procedureFile);
-
-				// Check if an error occurred
-				if (err) {
-					consoleHelper.noExitError(`Error while processing procedure ${file}: ${err}`);
-					if (err.validationErrors) {
-						consoleHelper.noExitError('Validation Errors:');
-						consoleHelper.noExitError(err.validationErrors);
-					}
-					return;
-				}
-
-				if (this.evaDocx) {
-					console.log('Creating EVA format');
-					const eva = new EvaDocxProcedureWriter(this, procedure);
-
-					eva.renderIntro(() => {
-						eva.renderTasks();
-						eva.writeFile(path.join(
-							this.outputPath,
-							`${procedure.filename}.docx`
-						));
-					});
-				}
-
-				if (this.sodf) {
-					console.log('Creating SODF format');
-					const sodf = new SodfDocxProcedureWriter(this, procedure);
-					sodf.renderTasks();
-					sodf.writeFile(path.join(
-						this.outputPath,
-						`${procedure.filename}.sodf.docx`
-					));
-				}
-
-				if (this.html) {
-					console.log('Creating EVA HTML format');
-					const evaHtml = new EvaHtmlProcedureWriter(this, procedure);
-					evaHtml.renderIntro();
-					evaHtml.renderTasks();
-					evaHtml.writeFile(path.join(
-						this.outputPath,
-						`${procedure.filename}.eva.html`
-					));
-				}
-
-			});
+			for (const file of files) {
+				this.generateProcedureFormats(file);
+			}
 		});
+	}
+
+	generateProcedureFormats(file) {
+
+		console.log(`Generating procedure from ${file}`);
+
+		const procedureFile = path.join(this.procedurePath, file);
+
+		// Parse the input file
+		const procedure = new Procedure();
+		const err = procedure.addProcedureDefinitionFromFile(procedureFile);
+
+		// Check if an error occurred
+		if (err) {
+			consoleHelper.noExitError(`Error while processing procedure ${file}: ${err}`);
+			if (err.validationErrors) {
+				consoleHelper.noExitError('Validation Errors:');
+				consoleHelper.noExitError(err.validationErrors);
+			}
+			return;
+		}
+
+		if (this.evaDocx) {
+			console.log('Creating EVA format');
+			const eva = new EvaDocxProcedureWriter(this, procedure);
+
+			eva.renderIntro(() => {
+				eva.renderTasks();
+				eva.writeFile(path.join(
+					this.outputPath,
+					`${procedure.filename}.docx`
+				));
+			});
+		}
+
+		if (this.sodf) {
+			this.renderBasicFormat(procedure, SodfDocxProcedureWriter, 'SODF', 'sodf.docx');
+		}
+
+		if (this.html) {
+			this.renderBasicFormat(procedure, EvaHtmlProcedureWriter, 'EVA HTML', 'eva.html');
+		}
+
+	}
+
+	renderBasicFormat(procedure, WriterClass, formatName, extension) {
+		console.log(`Creating ${formatName} format`);
+		const writer = new WriterClass(this, procedure);
+		writer.renderIntro();
+		writer.renderTasks();
+		writer.writeFile(path.join(
+			this.outputPath,
+			`${procedure.filename}.${extension}`
+		));
 	}
 };
