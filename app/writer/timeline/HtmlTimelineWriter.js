@@ -7,15 +7,24 @@ const nunjucks = require('../../model/nunjucksEnvironment');
 function getActivity(writer, columnIndex, task, actor) {
 
 	const opts = {
-		height: writer.minutesToPixels(task.actorRolesDict[actor].duration.getTotalMinutes(), false)
+		height: writer.minutesToPixels(
+			task.actorRolesDict[actor].duration.getTotalMinutes(), false) + 1
 	};
 	opts.stroke = '#000';
 	opts.fillColor = task.color || '#F0FFFF';
+	opts.marginTop = 0;
 
 	opts.title = task.title.toUpperCase();
 	opts.duration = task.actorRolesDict[actor].duration.format('H:M');
 
 	opts.textSize = 12; // potentially adjusted smaller by logic below
+
+	if (task.actorRolesDict[actor].prevTask) {
+		const minutesGap =
+			task.actorRolesDict[actor].startTime.getTotalMinutes() -
+			task.actorRolesDict[actor].prevTask.actorRolesDict[actor].endTime.getTotalMinutes();
+		opts.marginTop += writer.minutesToPixels(minutesGap, false);
+	}
 
 	if (opts.height < 16) {
 		opts.textSize = 8;
