@@ -26,7 +26,9 @@ const maestro = {
 	stepModules: require('./app/step-mods/stepModules'),
 
 	// writers
-	EvaHtmlProcedureWriter: require('./app/writer/procedure/EvaHtmlProcedureWriter')
+	EvaHtmlProcedureWriter: require('./app/writer/procedure/EvaHtmlProcedureWriter'),
+	HtmlTimelineWriter: require('./app/writer/timeline/HtmlTimelineWriter')
+
 };
 
 maestro.app = new maestro.WebProgram();
