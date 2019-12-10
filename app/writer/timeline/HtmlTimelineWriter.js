@@ -12,7 +12,7 @@ function getActivity(writer, columnIndex, task, actor) {
 	};
 	opts.stroke = '#000';
 	opts.fillColor = task.color || '#F0FFFF';
-	opts.marginTop = -1;
+	opts.marginTop = 0;
 
 	opts.title = task.title.toUpperCase();
 	opts.duration = task.actorRolesDict[actor].duration.format('H:M');
