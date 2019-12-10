@@ -16,6 +16,4 @@ module.exports = {
 		// Use Commander to process command line arguments
 		terminal.buildProgramArguments(args);
 	}
-	// buildProgramArguments: buildProgramArguments,
-	// validateProgramArguments: validateProgramArguments
 };

@@ -83,7 +83,6 @@ module.exports = class CommanderProgram extends Program {
 	 * arguments, and attemps to parse the arguments passed to this process.
 	 *
 	 * @param   {*} args        Command line argument array (e.g. process.argv)
-	 * @return  {*} TBD FIXME
 	 */
 	buildProgramArguments(args) {
 
@@ -177,8 +176,6 @@ module.exports = class CommanderProgram extends Program {
 				throw e;
 			}
 		}
-
-		return this.commander;
 	}
 
 	/**

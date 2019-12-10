@@ -126,8 +126,12 @@ module.exports = class Program {
 		return this.gitDate;
 	}
 
+	/**
+	 * Currently returns empty string. Someday actually get user info from git repo.
+	 * @return {string}  Currently just returns ''. Someday return 'User Name<user.name@example.com'
+	 */
 	getLastModifiedBy() {
-		return ''; // FIXME: get this from git repo if available
+		return '';
 	}
 
 };
