@@ -96,7 +96,6 @@ module.exports = class CommanderProgram extends Program {
 
 			// note: this will generate an options.evaDocx property, not noEvaDocx
 			.option('--no-eva-docx', 'Don\'t generate the default EVA DOCX file', null)
-			.option('-c, --css <.css>', 'CSS to append to generated HTML', null)
 			.action((projectPath, options) => {
 				this.projectPath = handleProjectPath(projectPath);
 

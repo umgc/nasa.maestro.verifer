@@ -73,7 +73,6 @@ module.exports = class Procedure {
 		this.actors = [];
 		this.columns = [];
 		this.tasks = [];
-		this.css = '';
 		this.actorToColumn = {};
 
 		this.taskDefinitions = {};
@@ -305,7 +304,6 @@ module.exports = class Procedure {
 
 		this.loadTaskDefinitionsFromFiles();
 		this.setupTimeSync();
-		this.setupCustomCSS();
 	}
 
 	/**
@@ -475,23 +473,6 @@ module.exports = class Procedure {
 		this.timeSync.sync();
 		this.taskEndpoints = this.timeSync.endpoints();
 
-	}
-
-	/**
-	 * ! FIXME: THIS IS DEPRECATED AND SHOULD BE REMOVED ON THE NEXT COMMIT
-	 */
-	setupCustomCSS() {
-
-		const fileName = this.procedureFile;
-
-		// Pull in css file if it is defined
-		if (this.procedureDefinition.css) {
-			const cssFileName = translatePath(fileName, this.procedureDefinition.css);
-			if (!fs.existsSync(cssFileName)) {
-				throw new Error(`Could not find css file ${cssFileName}`);
-			}
-			this.css = fs.readFileSync(cssFileName);
-		}
 	}
 
 };

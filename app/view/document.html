@@ -5,13 +5,11 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
 
-	<!-- <link href="./style.css" rel="stylesheet" type="text/css" /> -->
-
-	<!-- CSS goes in the document HEAD or added to your external stylesheet -->
 	{% include "css.njk" %}
 
 	<title>{{title}}</title>
 	<!-- momentjs is used for datetime parsing -->
+	<!-- FIXME: webpack this -->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment-duration-format/2.3.2/moment-duration-format.min.js"></script>
 </head>
