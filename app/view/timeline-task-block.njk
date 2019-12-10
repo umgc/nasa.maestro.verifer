@@ -1,7 +1,8 @@
 <div class="task-block"
      style='height: {{ height }}px;
         background-color: {{ fillColor }};
-        font-size: {{ textSize }}px;'>
+        font-size: {{ textSize }}px; {% if marginTop %}
+        margin-top: {{ marginTop }}px; {% endif %}'>
     <a href="#{{ title | idattr }}">
         <span class='task-title'>{{ title }}</span>
         <span class='task-duration'>({{ duration }})</span>
