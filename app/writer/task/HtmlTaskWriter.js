@@ -6,6 +6,7 @@ const path = require('path');
 const getImageFileDimensions = require('image-size');
 const nunjucks = require('../../model/nunjucksEnvironment');
 const consoleHelper = require('../../helpers/consoleHelper');
+const envHelper = require('../../helpers/envHelper');
 const TaskWriter = require('./TaskWriter');
 const TextTransform = require('../TextTransform');
 const settings = require('../../settings');
@@ -36,7 +37,7 @@ module.exports = class HtmlTaskWriter extends TaskWriter {
 			// copy image from ./images to ./build
 			// Do this asynchronously...no need to wait
 			// Also, super lazy: if the image already exists don't copy it again
-			if (!fs.existsSync(imageBuildPath)) {
+			if (envHelper.isNode && !fs.existsSync(imageBuildPath)) {
 				fs.copyFile(imageSrcPath, imageBuildPath, (err) => {
 					if (err) {
 						// for now don't throw errors on this. Allow build to finish

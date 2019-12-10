@@ -9,6 +9,11 @@ module.exports = class WebProgram extends Program {
 
 	constructor() {
 		super();
+		this.procedurePath = '/procedures';
+		this.tasksPath = '/tasks';
+		this.imagesPath = '/build';
+		this.outputPath = '/build';
+		this.gitPath = '[NO GIT PATH IN BROWSER]';
 	}
 
 	loadProcedure(procedureFilename) {

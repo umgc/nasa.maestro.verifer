@@ -34,6 +34,10 @@ module.exports = {
 		new webpack.NormalModuleReplacementPlugin(
 			/^.*\/envHelper$/,
 			path.resolve(__dirname, './app/mocks/envHelper.js')
+		),
+		new webpack.NormalModuleReplacementPlugin(
+			/^image-size$/,
+			path.resolve(__dirname, './app/mocks/image-size.js')
 		)
 	]
 

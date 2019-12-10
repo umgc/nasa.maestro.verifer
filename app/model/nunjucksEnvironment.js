@@ -8,7 +8,7 @@ let loader;
 if (envHelper.isNode) {
 	loader = new nunjucks.FileSystemLoader(path.join(__dirname, '../view'));
 } else {
-	loader = new nunjucks.Environment(new nunjucks.WebLoader('/maestro-views'));
+	loader = new nunjucks.WebLoader('/maestro-views');
 }
 
 const nunjucksEnvironment = new nunjucks.Environment(
