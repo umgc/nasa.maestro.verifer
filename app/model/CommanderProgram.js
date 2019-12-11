@@ -76,6 +76,12 @@ module.exports = class CommanderProgram extends Program {
 			.name(this.name)
 			.description(this.description);
 
+		this.composeOutputTypes = [
+			{ option: 'eva-docx', desc: 'Generate EVA .docx file', prop: 'evaDocx' },
+			{ option: 'html', desc: 'Generate HTML file', prop: 'html' },
+			{ option: 'sodf', desc: 'Generate SODF style procedure', prop: 'sodf' }
+		];
+
 	}
 
 	/**
@@ -84,24 +90,24 @@ module.exports = class CommanderProgram extends Program {
 	 */
 	buildProgramArguments() {
 
-		this.commander
+		const compose = this.commander
 			.command('compose [projectPath]')
 			.description('Build products for a Maestro project')
-			.option('--html', 'Generate HTML file', null)
-			.option('--sodf', 'Generate SODF style procedure', null)
+			.option(
+				'--all',
+				`Build all output types: ${this.composeOutputTypes.map((a) => a.option).join(', ')}`,
+				null
+			);
 
-			// note: this will generate an options.evaDocx property, not noEvaDocx
-			.option('--no-eva-docx', 'Don\'t generate the default EVA DOCX file', null)
-			.action((projectPath, options) => {
-				this.projectPath = handleProjectPath(projectPath);
+		for (const ot of this.composeOutputTypes) {
+			compose.option(`--${ot.option}`, ot.desc, null);
+		}
 
-				this.sodf = options.sodf;
-				this.html = options.html;
-				this.evaDocx = options.evaDocx;
-
-				this.validateProgramArguments();
-				this.doCompose();
-			});
+		compose.action((projectPath, options) => {
+			this.prepComposeArguments(projectPath, options);
+			this.validateProgramArguments();
+			this.doCompose();
+		});
 
 		this.commander
 			.command('conduct [projectPath]')
@@ -111,6 +117,26 @@ module.exports = class CommanderProgram extends Program {
 				this.serveMaestroWeb(projectPath, options);
 			});
 
+	}
+
+	prepComposeArguments(projectPath, options) {
+		this.projectPath = handleProjectPath(projectPath);
+
+		let anyTrue = false;
+
+		for (const ot of this.composeOutputTypes) {
+			// map options inputs to program properties
+			if (options.all || options[ot.prop]) {
+				this[ot.prop] = true;
+				anyTrue = true;
+			} else {
+				this[ot.prop] = false;
+			}
+		}
+
+		if (!anyTrue) {
+			this.evaDocx = true; // default if nothing is selected
+		}
 	}
 
 	/**
