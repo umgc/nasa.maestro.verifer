@@ -86,9 +86,23 @@ If you use [VS Code](https://code.visualstudio.com/), we recommend installing th
 
 ## Issue and feature tracking
 
-Issues in this repository will only be kept open for either (1) unresolved bugs or (2) features being legitimately worked as part of an active [project](https://github.com/xOPERATIONS/maestro/projects). "Legitimately being worked" means the issue is in the "priority" column or further. Items in the backlog will be left in the "closed" state in order to keep the list of issues clean, thus focusing on high-priority items (e.g. actual bugs and in-work features).
+Issues in this repository will only be kept open for either (1) unresolved bugs or (2) other items being legitimately worked as part of an [active project](https://github.com/xOPERATIONS/maestro/projects). "Legitimately being worked" means the issue is in the "priority" column or further. Items in the backlog will be left in the "closed" state in order to keep the list of all issues clean, thus focusing on high-priority items (e.g. actual bugs and in-work items).
 
-As such, new feature requests will be labelled accordingly and closed immediately (unless they will be immediately worked) with the following comment: `Feature requests closed until legitimately close to consideration for implementation. See [the list of pending feature requests](https://github.com/xOPERATIONS/maestro/issues?q=is%3Aclosed+is%3Aissue+label%3A%22feature+request%22)`
+When these incomplete-but-closed issues begin being worked, they will be reopened. When they are completed they will be closed and their labels will be updated accordingly (e.g. `feature request` becomes `feature added!` and `debt cleanup` becomes `debt paid!`).
+
+### New non-bugs are immediately closed
+
+New non-priority issues will be labelled accordingly and closed immediately (unless they will be immediately worked) with one of the following comments:
+
+- Feature requests: `Feature requests closed until legitimately close to consideration for implementation. See [the list of pending feature requests](https://github.com/xOPERATIONS/maestro/issues?q=is%3Aclosed+is%3Aissue+label%3A%22feature+request%22)`
+- Debt cleanup: `Debt cleanup issues closed until legitimately close to consideration for implementation. See [the list of pending debt cleanup](https://github.com/xOPERATIONS/maestro/issues?q=is%3Aclosed+is%3Aissue+label%3A%22debt+cleanup%22)`
+
+### Lists of deferred feature requests and debt cleanup
+
+The following lists include possible future issues to work, but are not currently being worked and thus are not given the priority of being shown open.
+
+- [Feature requests](https://github.com/xOPERATIONS/maestro/issues?q=is%3Aclosed+is%3Aissue+label%3A%22feature+request%22)
+- [Debt cleanup](https://github.com/xOPERATIONS/maestro/issues?q=is%3Aclosed+is%3Aissue+label%3A%22debt+cleanup%22)
 
 
 ## Definitions
