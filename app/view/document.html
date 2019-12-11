@@ -8,10 +8,6 @@
 	{% include "css.njk" %}
 
 	<title>{{title}}</title>
-	<!-- momentjs is used for datetime parsing -->
-	<!-- FIXME: webpack this -->
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment-duration-format/2.3.2/moment-duration-format.min.js"></script>
 </head>
 <body>
 	<script>
@@ -23,7 +19,6 @@
 		{{content}}
 		{{footer}}
 	</div>
-	<script>{% include "timeline.js" %}</script>
 	<script type="application/javascript" src="maestro/bundle.js"></script>
 </body>
 </html>

@@ -31,6 +31,8 @@ const maestro = {
 
 };
 
+require('./app/ui/timeline');
+
 maestro.app = new maestro.WebProgram();
 
 window.maestro = maestro;
