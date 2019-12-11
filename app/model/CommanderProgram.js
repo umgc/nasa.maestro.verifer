@@ -74,22 +74,19 @@ module.exports = class CommanderProgram extends Program {
 		this.commander
 			.version(this.version, '--version')
 			.name(this.name)
-			.description(this.description)
-			.allowUnknownOption();
+			.description(this.description);
+
 	}
 
 	/**
 	 * This function configures commander.js for this application's command line
-	 * arguments, and attemps to parse the arguments passed to this process.
-	 *
-	 * @param   {*} args        Command line argument array (e.g. process.argv)
+	 * arguments, and attempts to parse the arguments passed to this process.
 	 */
-	buildProgramArguments(args) {
+	buildProgramArguments() {
 
 		this.commander
 			.command('compose [projectPath]')
 			.description('Build products for a Maestro project')
-			.option('-t, --template <.html>', 'specify a template to use')
 			.option('--html', 'Generate HTML file', null)
 			.option('--sodf', 'Generate SODF style procedure', null)
 
@@ -101,9 +98,7 @@ module.exports = class CommanderProgram extends Program {
 				this.sodf = options.sodf;
 				this.html = options.html;
 				this.evaDocx = options.evaDocx;
-				this.template = options.template || path.join(
-					__dirname, 'templates', 'spacewalk.njk'
-				);
+
 				this.validateProgramArguments();
 				this.doCompose();
 			});
@@ -113,56 +108,16 @@ module.exports = class CommanderProgram extends Program {
 			.description('Serve Maestro web app')
 			.option('-p, --port <num>', 'specify port on which to serve', 8000)
 			.action((projectPath, options) => {
-				this.projectPath = handleProjectPath(projectPath);
-				this.port = parseInt(options.port);
-				if (!this.port || this.port < 1025) {
-					const tooSmall = this.port < 1025 ?
-						'\n  Please pick an integer over 1024' :
-						'';
-					const recommend = '\n  Recommended options: 3000, 8000, 8080, 9000';
-					consoleHelper.error(`port ${this.port} is invalid.${tooSmall}${recommend}`);
-				}
-				this.validateProgramArguments();
-
-				const express = require('express');
-				const app = express();
-
-				app.use('/build', express.static(path.join(this.projectPath, 'build')));
-				app.use('/procedures', express.static(path.join(this.projectPath, 'procedures')));
-				app.use('/tasks', express.static(path.join(this.projectPath, 'tasks')));
-
-				app.use('/maestro', express.static(path.resolve(__dirname, '../../build')));
-				app.use('/maestro-views', express.static(path.resolve(__dirname, '../view')));
-
-				const htmlFiles = fs.readdirSync(this.outputPath).filter((filename) => {
-					return filename.endsWith('.html');
-				});
-				if (htmlFiles.length === 0) {
-					consoleHelper.noExitError('No HTML files found in /build directory. Try running `maestro compose --html` first');
-					process.exit();
-				} else if (htmlFiles.length > 1) {
-					consoleHelper.warn(`Multiple HTML files found in /build directory\nBeing lazy and using first one: ${htmlFiles[0]}`);
-				}
-				const htmlFile = path.join(this.outputPath, htmlFiles[0]);
-
-				app.get('/', (req, res) => {
-					res.sendFile(htmlFile);
-				});
-
-				app.listen(this.port, () => {
-					consoleHelper.success(
-						`Visit http://localhost:${this.port} in your web browser. Type ctrl-c here to exit`
-					);
-				});
+				this.serveMaestroWeb(projectPath, options);
 			});
 
-		//  Commander.js does an unhelpful thing if there are invalid options;
-		//  Override the default behavior to do a more helpful thing.
-		this.commander.unknownOption = function() {
-			//  An invalid option has been received. Print usage and exit.
-			this.commander.help();
-		};
+	}
 
+	/**
+	 * Process user input
+	 * @param {Array} args  Command line argument array (e.g. process.argv)
+	 */
+	process(args) {
 		try {
 			this.commander.parse(args);
 		} catch (e) {
@@ -269,5 +224,52 @@ module.exports = class CommanderProgram extends Program {
 			this.outputPath,
 			`${procedure.filename}.${extension}`
 		));
+	}
+
+	serveMaestroWeb(projectPath, options) {
+		this.projectPath = handleProjectPath(projectPath);
+		this.port = parseInt(options.port);
+		if (!this.port || this.port < 1025) {
+			const tooSmall = this.port < 1025 ?
+				'\n  Please pick an integer over 1024' :
+				'';
+			const recommend = '\n  Recommended options: 3000, 8000, 8080, 9000';
+			consoleHelper.error(`port ${this.port} is invalid.${tooSmall}${recommend}`);
+		}
+		this.validateProgramArguments();
+
+		const express = require('express');
+		const app = express();
+
+		// Serve project resources
+		app.use('/build', express.static(path.join(this.projectPath, 'build')));
+		app.use('/procedures', express.static(path.join(this.projectPath, 'procedures')));
+		app.use('/tasks', express.static(path.join(this.projectPath, 'tasks')));
+
+		// Serve application resources
+		app.use('/maestro', express.static(path.resolve(__dirname, '../../build')));
+		app.use('/maestro-views', express.static(path.resolve(__dirname, '../view')));
+
+		const htmlFiles = fs.readdirSync(this.outputPath).filter((filename) => {
+			return filename.endsWith('.html');
+		});
+
+		if (htmlFiles.length === 0) {
+			consoleHelper.noExitError('No HTML files found in /build directory. Try running `maestro compose --html` first');
+			process.exit();
+		} else if (htmlFiles.length > 1) {
+			consoleHelper.warn(`Multiple HTML files found in /build directory\nBeing lazy and using first one: ${htmlFiles[0]}`);
+		}
+		const htmlFile = path.join(this.outputPath, htmlFiles[0]);
+
+		app.get('/', (req, res) => {
+			res.sendFile(htmlFile);
+		});
+
+		app.listen(this.port, () => {
+			consoleHelper.success(
+				`Visit http://localhost:${this.port} in your web browser. Type ctrl-c here to exit`
+			);
+		});
 	}
 };

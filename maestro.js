@@ -1,19 +1,21 @@
 'use strict';
 
 const CommanderProgram = require('./app/model/CommanderProgram');
-const terminal = new CommanderProgram();
+const program = new CommanderProgram();
 
 module.exports = {
 
 	/**
 	 * Surrogate program entry point
 	 *
-	 * @param   {*} args Command line arguments
+	 * @param {Array} args  Command line arguments
 	 */
 	run: function(args) {
-		console.log(`${terminal.fullName}\n`);
+		console.log(`${program.fullName}\n`);
 
 		// Use Commander to process command line arguments
-		terminal.buildProgramArguments(args);
+		program.buildProgramArguments();
+
+		program.process(args);
 	}
 };
