@@ -88,6 +88,9 @@ If you use [VS Code](https://code.visualstudio.com/), we recommend installing th
 
 Issues in this repository will only be kept open for either (1) unresolved bugs or (2) features being legitimately worked as part of an active [project](https://github.com/xOPERATIONS/maestro/projects). "Legitimately being worked" means the issue is in the "priority" column or further. Items in the backlog will be left in the "closed" state in order to keep the list of issues clean, thus focusing on high-priority items (e.g. actual bugs and in-work features).
 
+As such, new feature requests will be labelled accordingly and closed immediately (unless they will be immediately worked) with the following comment: `Feature requests closed until legitimately close to consideration for implementation. See [the list of pending feature requests](https://github.com/xOPERATIONS/maestro/issues?q=is%3Aclosed+is%3Aissue+label%3A%22feature+request%22)`
+
+
 ## Definitions
 
 Maestro uses several terms like "actors", "roles", and "tasks". These need better definition.
