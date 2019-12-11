@@ -8,6 +8,53 @@ const envHelper = require('../helpers/envHelper');
 
 const noGitMessage = 'Git not available in browser';
 
+function runGitCmd(projectPath, cmd) {
+	let output;
+
+	try {
+		output = childProcess
+			.execSync(`cd ${projectPath} && ${cmd}`)
+			.toString()
+			.trim();
+	} catch (err) {
+		console.error(err);
+	}
+
+	return output;
+}
+
+function getDateOrHash(program, type) {
+
+	const types = {
+		hash: {
+			prop: 'gitHash',
+			cmd: 'git rev-parse --short HEAD',
+			noRepoText: 'NO VERSION (NOT CONFIG CONTROLLED)'
+		},
+		date: {
+			prop: 'gitDate',
+			cmd: 'git log -1 --format=%cd --date=iso8601',
+			noRepoText: 'NO DATE (NOT CONFIG CONTROLLED)'
+		}
+	};
+	const prop = types[type].prop;
+
+	if (program[prop]) {
+		return program[prop];
+	}
+
+	if (envHelper.isBrowser) {
+		program[prop] = noGitMessage;
+		return program[prop];
+	}
+
+	program[prop] = fs.existsSync(program.gitPath) ?
+		runGitCmd(program.projectPath, types[type].cmd) :
+		types[type].noRepoText;
+
+	return program[prop];
+}
+
 module.exports = class Program {
 
 	constructor() {
@@ -36,31 +83,12 @@ module.exports = class Program {
 	 * @return {string} First 8 characters of git hash for project
 	 */
 	getGitHash() {
-
-		if (this.gitHash) {
-			return this.gitHash;
-		}
-
-		if (envHelper.isBrowser) {
-			this.gitHash = noGitMessage;
-			return this.gitHash;
-		}
-
-		if (fs.existsSync(this.gitPath)) {
-			try {
-				this.gitHash = childProcess
-					.execSync(`cd ${this.projectPath} && git rev-parse --short HEAD`)
-					.toString().trim();
-			} catch (err) {
-				console.error(err);
-			}
-		} else {
-			this.gitHash = 'NO VERSION (NOT CONFIG CONTROLLED)';
-		}
-
-		return this.gitHash;
+		return getDateOrHash(this, 'hash');
 	}
 
+	/**
+	 * @return {string|boolean}  False if no uncommitted changes. "X uncommitted change(s)" if any.
+	 */
 	getGitUncommittedChanges() {
 
 		if (this.gitUncommittedChanges) {
@@ -72,24 +100,14 @@ module.exports = class Program {
 			return this.gitUncommittedChanges;
 		}
 
+		this.gitUncommittedChanges = false;
+
 		if (fs.existsSync(this.gitPath)) {
-			try {
-				const uncommitted = childProcess
-					.execSync(`cd ${this.projectPath} && git status --porcelain`)
-					.toString().trim().split('\n');
-
-				if (uncommitted.length > 1 || uncommitted[0] !== '') {
-					const plural = uncommitted.length === 1 ? '' : 's';
-					this.gitUncommittedChanges = `${uncommitted.length} uncommitted change${plural}`;
-				} else {
-					this.gitUncommittedChanges = false;
-				}
-			} catch (err) {
-				console.error(err);
+			const uncommitted = runGitCmd(this.projectPath, 'git status --porcelain').split('\n');
+			if (uncommitted.length > 1 || uncommitted[0] !== '') {
+				const plural = uncommitted.length === 1 ? '' : 's';
+				this.gitUncommittedChanges = `${uncommitted.length} uncommitted change${plural}`;
 			}
-
-		} else {
-			this.gitUncommittedChanges = false;
 		}
 
 		return this.gitUncommittedChanges;
@@ -101,29 +119,7 @@ module.exports = class Program {
 	 * @return {string} Date in iso8601 format
 	 */
 	getGitDate() {
-
-		if (this.gitDate) {
-			return this.gitDate;
-		}
-
-		if (envHelper.isBrowser) {
-			this.gitDate = noGitMessage;
-			return this.gitDate;
-		}
-
-		if (fs.existsSync(this.gitPath)) {
-			try {
-				this.gitDate = childProcess
-					.execSync(`cd ${this.projectPath} && git log -1 --format=%cd --date=iso8601`)
-					.toString().trim();
-			} catch (err) {
-				console.error(err);
-			}
-		} else {
-			this.gitDate = 'NO DATE (NOT CONFIG CONTROLLED)';
-		}
-
-		return this.gitDate;
+		return getDateOrHash(this, 'date');
 	}
 
 	/**
