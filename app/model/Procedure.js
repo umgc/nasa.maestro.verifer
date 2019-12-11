@@ -10,6 +10,7 @@ const Task = require('./Task');
 const validateSchema = require('../schema/validateSchema');
 const Duration = require('./Duration');
 const TimeSync = require('./TimeSync');
+const consoleHelper = require('../helpers/consoleHelper');
 
 function translatePath(procedureFilePath, taskFileName) {
 	// Look in tasks directory, sister to procedures directory
@@ -473,6 +474,18 @@ module.exports = class Procedure {
 		this.timeSync.sync();
 		this.taskEndpoints = this.timeSync.endpoints();
 
+	}
+
+	handleParsingError(err, file) {
+		// Check if an error occurred
+		if (err && err instanceof Error) {
+			consoleHelper.noExitError(`Error while processing procedure ${file}: ${err}`);
+			if (err.validationErrors) {
+				consoleHelper.noExitError('Validation Errors:');
+				consoleHelper.noExitError(err.validationErrors);
+			}
+			return;
+		}
 	}
 
 };

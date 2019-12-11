@@ -11,7 +11,7 @@ const EvaDocxProcedureWriter = require('../writer/procedure/EvaDocxProcedureWrit
 const SodfDocxProcedureWriter = require('../writer/procedure/SodfDocxProcedureWriter');
 const EvaHtmlProcedureWriter = require('../writer/procedure/EvaHtmlProcedureWriter');
 
-const consoleHelper = require('../helpers/consoleHelper');
+const Server = require('../server/Server');
 
 function handleProjectPath(projectPath) {
 	if (projectPath) {
@@ -181,15 +181,8 @@ module.exports = class CommanderProgram extends Program {
 		// Parse the input file
 		const procedure = new Procedure();
 		const err = procedure.addProcedureDefinitionFromFile(procedureFile);
-
-		// Check if an error occurred
 		if (err) {
-			consoleHelper.noExitError(`Error while processing procedure ${file}: ${err}`);
-			if (err.validationErrors) {
-				consoleHelper.noExitError('Validation Errors:');
-				consoleHelper.noExitError(err.validationErrors);
-			}
-			return;
+			procedure.handleParsingError(err, file);
 		}
 
 		if (this.evaDocx) {
@@ -228,48 +221,12 @@ module.exports = class CommanderProgram extends Program {
 
 	serveMaestroWeb(projectPath, options) {
 		this.projectPath = handleProjectPath(projectPath);
-		this.port = parseInt(options.port);
-		if (!this.port || this.port < 1025) {
-			const tooSmall = this.port < 1025 ?
-				'\n  Please pick an integer over 1024' :
-				'';
-			const recommend = '\n  Recommended options: 3000, 8000, 8080, 9000';
-			consoleHelper.error(`port ${this.port} is invalid.${tooSmall}${recommend}`);
-		}
 		this.validateProgramArguments();
 
-		const express = require('express');
-		const app = express();
-
-		// Serve project resources
-		app.use('/build', express.static(path.join(this.projectPath, 'build')));
-		app.use('/procedures', express.static(path.join(this.projectPath, 'procedures')));
-		app.use('/tasks', express.static(path.join(this.projectPath, 'tasks')));
-
-		// Serve application resources
-		app.use('/maestro', express.static(path.resolve(__dirname, '../../build')));
-		app.use('/maestro-views', express.static(path.resolve(__dirname, '../view')));
-
-		const htmlFiles = fs.readdirSync(this.outputPath).filter((filename) => {
-			return filename.endsWith('.html');
-		});
-
-		if (htmlFiles.length === 0) {
-			consoleHelper.noExitError('No HTML files found in /build directory. Try running `maestro compose --html` first');
-			process.exit();
-		} else if (htmlFiles.length > 1) {
-			consoleHelper.warn(`Multiple HTML files found in /build directory\nBeing lazy and using first one: ${htmlFiles[0]}`);
-		}
-		const htmlFile = path.join(this.outputPath, htmlFiles[0]);
-
-		app.get('/', (req, res) => {
-			res.sendFile(htmlFile);
-		});
-
-		app.listen(this.port, () => {
-			consoleHelper.success(
-				`Visit http://localhost:${this.port} in your web browser. Type ctrl-c here to exit`
-			);
-		});
+		const server = new Server(this);
+		server
+			.setPort(options.port)
+			.setupStatic()
+			.serve();
 	}
 };
