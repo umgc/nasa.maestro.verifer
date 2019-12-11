@@ -411,6 +411,10 @@ module.exports = class Procedure {
 		}
 
 		// Create task model
+		// FIXME: WebProgram may load tasks asynchronously, and thus order may not be preserved.
+		//        This instead should determine the location of taskFile from the procedure
+		//        definition, and insert the new Task at that location within this.tasks. Or
+		//        something similar.
 		this.tasks.push(new Task(
 			taskDef,
 			proceduresTaskInstance,

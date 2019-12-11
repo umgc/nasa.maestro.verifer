@@ -80,3 +80,17 @@ exports.repeatArray = function(arr, count) {
 		return b;
 	}
 };
+
+/**
+ * Check if an item is within an array
+ * @param {*} needle        Any item to check for existence in haystack
+ * @param {Array} haystack  Array of items to check if needle is within
+ * @return {boolean}        Whether or not needle is in haystack
+ */
+exports.isAnyOf = function(needle, haystack) {
+	if (haystack.indexOf(needle) === -1) {
+		return false; // needle not in array haystack
+	} else {
+		return true;
+	}
+};
