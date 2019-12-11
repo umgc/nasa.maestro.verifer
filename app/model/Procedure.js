@@ -410,23 +410,37 @@ module.exports = class Procedure {
 			return err;
 		}
 
+		// Browser may load tasks asynchronously, and thus order may not be preserved.
+		// Thus, need to determine the location of taskFile from the procedure
+		// definition, and insert the new Task at that location within this.tasks
+		const index = this.getTaskIndexByFilename(taskFile);
+
+		if (index === -1) {
+			throw new Error(`Task file ${taskFile} not found.`);
+		}
+
 		// Create task model
-		// FIXME: WebProgram may load tasks asynchronously, and thus order may not be preserved.
-		//        This instead should determine the location of taskFile from the procedure
-		//        definition, and insert the new Task at that location within this.tasks. Or
-		//        something similar.
-		this.tasks.push(new Task(
+		this.tasks[index] = new Task(
 			taskDef,
 			proceduresTaskInstance,
 			this.getColumnKeys(),
 			this
-		));
+		);
 
 		// Save the raw definition
 		this.taskDefinitions[taskFile] = taskDef;
 
 		return null;
 
+	}
+
+	getTaskIndexByFilename(filename) {
+		for (let i = 0; i < this.procedureDefinition.tasks.length; i++) {
+			if (this.procedureDefinition.tasks[i].file === filename) {
+				return i;
+			}
+		}
+		return -1;
 	}
 
 	setupTimeSync() {
