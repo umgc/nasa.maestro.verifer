@@ -5,6 +5,13 @@ const YAML = require('js-yaml');
 const Program = require('./Program');
 const Procedure = require('./Procedure');
 
+function fetchFileText(uri) {
+	return fetch(encodeURI(uri))
+		.then((response) => {
+			return response.text();
+		});
+}
+
 module.exports = class WebProgram extends Program {
 
 	constructor() {
@@ -21,11 +28,7 @@ module.exports = class WebProgram extends Program {
 		this.procedure = new Procedure();
 
 		return new Promise((resolveOuter, rejectOuter) => {
-
-			fetch(encodeURI(`procedures/${procedureFilename}`))
-				.then((response) => {
-					return response.text();
-				})
+			fetchFileText(`procedures/${procedureFilename}`)
 				.then((text, reject) => {
 					const err = this.procedure.addProcedureDefinition(YAML.safeLoad(text));
 					if (err) {
@@ -56,10 +59,7 @@ module.exports = class WebProgram extends Program {
 		}
 
 		return new Promise((resolve, reject) => {
-			fetch(encodeURI(`tasks/${taskFilename}`))
-				.then((response) => {
-					return response.text();
-				})
+			fetchFileText(`tasks/${taskFilename}`)
 				.then((text) => {
 					const err = this.procedure.updateTaskDefinition(
 						taskFilename,
