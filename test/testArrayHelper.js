@@ -88,12 +88,6 @@ describe('arrayHelper', function() {
 		}
 	});
 
-	/**
-	 * Check if an item is within an array
-	 * @param {*} needle        Any item to check for existence in haystack
-	 * @param {Array} haystack  Array of items to check if needle is within
-	 * @return {boolean}        Whether or not needle is in haystack
-	 */
 	describe('isAnyOf()', function() {
 
 		const referenceVar = { my: 'object' };
