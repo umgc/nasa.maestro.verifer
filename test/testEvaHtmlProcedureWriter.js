@@ -9,13 +9,14 @@ const assert = require('chai').assert;
 const puppeteer = require('puppeteer');
 const resemble = require('node-resemble-js');
 
+const CommanderProgram = require('../app/model/CommanderProgram');
 const Procedure = require('../app/model/Procedure');
 
 const EvaHtmlProcedureWriter = require('../app/writer/procedure/EvaHtmlProcedureWriter');
 
 const tests = [
-	{ file: 'simple/procedures/proc.yml', mismatchThreshold: 1.48 },
-	{ file: 'complex-times/procedures/proc.yml', mismatchThreshold: 1.9 }
+	{ file: 'simple/procedures/proc.yml', mismatchThreshold: 1.57 },
+	{ file: 'complex-times/procedures/proc.yml', mismatchThreshold: 1.94 }
 ];
 
 describe('EvaHtmlProcedureWriter', function() {
@@ -23,7 +24,7 @@ describe('EvaHtmlProcedureWriter', function() {
 		const procedure = new Procedure();
 		const procedureFile = path.join(__dirname, 'cases', test.file);
 
-		const err = procedure.populateFromFile(procedureFile);
+		const err = procedure.addProcedureDefinitionFromFile(procedureFile);
 		if (err) {
 			throw new Error(err);
 		}
@@ -34,7 +35,7 @@ describe('EvaHtmlProcedureWriter', function() {
 		const expectedPath = path.join(buildDir, `${procedure.filename}.html.jpg`);
 		const testPath = path.join(buildDir, `test${procedure.filename}.html.jpg`);
 
-		const procWriter = new EvaHtmlProcedureWriter({}, procedure);
+		const procWriter = new EvaHtmlProcedureWriter(new CommanderProgram(), procedure);
 		procWriter.renderIntro();
 		procWriter.renderTasks();
 		procWriter.writeFile(htmlPath);
@@ -60,6 +61,7 @@ describe('EvaHtmlProcedureWriter', function() {
 			});
 
 			it(`should create expected screenshot of webpage for ${procedure.filename}.html`, function(done) {
+				this.timeout(10000);
 
 				// Screenshots must match within % below.
 				// Ideally this would be an exact match or something really low like 0.01%, but due

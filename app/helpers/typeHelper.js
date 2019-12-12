@@ -13,10 +13,20 @@ const validTypes = {
 	object: (v) => { return typeof v === 'object'; }
 };
 
+/**
+ * Determine what type a value is within a list of possible values, or false if not one of those
+ * types.
+ *
+ * @param {*} value                    Any type of variable to check its type.
+ * @param  {...string|Function} types  Strings matching keys in validTypes, to check if 'value' is
+ *                                     one of those types. Also can pass in a constructor function
+ *                                     to check if 'value' is an instance of that constructor class.
+ * @return {string|Function|boolean}   Return the string or constructor function if found, or false.
+ */
 function is(value, ...types) {
 	// types will be an array by definition because of the ...types. If it has just one element, and
 	// that element is itself an array, set types to that element (flatten the 2D array into 1D).
-	if (types.length === 1 && is(types[0], 'array')) {
+	if (types.length === 1 && Array.isArray(types[0])) {
 		types = types[0];
 	}
 
@@ -34,12 +44,20 @@ function is(value, ...types) {
 			return type;
 		}
 	}
+
+	return false;
 }
 
 function errorIfIsnt(value, ...types) {
+	// see comment above in is()
+	if (types.length === 1 && Array.isArray(types[0])) {
+		types = types[0];
+	}
+
 	if (!is(value, types)) {
 		throw new Error(`Value ${value} must be one of these types:\n  - ${types.join('\n  - ')}`);
 	}
+	return false; // didn't error
 }
 
 module.exports = {

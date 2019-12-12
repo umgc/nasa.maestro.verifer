@@ -46,10 +46,6 @@
                     }
                 ]
             }
-        },
-        "css": {
-            "type": "string",
-            "description": "DEPRECATED. Not really relevant to current Maestro."
         }
     },
     "required": [

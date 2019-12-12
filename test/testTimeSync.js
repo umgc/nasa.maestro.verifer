@@ -61,7 +61,7 @@ describe('TimeSync', function() {
 	const baseProcedure = new Procedure();
 	const procedureFilePath = path.join(__dirname, 'cases/complex-times/procedures/proc.yml');
 
-	const err = baseProcedure.populateFromFile(procedureFilePath);
+	const err = baseProcedure.addProcedureDefinitionFromFile(procedureFilePath);
 	if (err) {
 		throw new Error(err);
 	}
@@ -73,7 +73,7 @@ describe('TimeSync', function() {
 	describe('updateStartTimes()', function() {
 		for (let t = 0; t < baseProcedure.tasks.length; t++) {
 			const testProcedure = new Procedure();
-			const err = testProcedure.populateFromFile(procedureFilePath);
+			const err = testProcedure.addProcedureDefinitionFromFile(procedureFilePath);
 			if (err) {
 				throw new Error(err);
 			}
@@ -98,7 +98,7 @@ describe('TimeSync', function() {
 	describe('sync()', function() {
 		for (let t = 0; t < baseProcedure.tasks.length; t++) {
 			const testProcedure = new Procedure();
-			const err = testProcedure.populateFromFile(procedureFilePath);
+			const err = testProcedure.addProcedureDefinitionFromFile(procedureFilePath);
 			if (err) {
 				throw new Error(err);
 			}

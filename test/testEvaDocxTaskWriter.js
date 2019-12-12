@@ -7,6 +7,7 @@ const path = require('path');
 const assert = require('chai').assert;
 const docx = require('docx');
 
+const CommanderProgram = require('../app/model/CommanderProgram');
 const Procedure = require('../app/model/Procedure');
 
 const EvaDocxProcedureWriter = require('../app/writer/procedure/EvaDocxProcedureWriter');
@@ -16,12 +17,12 @@ describe('EvaDocxTaskWriter', function() {
 	const procedure = new Procedure();
 	const procedureFile = path.join(__dirname, 'cases/simple/procedures/proc.yml');
 
-	const err = procedure.populateFromFile(procedureFile);
+	const err = procedure.addProcedureDefinitionFromFile(procedureFile);
 	if (err) {
 		throw new Error(err);
 	}
 
-	const procWriter = new EvaDocxProcedureWriter({}, procedure);
+	const procWriter = new EvaDocxProcedureWriter(new CommanderProgram(), procedure);
 	const taskWriter = new EvaDocxTaskWriter(
 		procedure.tasks[0],
 		procWriter

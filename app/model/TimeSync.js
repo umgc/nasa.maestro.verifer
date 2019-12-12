@@ -306,6 +306,7 @@ module.exports = class TimeSync {
 	 */
 	constructor(tasks, beVerbose = false, initStartTimes = true) {
 		this.tasks = tasks;
+		this.updateStartTimesRequired = true;
 		if (beVerbose) {
 			verbose = true;
 		}
@@ -332,6 +333,7 @@ module.exports = class TimeSync {
 		// may need to be synchronized between actors (i.e. actors need to start joint tasks at the
 		// same time)
 		updateActivityStartTime(task);
+		this.updateStartTimesRequired = false;
 	}
 
 	/**
@@ -349,6 +351,10 @@ module.exports = class TimeSync {
 		// to target updates to specific parts of the graph.
 		if (!task) {
 			task = this.tasks[0];
+		}
+
+		if (this.updateStartTimesRequired) {
+			this.updateStartTimes(task);
 		}
 
 		// Clear the syncComplete object

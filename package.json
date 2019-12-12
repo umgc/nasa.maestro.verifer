@@ -10,7 +10,10 @@
     "lint:fix": "eslint . --color --fix",
     "test": "mocha",
     "test:colors": "mocha  --colors",
-    "test:coverage": "nyc --all --reporter=text --reporter=lcov npm run test"
+    "test:coverage": "nyc --all --reporter=text --reporter=lcov npm run test",
+    "build": "./node_modules/.bin/webpack",
+    "build:prod": "./node_modules/.bin/webpack -p",
+    "watch": "./node_modules/.bin/webpack --watch"
   },
   "pre-commit": [
     "pre-commit-msg",
@@ -77,6 +80,8 @@
     "nyc": "^14.1.1",
     "pre-commit": "^1.2.2",
     "puppeteer": "^2.0.0",
-    "sinon": "^7.5.0"
+    "sinon": "^7.5.0",
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.10"
   }
 }

@@ -13,7 +13,6 @@
 | Property                          | Type       | Required     | Nullable | Defined by                                 |
 | --------------------------------- | ---------- | ------------ | -------- | ------------------------------------------ |
 | [actors](#actors)                 | `object[]` | Optional     | No       | (this schema)                              |
-| [css](#css)                       | `string`   | Optional     | No       | (this schema)                              |
 | [procedure_name](#procedure_name) | `string`   | **Required** | No       | (this schema)                              |
 | [tasks](#tasks)                   | `object[]` | **Required** | No       | (this schema)                              |
 | `*`                               | any        | Additional   | Yes      | this schema _allows_ additional properties |
@@ -62,20 +61,6 @@ in parentheses and appended to the role as the column header.
 - type: `string`
 
 ##### name Type
-
-`string`
-
-## css
-
-DEPRECATED. Not really relevant to current Maestro.
-
-`css`
-
-- is optional
-- type: `string`
-- defined in this schema
-
-### css Type
 
 `string`
 

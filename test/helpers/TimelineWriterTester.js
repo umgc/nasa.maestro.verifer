@@ -43,7 +43,7 @@ const tests = [
 
 function createProcedure(filepath) {
 	const procedure = new Procedure();
-	const err = procedure.populateFromFile(filepath);
+	const err = procedure.addProcedureDefinitionFromFile(filepath);
 	if (err) {
 		throw new Error(err);
 	}

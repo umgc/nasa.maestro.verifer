@@ -8,6 +8,7 @@ const assert = require('chai').assert;
 const docx = require('docx');
 const clonedeep = require('lodash/cloneDeep');
 
+const CommanderProgram = require('../app/model/CommanderProgram');
 const Procedure = require('../app/model/Procedure');
 
 const EvaDocxProcedureWriter = require('../app/writer/procedure/EvaDocxProcedureWriter');
@@ -16,13 +17,13 @@ describe('EvaDocxProcedureWriter', function() {
 	const procedure = new Procedure();
 	const procedureFile = path.join(__dirname, 'cases/simple/procedures/proc.yml');
 
-	const err = procedure.populateFromFile(procedureFile);
+	const err = procedure.addProcedureDefinitionFromFile(procedureFile);
 	if (err) {
 		throw new Error(err);
 	}
 	const procedureClone = clonedeep(procedure);
 
-	const procWriter = new EvaDocxProcedureWriter({}, procedure);
+	const procWriter = new EvaDocxProcedureWriter(new CommanderProgram(), procedure);
 
 	describe('constructor', function() {
 

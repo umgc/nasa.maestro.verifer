@@ -1,8 +1,107 @@
 'use strict';
 
+const Duration = require('./Duration');
 const ConcurrentStep = require('./ConcurrentStep.js');
 const TaskRole = require('./TaskRole.js');
 const consoleHelper = require('../helpers/consoleHelper');
+const arrayHelper = require('../helpers/arrayHelper');
+
+const validTimeTypes = ['startTime', 'endTime', 'duration'];
+
+function timeSyncRequired(task) {
+	task.procedure.timeSync.updateStartTimesRequired = true;
+}
+
+/**
+ * From inputs of two types, get the third type
+ * @param {string} first   Either startTime, endTime, or duration
+ * @param {string} second  Either startTime, endTime, or duration (but not the same as first)
+ * @return {string}        The third type, whichever first and second is not.
+ */
+function getThirdTimeType(first, second) {
+	if (!arrayHelper.isAnyOf(first, validTimeTypes) ||
+		!arrayHelper.isAnyOf(second, validTimeTypes)) {
+
+		throw new Error(`Two time types required, and must be in ${JSON.stringify(validTimeTypes)}`);
+	} else if (first === second) {
+		throw new Error('First and second paramaters should not be the same');
+	}
+
+	const inputs = {
+		duration: first === 'duration' || second === 'duration',
+		startTime: first === 'startTime' || second === 'startTime',
+		endTime: first === 'endTime' || second === 'endTime'
+	};
+	for (const type in inputs) {
+		if (inputs[type] === false) {
+			// this input not present, return it
+			return type;
+		}
+	}
+}
+
+/**
+ * Based upon another time (that has probably been recently changed...at least that's the point of
+ * this function) update another time if the third time type is defined. For example, if the
+ * startTime was just changed, and the duration is defined, update the endTime by start + duration.
+ *
+ * Note on implementation: Getting the endTime requires addition of start and duration. Getting the
+ * duration or startTime requires subtraction of one from the endTime. So which action to take, sum
+ * or subtract, must be determined.
+ *
+ * @param {TaskRole} taskRole
+ * @param {string} recentlyChanged
+ * @param {string} tryToChange
+ */
+function updateDependentTime(taskRole, recentlyChanged, tryToChange) {
+	const third = getThirdTimeType(recentlyChanged, tryToChange);
+	let change;
+
+	if (tryToChange === 'startTime' && taskRole[third]) {
+		change = {
+			action: 'subtract',
+			firstOperand: 'endTime',
+			secondOperand: 'duration',
+			ifPropPresent: third
+		};
+
+	} else if (tryToChange === 'endTime' && taskRole[third]) {
+		change = {
+			action: 'sum',
+			firstOperand: 'startTime',
+			secondOperand: 'duration',
+			ifPropPresent: third
+		};
+	} else if (taskRole[third]) { // tryToChange === duration
+		change = {
+			action: 'subtract',
+			firstOperand: 'endTime',
+			secondOperand: 'startTime',
+			ifPropPresent: third
+		};
+	} else {
+		return;
+	}
+
+	taskRole[tryToChange] = Duration[change.action](
+		taskRole[change.firstOperand],
+		taskRole[change.secondOperand]
+	);
+}
+
+/**
+ * Helper function to perform time update exposed in exported functions
+ * @param {Task} task                 Task on which to set time
+ * @param {string} actor              Actor to set time for
+ * @param {string} timeType           Either 'startTime, 'duration', or 'endTime'
+ * @param {Duration} time             Duration object specifying time to be set
+ * @param {string} dependentTimeType  Either 'startTime, 'duration', or 'endTime'. Not === timeType
+ */
+function doTimeUpdate(task, actor, timeType, time, dependentTimeType) {
+	task.actorRolesDict[actor][timeType] = time.clone();
+	timeSyncRequired(task); // this time was updated and may affect other times in procedure
+	updateDependentTime(task.actorRolesDict[actor], timeType, dependentTimeType);
+}
 
 module.exports = class Task {
 
@@ -149,6 +248,45 @@ module.exports = class Task {
 		}
 
 		return this.columnIndexes;
+	}
+
+	/**
+	 * Set the start time of this task for a particular role. Also updates end time if duration is
+	 * set.
+	 *
+	 * @param {string} actor    Role for which to adjust start time, e.g. "crewA"
+	 * @param {Duration} time  Duration object specifying start time
+	 * @return {Task}          Return this task for method chaining
+	 */
+	setStartTimeForRole(actor, time) {
+		doTimeUpdate(this, actor, 'startTime', time, 'endTime');
+		return this;
+	}
+
+	/**
+	 * Set the start time of this task for a particular role. Also updates start time if duration is
+	 * set.
+	 *
+	 * @param {string} actor    Role for which to adjust end time, e.g. "crewA"
+	 * @param {Duration} time  Duration object specifying end time
+	 * @return {Task}          Return this task for method chaining
+	 */
+	setEndTimeForRole(actor, time) {
+		doTimeUpdate(this, actor, 'endTime', time, 'startTime');
+		return this;
+	}
+
+	/**
+	 * Set the duration of this task for a particular role. Also updates end time if start time is
+	 * set.
+	 *
+	 * @param {string} actor       Role for which to adjust end time, e.g. "crewA"
+	 * @param {Duration} time      Duration object specifying duration
+	 * @return {Task}              Return this task for method chaining
+	 */
+	setDurationForRole(actor, time) {
+		doTimeUpdate(this, actor, 'duration', time, 'endTime');
+		return this;
 	}
 
 };

@@ -2,8 +2,17 @@
 
 const path = require('path');
 const nunjucks = require('nunjucks');
+const envHelper = require('../helpers/envHelper');
+
+let loader;
+if (envHelper.isNode) {
+	loader = new nunjucks.FileSystemLoader(path.join(__dirname, '../view'));
+} else {
+	loader = new nunjucks.WebLoader('/maestro-views');
+}
+
 const nunjucksEnvironment = new nunjucks.Environment(
-	new nunjucks.FileSystemLoader(path.join(__dirname, '../view')),
+	loader,
 	{ autoescape: false }
 );
 const filters = require('../helpers/filters');
