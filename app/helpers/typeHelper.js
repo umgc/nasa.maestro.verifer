@@ -16,7 +16,7 @@ const validTypes = {
 function is(value, ...types) {
 	// types will be an array by definition because of the ...types. If it has just one element, and
 	// that element is itself an array, set types to that element (flatten the 2D array into 1D).
-	if (types.length === 1 && is(types[0], 'array')) {
+	if (types.length === 1 && Array.isArray(types[0])) {
 		types = types[0];
 	}
 

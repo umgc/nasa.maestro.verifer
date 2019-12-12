@@ -3,30 +3,25 @@
 const typeHelper = require('./typeHelper');
 
 /**
- * Parse yaml as either string or array, and return an array. If the YAML
- * was a simple string, the array has a single element. If the YAML was
+ * Parse input as either string or array, and return an array. If the input
+ * is a string, return an array with just that string as the single element. If the input has
  * multiple elements, return an array with all strings.
  *
- * @param   {*} yaml yaml string or array
- * @return  {Array} array of substeps
+ * @param   {Array|string} stringOrArray  String or array of strings
+ * @return  {Array}                       Array of strings
  */
-exports.parseArray = function(yaml) {
+exports.parseArray = function(stringOrArray) {
 
 	const array = [];
 
-	// Check for string
-	if (typeof yaml === 'string') {
-		array.push(yaml);
+	if (typeof stringOrArray === 'string') {
+		array.push(stringOrArray);
 
-	// Check for array
-	} else if (Array.isArray(yaml)) {
-		for (var element of yaml) {
-			array.push(element);
-		}
+	} else if (Array.isArray(stringOrArray)) {
+		array.push(...stringOrArray);
 
-	// Don't know how to process
 	} else {
-		throw new Error(`Expected string or array. Instead got: ${JSON.stringify(yaml)}`);
+		throw new Error(`Expected string or array. Instead got: ${JSON.stringify(stringOrArray)}`);
 	}
 
 	return array;
@@ -69,7 +64,7 @@ exports.repeatArray = function(arr, count) {
 	}
 
 	if (arr.length >= count) {
-		return arr;
+		return [...arr];
 	} else {
 		const ln = arr.length;
 		const b = [];
