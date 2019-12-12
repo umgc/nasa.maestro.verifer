@@ -84,16 +84,26 @@ If you use [VS Code](https://code.visualstudio.com/), we recommend installing th
 5. Procedure authors should be able to easily diff changes between arbitrary versions of procedures
 6. Editing a procedure should be as easy as editing one in MS Word. On face value this seems like a difficult requirement, but in reality formatting hardships with Word are a big driver for finding a better solution. Editing the raw YAML files is doable and preferable for some users, but for those
 
-## Future features
+## Issue and feature tracking
 
-Below are future desired features, in approximate order of priority.
+Issues in this repository will only be kept open for either (1) unresolved bugs or (2) other items being legitimately worked as part of an [active project](https://github.com/xOPERATIONS/maestro/projects). "Legitimately being worked" means the issue is in the "priority" column or further. Items in the backlog will be left in the "closed" state in order to keep the list of all issues clean, thus focusing on high-priority items (e.g. actual bugs and in-work items).
 
-1. High-level procedure editor ([#37](https://github.com/xOPERATIONS/maestro/issues/37), currently under development by UMUC students): This will not perform editing of steps, but will allow for reorganization of tasks, adjusting task durations, etc.
-2. Modules ([#42](https://github.com/xOPERATIONS/maestro/issues/42)): Pre-built step-generators. Just supply inputs, get the standards-compliant step text
-3. Variables ([#43](https://github.com/xOPERATIONS/maestro/issues/43)): Certain values may be repeated many times throughout a procedure. Capture them as variables.
-4. Package/dependency manager ([#21](https://github.com/xOPERATIONS/maestro/issues/21)): Allow reuse of common elements (e.g. egressing the airlock) or sharing tasks (two EVAs may carry the same task)
-5. Track state ([#44](https://github.com/xOPERATIONS/maestro/issues/44)): During spacewalks, the crew move and reconfigure things. Maestro should be able to track this.
-6. Full editor: Edit all steps, handling modules, variables, state, etc, and integrate with GitLab (GitLab is used internally).
+When these incomplete-but-closed issues begin being worked, they will be reopened. When they are completed they will be closed and their labels will be updated accordingly (e.g. `feature request` becomes `feature added!` and `debt cleanup` becomes `debt paid!`).
+
+### New non-bugs are immediately closed
+
+New non-priority issues will be labelled accordingly and closed immediately (unless they will be immediately worked) with one of the following comments:
+
+- Feature requests: `Feature requests closed until legitimately close to consideration for implementation. See [the list of pending feature requests](https://github.com/xOPERATIONS/maestro/issues?q=is%3Aclosed+is%3Aissue+label%3A%22feature+request%22)`
+- Debt cleanup: `Debt cleanup issues closed until legitimately close to consideration for implementation. See [the list of pending debt cleanup](https://github.com/xOPERATIONS/maestro/issues?q=is%3Aclosed+is%3Aissue+label%3A%22debt+cleanup%22)`
+
+### Lists of deferred feature requests and debt cleanup
+
+The following lists include possible future issues to work, but are not currently being worked and thus are not given the priority of being shown open.
+
+- [Feature requests](https://github.com/xOPERATIONS/maestro/issues?q=is%3Aclosed+is%3Aissue+label%3A%22feature+request%22)
+- [Debt cleanup](https://github.com/xOPERATIONS/maestro/issues?q=is%3Aclosed+is%3Aissue+label%3A%22debt+cleanup%22)
+
 
 ## Definitions
 
