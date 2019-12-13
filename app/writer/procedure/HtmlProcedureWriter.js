@@ -29,7 +29,7 @@ module.exports = class HtmlProcedureWriter extends ProcedureWriter {
 
 	wrapDocument() {
 		return nunjucks.render('document.html', {
-			title: this.procedure.name,
+			title: this.program.fullName,
 			content: this.content,
 			footer: this.genFooter()
 		});

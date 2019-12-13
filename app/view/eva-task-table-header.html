@@ -1,6 +1,6 @@
 {# Create headers for each column #}
 <tr>
 	{% for col in columnNames %}
-		<th>{{col}}</th>
+		<th style='width: {{columnWidthPercent}}%;'>{{col}}</th>
 	{% endfor %}
 </tr>

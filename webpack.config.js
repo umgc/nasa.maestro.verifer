@@ -39,7 +39,7 @@ module.exports = {
 			/^image-size$/,
 			path.resolve(__dirname, './app/mocks/image-size.js')
 		)
-	]
+	],
 
 	// The base directory, an absolute path, for resolving entry points and loaders from
 	// configuration. By default the current directory is used, but it's recommended to pass a
@@ -47,5 +47,28 @@ module.exports = {
 	// working directory).
 	// context: path.resolve(__dirname, 'src'),
 
-	// module: { rules: [] }
+	module: {
+		rules: [
+			{
+				test: /\.m?js$/,
+				exclude: /(node_modules|bower_components)/,
+				use: {
+					loader: 'babel-loader'
+				}
+			},
+			{
+				test: /\.css$/,
+				use: [
+					'style-loader',
+					{
+						loader: 'css-loader',
+						options: {
+							modules: true
+						}
+					}
+				]
+			}
+		]
+
+	}
 };

@@ -154,4 +154,10 @@ module.exports = class Program {
 		return htmlFile;
 	}
 
+	getProjectProcedureFiles() {
+		return fs.readdirSync(this.procedurePath).filter((filename) => {
+			return filename.endsWith('.yml');
+		});
+	}
+
 };

@@ -1,5 +1,9 @@
 'use strict';
 
+const React = require('react');
+const ReactDOM = require('react-dom');
+const App = require('./app/components/App');
+
 /**
  * NOTE: Below is deliberately over-exposing modules for now. This is intended for exploring how
  *       Maestro will be used in browser.
@@ -31,11 +35,13 @@ const maestro = {
 
 };
 
-require('./app/ui/timeline');
+// require('./app/ui/timeline');
 
 maestro.app = new maestro.WebProgram();
 
 window.maestro = maestro;
+
+ReactDOM.render(<App />, document.getElementById('root'));
 
 console.log(`     __  ______    _____________________  ____
     /  |/  /   |  / ____/ ___/_  __/ __ \\/ __ \\

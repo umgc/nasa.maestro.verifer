@@ -3,6 +3,7 @@
 const path = require('path');
 
 const express = require('express');
+const nunjucks = require('../model/nunjucksEnvironment');
 
 const consoleHelper = require('../helpers/consoleHelper');
 
@@ -10,6 +11,7 @@ module.exports = class Server {
 
 	constructor(program) {
 
+		this.procedureFiles = program.getProjectProcedureFiles();
 		this.baseHtmlFile = program.getProjectHtmlFile();
 		if (!this.baseHtmlFile) {
 			consoleHelper.noExitError('No HTML files found in /build directory. Try running `maestro compose --html` first');
@@ -59,7 +61,11 @@ module.exports = class Server {
 
 	serve() {
 		this.app.get('/', (req, res) => {
-			res.sendFile(this.baseHtmlFile);
+			// res.sendFile(this.baseHtmlFile);
+			res.send(nunjucks.render('document.html', {
+				title: 'Maestro',
+				procedureFiles: this.procedureFiles
+			}));
 		});
 
 		this.app.listen(this.port, () => {

@@ -1,4 +1,5 @@
 'use strict';
+const React = require('react');
 
 const TextTransform = require('../writer/TextTransform');
 const Abstract = require('../helpers/Abstract');
@@ -16,7 +17,10 @@ module.exports = class StepModule extends Abstract {
 			Docx: ['Docx', 'Base'],
 			EvaHtml: ['EvaHtml', 'Html', 'Base'],
 			Html: ['Html', 'Base'],
-			SodfDocx: ['SodfDocx', 'Docx', 'Base']
+			SodfDocx: ['SodfDocx', 'Docx', 'Base'],
+
+			// if no react function, ReactFallback will try wrapping Html- or Base-output in JSX
+			React: ['React', 'ReactFallback']
 		};
 		this.outputTypeFns = fns[outputType] || [];
 		return this.outputTypeFns;
@@ -34,6 +38,17 @@ module.exports = class StepModule extends Abstract {
 		throw new Error(`Output function matching ${fn} not found for ${this.constructor.name}`);
 	}
 
+	AlterStepReactFallback() {
+		if (this.alterStepHtml && typeof this.alterStepHtml === 'function') {
+			return (<span dangerouslySetInnerHTML={{ __html: this.alterStepHtml() }}></span>);
+		} else if (this.alterStepBase && typeof this.alterStepBase === 'function') {
+			return (<React.Fragment>{this.alterStepBase()}</React.Fragment>);
+		} else {
+			throw new Error(
+				'Step module must implement alterStepReact, alterStepHtml, or alterStepBase');
+		}
+	}
+
 	transform(text) {
 		if (!this.outputTypeFns) {
 			throw new Error('Can\'t call StepModule.transform() until StepModule.getOutputTypeFunctions() called');
@@ -43,6 +58,8 @@ module.exports = class StepModule extends Abstract {
 			xformType = 'docx';
 		} else if (this.outputTypeFns.indexOf('Html') !== -1) {
 			xformType = 'html';
+		} else if (this.outputTypeFns.indexOf('React') !== -1) {
+			xformType = 'react';
 		} else {
 			xformType = 'text'; // todo not really sure this will work...transforms text to text...
 		}

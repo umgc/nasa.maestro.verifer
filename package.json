@@ -15,6 +15,15 @@
     "build:prod": "./node_modules/.bin/webpack -p",
     "watch": "./node_modules/.bin/webpack --watch"
   },
+  "babel": {
+    "presets": [
+      "@babel/env",
+      "@babel/react"
+    ],
+    "plugins": [
+      "@babel/plugin-proposal-class-properties"
+    ]
+  },
   "pre-commit": [
     "pre-commit-msg",
     "lint",
@@ -55,10 +64,17 @@
   },
   "homepage": "https://github.com/xOPERATIONS/maestro#readme",
   "dependencies": {
+    "@babel/core": "^7.7.5",
+    "@babel/plugin-proposal-class-properties": "^7.7.4",
+    "@babel/preset-env": "^7.7.6",
+    "@babel/preset-react": "^7.7.4",
     "@svgdotjs/svg.js": "^3.0.16",
     "ajv": "^6.10.2",
+    "babel-eslint": "^10.0.3",
+    "babel-loader": "^8.0.6",
     "colors": "^1.4.0",
     "commander": "^2.20.3",
+    "css-loader": "^3.3.2",
     "docx": "^5.0.0-rc7",
     "express": "^4.17.1",
     "filenamify": "^4.1.0",
@@ -66,13 +82,19 @@
     "js-yaml": "^3.13.1",
     "lodash": "^4.17.15",
     "nunjucks": "^3.2.0",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
+    "style-loader": "^1.0.1",
     "svg2img": "^0.6.1",
-    "svgdom": "0.0.20"
+    "svgdom": "0.0.21",
+    "uuid": "^3.3.3",
+    "webpack-dev-server": "^3.9.0"
   },
   "devDependencies": {
     "chai": "^4.2.0",
     "eslint": "^6.6.0",
     "eslint-config-wikimedia": "^0.14.3",
+    "eslint-plugin-react": "^7.17.0",
     "jsdoc": "^3.6.3",
     "mocha": "^5.2.0",
     "mocha-junit-reporter": "^1.23.1",

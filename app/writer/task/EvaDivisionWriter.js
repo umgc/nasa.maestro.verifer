@@ -76,6 +76,18 @@ function getJointActorColumnInfo(nonJointColumnsInDivision, jointActors, taskWri
 
 module.exports = class EvaDivisionWriter {
 
+	/**
+	 *
+	 * @param {ConcurrentStep} division  ConcurrentStep AKA division object. Looks like:
+	 *                                   { actorId: [...steps], actor2id: [...steps] }
+	 * @param {TaskWriter} taskWriter
+	 * @return {Object}                  columns object in the form:
+	 *                                   { 0: { colspan: 1, children: [...children] },
+	 *                                     1: { colspan: 2, children: [...children] } }
+	 *                                   "children" is whatever is outputted by:
+	 *                                   taskWriter.writeSeries(), and thus is format-specific (e.g.
+	 *                                   docx vs web)
+	 */
 	prepareDivision(division, taskWriter) {
 
 		const columns = {};

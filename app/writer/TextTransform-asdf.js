@@ -1,6 +1,6 @@
 'use strict';
 
-// const React = require('react');
+const React = require('react');
 const docx = require('docx');
 const arrayHelper = require('../helpers/arrayHelper');
 
@@ -17,7 +17,7 @@ function docxColor(text, color) {
 }
 
 function reactColor(text, color) {
-	return text; // (<span style={{ fontWeight: 'bold', color: color }}>{text}</span>);
+	return (<span style={{ fontWeight: 'bold', color: color }}>{text}</span>);
 }
 
 const transforms = [
@@ -25,7 +25,7 @@ const transforms = [
 		text: '{{CHECK}}',
 		html: '✓',
 		docx: '✓',
-		react: null // (<React.Fragment>✓</React.Fragment>)
+		react: (<React.Fragment>✓</React.Fragment>)
 	},
 	{
 		text: '{{CHECKBOX}}',
@@ -33,37 +33,37 @@ const transforms = [
 		docx: () => {
 			return new docx.SymbolRun('F071');
 		},
-		react: null // (<React.Fragment>☐</React.Fragment>)
+		react: (<React.Fragment>☐</React.Fragment>)
 	},
 	{
 		text: '{{CHECKEDBOX}}',
 		html: '☑',
 		docx: '☑',
-		react: null // (<React.Fragment>☑</React.Fragment>)
+		react: (<React.Fragment>☑</React.Fragment>)
 	},
 	{
 		text: '{{LEFT}}',
 		html: '←',
 		docx: new docx.SymbolRun('F0DF'),
-		react: null // (<React.Fragment>←</React.Fragment>)
+		react: (<React.Fragment>←</React.Fragment>)
 	},
 	{
 		text: '{{UP}}',
 		html: '↑',
 		docx: new docx.SymbolRun('F0E1'),
-		react: null // (<React.Fragment>↑</React.Fragment>)
+		react: (<React.Fragment>↑</React.Fragment>)
 	},
 	{
 		text: '{{RIGHT}}',
 		html: '→',
 		docx: new docx.SymbolRun('F0E0'),
-		react: null // (<React.Fragment>→</React.Fragment>)
+		react: (<React.Fragment>→</React.Fragment>)
 	},
 	{
 		text: '{{DOWN}}',
 		html: '↓',
 		docx: new docx.SymbolRun('F0E2'),
-		react: null // (<React.Fragment>↓</React.Fragment>)
+		react: (<React.Fragment>↓</React.Fragment>)
 	}
 ];
 const colors = [
@@ -89,7 +89,7 @@ for (const item of colors) {
 			text: text,
 			html: htmlColor(text, item.color),
 			docx: docxColor(text, item.color),
-			react: null // was reactColor(text, item.color)
+			react: reactColor(text, item.color)
 		});
 	}
 }
@@ -146,11 +146,11 @@ function docxStringsToTextRuns(transformArr) {
 	});
 }
 
-// function reactStringsToJSX(transformArr) {
-// 	return transformArr.map((cur) => {
-// 		return typeof cur === 'string' ? (<React.Fragment>{cur}</React.Fragment>) : cur;
-// 	});
-// }
+function reactStringsToJSX(transformArr) {
+	return transformArr.map((cur) => {
+		return typeof cur === 'string' ? (<React.Fragment>{cur}</React.Fragment>) : cur;
+	});
+}
 
 module.exports = class TextTransform {
 
@@ -184,4 +184,4 @@ module.exports = class TextTransform {
 		}
 		return htmlColor(text, color);
 	}
-}
+};
