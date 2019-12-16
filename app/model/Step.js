@@ -21,9 +21,13 @@ module.exports = class Step {
 		this.comments = [];
 		this.notes = [];
 		this.substeps = [];
+		this.raw = null;
+		this.taskRolesMap = {};
 	}
 
 	populateFromYaml(stepYaml) {
+
+		this.raw = stepYaml;
 
 		// Check if the step is a simple string
 		if (typeof stepYaml === 'string') {
@@ -102,7 +106,7 @@ module.exports = class Step {
 
 	parseBlock(textOrArray) {
 		if (textOrArray) {
-			return arrayHelper.parseArray(textOrArray).map(this.replaceTaskRoles);
+			return arrayHelper.parseArray(textOrArray).map(this.replaceTaskRoles.bind(this));
 		} else {
 			return [];
 		}
@@ -129,16 +133,17 @@ module.exports = class Step {
 	 */
 	mapTaskRolesToActor(taskRoles) {
 		this.taskRoles = taskRoles;
-		const taskRolesMap = {};
+		this.taskRolesMap = {};
 		for (const role in taskRoles) {
-			taskRolesMap[role] = taskRoles[role].actor;
+			this.taskRolesMap[role] = taskRoles[role].actor;
 		}
-		this.replaceTaskRoles = function(text) {
-			for (const role in taskRolesMap) {
-				text = text.replace(`{{role:${role}}}`, taskRolesMap[role]);
-			}
-			return text;
-		};
+	}
+
+	replaceTaskRoles(text) {
+		for (const role in this.taskRolesMap) {
+			text = text.replace(`{{role:${role}}}`, this.taskRolesMap[role]);
+		}
+		return text;
 	}
 
 	setActors(actorIdOrIds) {

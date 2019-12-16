@@ -178,24 +178,40 @@ module.exports = class TaskWriter extends Abstract {
 		}
 
 		if (step.substeps.length) {
+			const grandChildren = [];
+
+			// FIXME why does substeps not push preInsertSteps to children?
 			this.preInsertSteps(level + 1);
 			for (const substep of step.substeps) {
-				children.push(...this.insertStep(substep, level + 1));
+				grandChildren.push(...this.insertStep(substep, level + 1));
 			}
 			this.postInsertSteps(level + 1);
+
+			if (this.wrapStepLists) {
+				children.push(this.wrapStepLists(grandChildren));
+			} else {
+				children.push(...grandChildren);
+			}
 		}
 
 		if (step.checkboxes.length) {
+			const grandChildren = [];
 			const preSteps = this.preInsertSteps(level + 1, true);
 			if (preSteps) {
-				children.push(preSteps);
+				grandChildren.push(preSteps);
 			}
 			for (const checkstep of step.checkboxes) {
-				children.push(this.addCheckStepText(checkstep, level + 1));
+				grandChildren.push(this.addCheckStepText(checkstep, level + 1));
 			}
 			const postSteps = this.postInsertSteps(level + 1, true);
 			if (postSteps) {
-				children.push(postSteps);
+				grandChildren.push(postSteps);
+			}
+
+			if (this.wrapStepLists) {
+				children.push(this.wrapStepLists(grandChildren));
+			} else {
+				children.push(...grandChildren);
 			}
 		}
 

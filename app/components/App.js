@@ -1,6 +1,9 @@
 /* global maestro */
 const React = require('react');
-const PropTypes = require('prop-types');
+const cloneDeep = require('lodash/cloneDeep');
+
+const stateHandler = require('../state/index');
+// const PropTypes = require('prop-types');
 const Header = require('./layout/Header');
 const ProcedureViewer = require('./pages/ProcedureViewer');
 const ProcedureSelector = require('./pages/ProcedureSelector');
@@ -12,11 +15,26 @@ class App extends React.Component {
 	};
 
 	setProcedure = (procObject) => {
+		stateHandler.state.procedure = procObject;
 		this.setState({
-			procedure: procObject,
+			procedure: stateHandler.state.procedure,
 			procedureWriter: new ReactProcedureWriter(maestro.app, procObject)
 		});
 
+		stateHandler.modifyStep = (actIndex, divIndex, colKey, stepIndex, newStep) => {
+
+			// overkill?
+			const newProc = cloneDeep(this.state.procedure);
+
+			newProc.tasks[actIndex].concurrentSteps[divIndex][colKey][stepIndex] = newStep;
+
+			this.setState({
+				procedure: newProc
+			});
+
+		};
+
+		maestro.react = { app: this }; // for testing/playing with react FIXME remove later
 		console.log(`Procedure set to ${procObject.name}`);
 	};
 

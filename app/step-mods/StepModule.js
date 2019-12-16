@@ -1,5 +1,6 @@
 'use strict';
 const React = require('react');
+const uuidv4 = require('uuid/v4');
 
 const TextTransform = require('../writer/TextTransform');
 const Abstract = require('../helpers/Abstract');
@@ -38,11 +39,14 @@ module.exports = class StepModule extends Abstract {
 		throw new Error(`Output function matching ${fn} not found for ${this.constructor.name}`);
 	}
 
-	AlterStepReactFallback() {
+	alterStepReactFallback() {
 		if (this.alterStepHtml && typeof this.alterStepHtml === 'function') {
-			return (<span dangerouslySetInnerHTML={{ __html: this.alterStepHtml() }}></span>);
+			return (
+				<span key={uuidv4()} dangerouslySetInnerHTML={{ __html: this.alterStepHtml() }}>
+				</span>
+			);
 		} else if (this.alterStepBase && typeof this.alterStepBase === 'function') {
-			return (<React.Fragment>{this.alterStepBase()}</React.Fragment>);
+			return (<React.Fragment key={uuidv4()}>{this.alterStepBase()}</React.Fragment>);
 		} else {
 			throw new Error(
 				'Step module must implement alterStepReact, alterStepHtml, or alterStepBase');

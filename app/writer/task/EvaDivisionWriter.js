@@ -81,6 +81,8 @@ module.exports = class EvaDivisionWriter {
 	 * @param {ConcurrentStep} division  ConcurrentStep AKA division object. Looks like:
 	 *                                   { actorId: [...steps], actor2id: [...steps] }
 	 * @param {TaskWriter} taskWriter
+	 * @param {boolean} raw              If true, don't run taskWriter.writeSeries(), just return
+	 *                                   the raw data.
 	 * @return {Object}                  columns object in the form:
 	 *                                   { 0: { colspan: 1, children: [...children] },
 	 *                                     1: { colspan: 2, children: [...children] } }
@@ -88,7 +90,7 @@ module.exports = class EvaDivisionWriter {
 	 *                                   taskWriter.writeSeries(), and thus is format-specific (e.g.
 	 *                                   docx vs web)
 	 */
-	prepareDivision(division, taskWriter) {
+	prepareDivision(division, taskWriter, raw = false) {
 
 		const columns = {};
 
@@ -131,10 +133,21 @@ module.exports = class EvaDivisionWriter {
 				};
 			}
 
-			columns[firstCol].children.push(...taskWriter.writeSeries(
-				division[actors.key], // get the division info by the key like "EV1 + EV2"
-				actors.columnKeys
-			));
+			if (raw) {
+				columns[firstCol].stateColumnKey = actors.key;
+				columns[firstCol].series = division[actors.key];
+				columns[firstCol].columnKeys = actors.columnKeys;
+			} else {
+				const series = taskWriter.writeSeries(
+					division[actors.key], // get the division info by the key like "EV1 + EV2"
+					actors.columnKeys
+				);
+				if (Array.isArray(series)) {
+					columns[firstCol].children.push(...series);
+				} else {
+					columns[firstCol].children.push(series);
+				}
+			}
 		}
 
 		// write series' the normal columns
@@ -149,9 +162,18 @@ module.exports = class EvaDivisionWriter {
 				};
 			}
 
-			columns[col].children.push(
-				...taskWriter.writeSeries(division[actor], columnKey)
-			);
+			if (raw) {
+				columns[col].stateColumnKey = columnKey;
+				columns[col].series = division[actor];
+				columns[col].columnKeys = [columnKey];
+			} else {
+				const series = taskWriter.writeSeries(division[actor], columnKey);
+				if (Array.isArray(series)) {
+					columns[col].children.push(...series);
+				} else {
+					columns[col].children.push(series);
+				}
+			}
 		}
 
 		return columns;

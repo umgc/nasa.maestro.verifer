@@ -6,10 +6,11 @@ const Activity = require('../layout/Activity');
 class ProcedureViewer extends React.Component {
 	render() {
 
-		return this.props.procedure.tasks.map((task) => (
+		return this.props.procedure.tasks.map((task, index) => (
 			<Activity
 				key={task.filename}
 				activity={task}
+				activityIndex={index}
 				procedure={this.props.procedure}
 				getProcedureWriter={this.props.getProcedureWriter}
 			/>

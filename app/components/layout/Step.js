@@ -1,0 +1,192 @@
+const React = require('react');
+const cloneDeep = require('lodash/cloneDeep');
+const PropTypes = require('prop-types');
+const YAML = require('js-yaml');
+
+const stateHandler = require('../../state/index');
+
+const StepModel = require('../../model/Step');
+
+const liStyle = {
+	position: 'relative'
+};
+const editButtonStyle = {
+	position: 'absolute',
+	right: '5px',
+	top: '3px'
+};
+const textareaStyle = {
+	height: '80px',
+	width: '100%'
+};
+
+class Step extends React.Component {
+
+	state = {
+		isMouseInside: false,
+		editMode: false
+	}
+
+	constructor(props) {
+		super(props);
+
+		// initialize to allow holding an in-work set of changes before saving
+		// this.state.localStepState = this.props.stepState;
+
+		this.editorInput = React.createRef();
+	}
+
+	mouseEnter = () => {
+		console.log('mouseEnter');
+		this.setState({ isMouseInside: true });
+	}
+	mouseLeave = () => {
+		console.log('mouseLeave');
+		this.setState({ isMouseInside: false });
+	}
+
+	handleEditButtonClick = (e) => {
+		console.log('edit button click');
+		e.preventDefault();
+		e.stopPropagation();
+		this.setState({ editMode: true });
+	}
+
+	getKey() {
+		return `act${this.props.activityIndex}-div${this.props.divisionIndex}-${this.props.primaryColumnKey}-step${this.props.stepIndex}`;
+	}
+
+	render() {
+		return this.state.editMode ? this.renderEditor() : this.renderViewer();
+	}
+
+	renderViewer() {
+		const step = this.props.stepState;
+		step.columnKeys = this.props.columnKeys;
+
+		const options = { level: 0 };
+
+		return (
+			<li
+				style={liStyle}
+				className={`li-level-${options.level}`}
+				onMouseEnter={this.mouseEnter}
+				onMouseLeave={this.mouseLeave}
+			>
+				{this.renderButton()}
+				{this.props.taskWriter.insertStep(step)}
+			</li>
+		);
+	}
+
+	renderButton() {
+		if (this.state.isMouseInside) {
+			return (
+				<button
+					style={editButtonStyle}
+					onClick={this.handleEditButtonClick}
+				>
+					edit
+				</button>
+			);
+		}
+	}
+
+	renderEditor() {
+
+		const options = { level: 0 };
+
+		// was: this.state.localStepState.text
+		const initial = YAML.safeDump(this.props.stepState.raw);
+
+		// had: onChange={this.handleEditTextChange}
+		return (
+			<li
+				style={liStyle}
+				className={`li-level-${options.level}`}
+			>
+				<div>
+					<textarea
+						style={textareaStyle}
+						type='text'
+						defaultValue={initial}
+						ref={this.editorInput}
+					/>
+				</div>
+				<button onClick={this.handleSave}>save</button>
+				<button onClick={this.handleCancel}>cancel</button>
+			</li>
+		);
+
+	}
+
+	// handleEditTextChange = (e) => {
+	// 	e.preventDefault();
+	// 	e.stopPropagation();
+	// 	console.log('edit text change');
+
+	// 	const newRaw = YAML.safeLoad(e.target.value);
+	// 	const newState = cloneDeep(this.state.localStepState);
+	// 	// newState.text = e.target.value;
+	// 	newState.raw = newRaw;
+
+	// 	this.setState({
+	// 		localStepState: newState
+	// 	});
+	// }
+
+	handleSave = (e) => {
+		console.log('handle save');
+
+		e.preventDefault();
+		e.stopPropagation();
+
+		const newRaw = YAML.safeLoad(this.editorInput.current.value);
+		// const newState = cloneDeep(this.props.stepState);
+		// newState.raw = newRaw;
+
+		const newStep = new StepModel();
+		newStep.populateFromYaml(newRaw);
+
+		stateHandler.modifyStep(
+			this.props.activityIndex,
+			this.props.divisionIndex,
+			this.props.primaryColumnKey,
+			this.props.stepIndex,
+			newStep
+		);
+
+		this.setState({
+			editMode: false
+			// localStepState: newStep
+		});
+	}
+
+	handleCancel = (e) => {
+		console.log('handle cancel');
+
+		e.preventDefault();
+		e.stopPropagation();
+
+		this.setState({
+			editMode: false
+			// localStepState: this.props.stepState
+		});
+	}
+
+}
+
+Step.propTypes = {
+
+	stepState: PropTypes.object.isRequired,
+	columnKeys: PropTypes.array.isRequired,
+	taskWriter: PropTypes.object.isRequired,
+
+	activityIndex: PropTypes.number.isRequired,
+	divisionIndex: PropTypes.number.isRequired,
+	primaryColumnKey: PropTypes.string.isRequired,
+	stepIndex: PropTypes.number.isRequired
+
+};
+
+module.exports = Step;

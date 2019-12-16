@@ -31,7 +31,12 @@ const maestro = {
 
 	// writers
 	EvaHtmlProcedureWriter: require('./app/writer/procedure/EvaHtmlProcedureWriter'),
-	HtmlTimelineWriter: require('./app/writer/timeline/HtmlTimelineWriter')
+	HtmlTimelineWriter: require('./app/writer/timeline/HtmlTimelineWriter'),
+
+	// state
+	// for now just a lazy way to make a globalish-accessible state container
+	// this will get replaced by redux or something at some point, or just made less stupid
+	state: require('./app/state/index')
 
 };
 

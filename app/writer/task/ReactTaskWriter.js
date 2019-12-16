@@ -3,10 +3,13 @@
 const path = require('path');
 const React = require('react');
 
+const Series = require('../../components/layout/Series');
+
 const getImageFileDimensions = require('image-size');
 const TextTransform = require('../TextTransform');
 const settings = require('../../settings');
 
+const maestroKey = require('../../components/helpers/maestroKey');
 const uuidv4 = require('uuid/v4');
 
 const TaskWriter = require('./HtmlTaskWriter');
@@ -46,19 +49,24 @@ module.exports = class ReactTaskWriter extends TaskWriter {
 	}
 
 	// FIXME: duplication from HtmlTaskWriter or something like that
-	writeDivision(division) {
+	writeDivision(division, activityIndex, divisionIndex) {
 		const divWriter = new EvaDivisionWriter();
 
 		const columns = divWriter.prepareDivision(
-			division, this
+			division, this, true
 		);
 
 		for (let c = 0; c < this.numCols; c++) {
 			if (!columns[c]) {
 				columns[c] = {
+					children: [], // FIXME remove these if the stuff below works...
 					content: [],
-					colspan: 1
+					colspan: 1,
+
+					series: [], // FIXME is this right?
+					columnKeys: [this.task.getColumns()[c]] // ['NONE'] // FIXME
 				};
+				columns[c].stateColumnKey = columns[c].columnKeys[0];
 				continue;
 			}
 			if (columns[c].colspan > 1) {
@@ -68,26 +76,37 @@ module.exports = class ReactTaskWriter extends TaskWriter {
 
 		return (
 			<tr>
-				{Object.keys(columns).map((key) => (
-					<td key={uuidv4()} colSpan={columns[key].colspan}>{columns[key].children}</td>
-				))}
+				{Object.keys(columns).map((colId) => {
+					const startStep = this.preInsertSteps(); // FIXME this doesn't seem right
+
+					const key = maestroKey.getKey(
+						activityIndex,
+						divisionIndex,
+						columns[colId].stateColumnKey
+					);
+
+					return (
+						<Series
+							key={key}
+							startStep={startStep}
+							colspan={columns[colId].colspan}
+							primaryColumnKey={columns[colId].stateColumnKey}
+							columnKeys={columns[colId].columnKeys}
+							seriesState={columns[colId].series}
+							activityIndex={activityIndex}
+							divisionIndex={divisionIndex}
+							taskWriter={this}
+						/>
+					);
+				})}
 			</tr>
 		);
 
 	}
 
-	writeSeries(series, columnKeys) {
-		const steps = [];
-		const startStep = this.preInsertSteps();
-
-		for (const step of series) {
-			step.columnKeys = Array.isArray(columnKeys) ? columnKeys : [columnKeys];
-			steps.push(
-				...this.insertStep(step)
-			);
-		}
-
-		return (<ol start={startStep}>{steps}</ol>);
+	// used by sub-steps
+	wrapStepLists(steps, startStep = 1) {
+		return (<ol key={uuidv4()} start={startStep}>{steps}</ol>);
 	}
 
 	/**
@@ -109,7 +128,7 @@ module.exports = class ReactTaskWriter extends TaskWriter {
 			const imgPath = settings.htmlImagePrefix + imageMeta.path;
 
 			const image = (
-				<a href={imgPath}>
+				<a href={imgPath} key={uuidv4()}>
 					<img
 						className="img-fluid"
 						src={imgPath}
@@ -130,7 +149,7 @@ module.exports = class ReactTaskWriter extends TaskWriter {
 		if (!params.text) {
 			params.text = '';
 		}
-		return (<p>{params.text}</p>);
+		return (<p key={uuidv4()}>{params.text}</p>);
 	}
 
 	addBlock(blockType, blockLines) {
@@ -140,7 +159,7 @@ module.exports = class ReactTaskWriter extends TaskWriter {
 		});
 
 		return (
-			<div className="ncw ncw-{{blockType}}">
+			<div key={uuidv4()} className="ncw ncw-{{blockType}}">
 				<div className="ncw-head">
 					{blockType.toUpperCase()}
 				</div>
@@ -185,19 +204,19 @@ module.exports = class ReactTaskWriter extends TaskWriter {
 		}
 
 		return (
-			<li className={`li-level-${options.level}`}>
+			<div key={uuidv4()} className={`li-level-${options.level}`}>
 				{ actorText ?
 					(<strong>{actorText}: </strong>) :
 					(<React.Fragment></React.Fragment>)
 				}
 				{this.textTransform.transform(stepText)}
-			</li>
+			</div>
 		);
 	}
 
 	addCheckStepText(stepText, level, parent) {
 		return (
-			<li className={`li-level-${level}`}>
+			<li key={uuidv4()} className={`li-level-${level}`}>
 				<label>
 					<input
 						data-level="step"
@@ -213,7 +232,7 @@ module.exports = class ReactTaskWriter extends TaskWriter {
 
 	addTitleText(step) {
 		return (
-			<h3 data-level="subtask">
+			<h3 key={uuidv4()} data-level="subtask">
 				<span className="subtask-title">{step.title.toUpperCase().trim()}</span>
 				&nbsp;
 				<span className="subtask-duration">({step.duration.format('H:M')})</span>

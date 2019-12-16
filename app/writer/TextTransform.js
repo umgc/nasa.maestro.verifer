@@ -1,8 +1,8 @@
 'use strict';
 
-// const React = require('react');
 const docx = require('docx');
 const arrayHelper = require('../helpers/arrayHelper');
+let reactTextTransform; // only load this when needed, because JSX.
 
 function htmlColor(text, color) {
 	return `<span style="font-weight:bold;color:${color};">${text}</span>`;
@@ -16,16 +16,12 @@ function docxColor(text, color) {
 	});
 }
 
-function reactColor(text, color) {
-	return text; // (<span style={{ fontWeight: 'bold', color: color }}>{text}</span>);
-}
-
 const transforms = [
 	{
 		text: '{{CHECK}}',
 		html: '✓',
 		docx: '✓',
-		react: null // (<React.Fragment>✓</React.Fragment>)
+		react: null // see ReactTextTransform
 	},
 	{
 		text: '{{CHECKBOX}}',
@@ -33,39 +29,52 @@ const transforms = [
 		docx: () => {
 			return new docx.SymbolRun('F071');
 		},
-		react: null // (<React.Fragment>☐</React.Fragment>)
+		react: null // see ReactTextTransform
 	},
 	{
 		text: '{{CHECKEDBOX}}',
 		html: '☑',
 		docx: '☑',
-		react: null // (<React.Fragment>☑</React.Fragment>)
+		react: null // see ReactTextTransform
 	},
 	{
 		text: '{{LEFT}}',
 		html: '←',
 		docx: new docx.SymbolRun('F0DF'),
-		react: null // (<React.Fragment>←</React.Fragment>)
+		react: null // see ReactTextTransform
 	},
 	{
 		text: '{{UP}}',
 		html: '↑',
 		docx: new docx.SymbolRun('F0E1'),
-		react: null // (<React.Fragment>↑</React.Fragment>)
+		react: null // see ReactTextTransform
 	},
 	{
 		text: '{{RIGHT}}',
 		html: '→',
 		docx: new docx.SymbolRun('F0E0'),
-		react: null // (<React.Fragment>→</React.Fragment>)
+		react: null // see ReactTextTransform
 	},
 	{
 		text: '{{DOWN}}',
 		html: '↓',
 		docx: new docx.SymbolRun('F0E2'),
-		react: null // (<React.Fragment>↓</React.Fragment>)
+		react: null // see ReactTextTransform
 	}
 ];
+
+/**
+ * If using React, add react transforms to each transform object
+ */
+if (reactTextTransform) {
+	for (const xform of transforms) {
+		xform.react = reactTextTransform[xform.text];
+	}
+}
+
+/**
+ * Add colors to list of transforms
+ */
 const colors = [
 	{ text: 'GREEN', color: 'green' },
 	{ text: 'RED', color: 'red' },
@@ -88,9 +97,12 @@ for (const item of colors) {
 		transforms.push({
 			text: text,
 			html: htmlColor(text, item.color),
-			docx: docxColor(text, item.color),
-			react: null // was reactColor(text, item.color)
+			docx: docxColor(text, item.color)
 		});
+		if (reactTextTransform) {
+			transforms[transforms.length - 1].react =
+				reactTextTransform.reactColor(text, item.color);
+		}
 	}
 }
 
@@ -146,12 +158,6 @@ function docxStringsToTextRuns(transformArr) {
 	});
 }
 
-// function reactStringsToJSX(transformArr) {
-// 	return transformArr.map((cur) => {
-// 		return typeof cur === 'string' ? (<React.Fragment>{cur}</React.Fragment>) : cur;
-// 	});
-// }
-
 module.exports = class TextTransform {
 
 	constructor(format) {
@@ -160,6 +166,9 @@ module.exports = class TextTransform {
 			throw new Error('new TextWriter(format) requires format to be in ${validFormats.toString()}');
 		}
 		this.format = format;
+		if (this.format === 'react') {
+			reactTextTransform = require('./ReactTextTransform');
+		}
 	}
 
 	transform(text) {
@@ -167,7 +176,7 @@ module.exports = class TextTransform {
 		if (this.format === 'docx') {
 			transform = docxStringsToTextRuns(transform);
 		} else if (this.format === 'react') {
-			transform = reactStringsToJSX(transform);
+			transform = reactTextTransform.reactStringsToJSX(transform);
 		}
 		return transform;
 	}
@@ -184,4 +193,4 @@ module.exports = class TextTransform {
 		}
 		return htmlColor(text, color);
 	}
-}
+};

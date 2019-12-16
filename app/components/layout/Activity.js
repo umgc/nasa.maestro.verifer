@@ -1,10 +1,10 @@
 const React = require('react');
 const PropTypes = require('prop-types');
-const uuidv4 = require('uuid/v4');
 
 const Division = require('./Division');
 
 const filters = require('../../helpers/filters');
+const maestroKey = require('../helpers/maestroKey');
 
 // const taskStyle = {
 // height: {{ height }}px;
@@ -27,21 +27,12 @@ class Activity extends React.Component {
 
 		return columnNames.map((name) => (
 			<th
-				key={filters.uniqueHtmlId('table-header-name')}
+				key={filters.uniqueHtmlId(`table-header-${name}`)}
 				style={{ width: `${100 / columnKeys.length}%` }}>{name}</th>
 		));
 	}
 
 	render() {
-
-		console.log('move this <Division> back into JSX and troubleshoot');
-		// 	<Division
-		// 	key={uuidv4()}
-		// 	procedure={this.props.procedure}
-		// 	activity={this.props.activity}
-		// 	division={division}
-		// 	getProcedureWriter={this.props.getProcedureWriter}
-		// />
 
 		return (
 			<React.Fragment>
@@ -55,12 +46,26 @@ class Activity extends React.Component {
 					({this.props.getProcedureWriter().getTaskDurationDisplay(this.props.activity)})
 				</h2>
 				<table className="gridtable">
-					<tr>
-						{this.getTableHeaderCells()}
-					</tr>
-					{this.props.activity.concurrentSteps.map((division) => (
-						<tr key={uuidv4()}><td>1</td><td>2</td></tr>
-					))}
+					<thead>
+						<tr>
+							{this.getTableHeaderCells()}
+						</tr>
+					</thead>
+					<tbody>
+						{this.props.activity.concurrentSteps.map((division, index) => {
+							return (
+								<Division
+									key={maestroKey.getKey(this.props.activityIndex, index)}
+									procedure={this.props.procedure}
+									activity={this.props.activity}
+									activityIndex={this.props.activityIndex}
+									division={division}
+									divisionIndex={index}
+									getProcedureWriter={this.props.getProcedureWriter}
+								/>
+							);
+						})}
+					</tbody>
 				</table>
 			</React.Fragment>
 		);
@@ -71,7 +76,8 @@ class Activity extends React.Component {
 Activity.propTypes = {
 	procedure: PropTypes.object.isRequired,
 	activity: PropTypes.object.isRequired,
-	getProcedureWriter: PropTypes.func.isRequired
+	getProcedureWriter: PropTypes.func.isRequired,
+	activityIndex: PropTypes.number.isRequired
 };
 
 module.exports = Activity;
