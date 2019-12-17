@@ -40,17 +40,12 @@ module.exports = class StepModule extends Abstract {
 	}
 
 	alterStepReactFallback() {
-		if (this.alterStepHtml && typeof this.alterStepHtml === 'function') {
-			return (
-				<span key={uuidv4()} dangerouslySetInnerHTML={{ __html: this.alterStepHtml() }}>
-				</span>
-			);
-		} else if (this.alterStepBase && typeof this.alterStepBase === 'function') {
-			return (<React.Fragment key={uuidv4()}>{this.alterStepBase()}</React.Fragment>);
-		} else {
-			throw new Error(
-				'Step module must implement alterStepReact, alterStepHtml, or alterStepBase');
+		if (!this.reactBaseStepModule) {
+			this.reactFallbackFunction = require('./reactFallbackFunction');
 		}
+
+		// wrap JSX in separate file to prevent syntax errors in non-transpiled code
+		return this.reactFallbackFunction(this);
 	}
 
 	transform(text) {
