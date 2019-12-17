@@ -203,13 +203,39 @@ module.exports = class ReactTaskWriter extends TaskWriter {
 			}
 		}
 
+		// ! FIXME does not yet handle if step has text component and a module with JSX/react
+		// const stepTextComponent = typeof stepText === 'string' ?
+		// 	this.textTransform.transform(stepText) :
+		// 	stepText;
+		let stepTextComponent;
+
+		if (typeof stepText === 'string') {
+			stepTextComponent = this.textTransform.transform(stepText);
+		} else if (Array.isArray(stepText)) {
+			// ! FIXME I'm pretty sure this will always be the case now
+
+			stepTextComponent = [];
+			for (let s = 0; s < stepText.length; s++) {
+				let elem = stepText[s];
+				if (typeof elem === 'string') {
+					elem = this.textTransform.transform(elem);
+				}
+				// else { assume it's a react object }
+
+				stepTextComponent.push(elem);
+			}
+		} else {
+			// probably a react object
+			stepTextComponent = stepText;
+		}
+
 		return (
 			<div key={uuidv4()} className={`li-level-${options.level}`}>
 				{ actorText ?
 					(<strong>{actorText}: </strong>) :
 					(<React.Fragment></React.Fragment>)
 				}
-				{this.textTransform.transform(stepText)}
+				{stepTextComponent}
 			</div>
 		);
 	}
@@ -230,12 +256,12 @@ module.exports = class ReactTaskWriter extends TaskWriter {
 		);
 	}
 
-	addTitleText(step) {
+	addTitleText(title, duration) {
 		return (
 			<h3 key={uuidv4()} data-level="subtask">
-				<span className="subtask-title">{step.title.toUpperCase().trim()}</span>
+				<span className="subtask-title">{title.toUpperCase().trim()}</span>
 				&nbsp;
-				<span className="subtask-duration">({step.duration.format('H:M')})</span>
+				<span className="subtask-duration">({duration.format('H:M')})</span>
 			</h3>
 		);
 	}

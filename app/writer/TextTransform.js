@@ -64,16 +64,14 @@ const transforms = [
 ];
 
 /**
- * If using React, add react transforms to each transform object
- */
-if (reactTextTransform) {
-	for (const xform of transforms) {
-		xform.react = reactTextTransform[xform.text];
-	}
-}
-
-/**
- * Add colors to list of transforms
+ * Add colors to list of transforms. Will add color transforms:
+ *
+ *  {
+ *    text: 'BLACK',
+ *    html: '<span style="font-weight:bold;color:black;">BLACK</span>',
+ *    docx: TextRun {...}
+ *    react: (<span style="font-weight:bold;color:black;">BLACK</span>) // <-- only if react in use
+ *  }
  */
 const colors = [
 	{ text: 'GREEN', color: 'green' },
@@ -91,6 +89,7 @@ const colors = [
 	{ text: 'PURPLE', color: 'purple' },
 	{ text: 'ORANGE', color: 'orange' }
 ];
+const colorPointers = {};
 for (const item of colors) {
 	const texts = arrayHelper.parseArray(item.text);
 	for (const text of texts) {
@@ -99,10 +98,7 @@ for (const item of colors) {
 			html: htmlColor(text, item.color),
 			docx: docxColor(text, item.color)
 		});
-		if (reactTextTransform) {
-			transforms[transforms.length - 1].react =
-				reactTextTransform.reactColor(text, item.color);
-		}
+		colorPointers[text] = transforms.length - 1; // for React transforms to easily be added
 	}
 }
 
@@ -166,8 +162,15 @@ module.exports = class TextTransform {
 			throw new Error('new TextWriter(format) requires format to be in ${validFormats.toString()}');
 		}
 		this.format = format;
-		if (this.format === 'react') {
-			reactTextTransform = require('./ReactTextTransform');
+
+		// modify transforms to include React transforms if (1) using React and (2) prior
+		// TextTransform objects haven't already modified them
+		if (this.format === 'react' && !reactTextTransform) {
+			console.log('Creating React text transforms');
+			const ReactTextTransform = require('./ReactTextTransform');
+
+			// instantiate in module context
+			reactTextTransform = new ReactTextTransform(transforms, colors, colorPointers);
 		}
 	}
 

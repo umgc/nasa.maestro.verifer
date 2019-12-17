@@ -1,5 +1,4 @@
 const React = require('react');
-const cloneDeep = require('lodash/cloneDeep');
 const PropTypes = require('prop-types');
 const YAML = require('js-yaml');
 
@@ -23,7 +22,6 @@ const textareaStyle = {
 class Step extends React.Component {
 
 	state = {
-		isMouseInside: false,
 		editMode: false
 	}
 
@@ -34,15 +32,6 @@ class Step extends React.Component {
 		// this.state.localStepState = this.props.stepState;
 
 		this.editorInput = React.createRef();
-	}
-
-	mouseEnter = () => {
-		console.log('mouseEnter');
-		this.setState({ isMouseInside: true });
-	}
-	mouseLeave = () => {
-		console.log('mouseLeave');
-		this.setState({ isMouseInside: false });
 	}
 
 	handleEditButtonClick = (e) => {
@@ -69,9 +58,7 @@ class Step extends React.Component {
 		return (
 			<li
 				style={liStyle}
-				className={`li-level-${options.level}`}
-				onMouseEnter={this.mouseEnter}
-				onMouseLeave={this.mouseLeave}
+				className={`li-level-${options.level} step-component`}
 			>
 				{this.renderButton()}
 				{this.props.taskWriter.insertStep(step)}
@@ -80,16 +67,15 @@ class Step extends React.Component {
 	}
 
 	renderButton() {
-		if (this.state.isMouseInside) {
-			return (
-				<button
-					style={editButtonStyle}
-					onClick={this.handleEditButtonClick}
-				>
-					edit
-				</button>
-			);
-		}
+		return (
+			<button
+				style={editButtonStyle}
+				onClick={this.handleEditButtonClick}
+				className='edit-button'
+			>
+				edit
+			</button>
+		);
 	}
 
 	renderEditor() {
@@ -119,21 +105,6 @@ class Step extends React.Component {
 		);
 
 	}
-
-	// handleEditTextChange = (e) => {
-	// 	e.preventDefault();
-	// 	e.stopPropagation();
-	// 	console.log('edit text change');
-
-	// 	const newRaw = YAML.safeLoad(e.target.value);
-	// 	const newState = cloneDeep(this.state.localStepState);
-	// 	// newState.text = e.target.value;
-	// 	newState.raw = newRaw;
-
-	// 	this.setState({
-	// 		localStepState: newState
-	// 	});
-	// }
 
 	handleSave = (e) => {
 		console.log('handle save');

@@ -61,44 +61,55 @@ module.exports = class ApfrInstall extends StepModule {
 	}
 
 	alterStepBase() {
-		this.step.text = `Install APFR in ${this.wif} [${getSettings(this).join(',')}]`;
-		return this.step;
+		return {
+			body: {
+				content: `Install APFR in ${this.wif} [${getSettings(this).join(',')}]`,
+				type: 'APPEND'
+			}
+		};
 	}
 
 	alterStepDocx() {
 
-		const textRuns = [];
-		if (this.step.text) {
-			textRuns.push(...this.transform(this.step.text));
-		}
+		// const textRuns = [];
+		// if (this.step.text) {
+		// textRuns.push(...this.transform(this.step.text));
+		// }
+
+		const changes = {
+			body: {
+				content: [],
+				type: 'APPEND'
+			},
+			checkboxes: {
+				// push some checkboxes onto the front
+				content: [
+					'Pull/twist test',
+					'Black-on-black',
+					'pitch knob locked, can be depressed'
+				],
+				type: 'PREPEND'
+			}
+		};
 
 		const installAPFR = new docx.TextRun({
 			text: `Install APFR in ${this.wif} `
 		});
 
-		if (textRuns.length > 0) {
+		if (this.step.text) {
 			// if there is step text, put first APFR text on a new line
 			installAPFR.break();
 		}
-		textRuns.push(installAPFR);
+		changes.body.content.push(installAPFR);
 
-		textRuns.push(
+		changes.body.content.push(
 			new docx.TextRun({
 				text: `[${getSettings(this).join(',')}]`,
 				bold: true
 			})
 		);
 
-		this.step.text = textRuns;
-
-		// push some checkboxes onto the front
-		this.step.checkboxes.unshift(
-			'Pull/twist test',
-			'Black-on-black',
-			'pitch knob locked, can be depressed'
-		);
-
-		return this.step;
+		return changes;
 	}
 
 };

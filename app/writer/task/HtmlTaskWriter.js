@@ -124,10 +124,10 @@ module.exports = class HtmlTaskWriter extends TaskWriter {
 		});
 	}
 
-	addTitleText(step) {
+	addTitleText(title, duration) {
 		const subtaskTitle = nunjucks.render('subtask-title.html', {
-			title: step.title.toUpperCase().trim(),
-			duration: step.duration.format('H:M')
+			title: title.toUpperCase().trim(),
+			duration: duration.format('H:M')
 		});
 
 		return subtaskTitle;
