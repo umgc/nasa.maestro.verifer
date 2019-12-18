@@ -31,12 +31,12 @@ function commonExpectations(procedure) {
 	expect(procedure.tasks[0].concurrentSteps).to.have.all.keys(0);
 
 	// eslint-disable-next-line no-unused-expressions
-	expect(procedure.tasks[0].concurrentSteps[0].EV1).to.exist;
-	expect(procedure.tasks[0].concurrentSteps[0].EV1).to.be.an('array');
-	expect(procedure.tasks[0].concurrentSteps[0].EV1).to.have.all.keys(0);
+	expect(procedure.tasks[0].concurrentSteps[0].subscenes.EV1).to.exist;
+	expect(procedure.tasks[0].concurrentSteps[0].subscenes.EV1).to.be.an('array');
+	expect(procedure.tasks[0].concurrentSteps[0].subscenes.EV1).to.have.all.keys(0);
 
-	expect(procedure.tasks[0].concurrentSteps[0].EV1[0].text).to.be.a('string');
-	expect(procedure.tasks[0].concurrentSteps[0].EV1[0].text).to.equal('Go Outside');
+	expect(procedure.tasks[0].concurrentSteps[0].subscenes.EV1[0].text).to.be.a('string');
+	expect(procedure.tasks[0].concurrentSteps[0].subscenes.EV1[0].text).to.equal('Go Outside');
 }
 
 const procedureDefinition1 = {

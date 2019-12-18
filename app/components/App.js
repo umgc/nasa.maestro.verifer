@@ -28,7 +28,7 @@ class App extends React.Component {
 			const division = newProc.tasks[actIndex].concurrentSteps[divIndex];
 			const newStep = division.makeStep(colKey, rawDefinition);
 
-			division[colKey][stepIndex] = newStep;
+			division.subscenes[colKey][stepIndex] = newStep;
 
 			this.setState({
 				procedure: newProc

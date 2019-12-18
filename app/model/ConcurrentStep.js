@@ -96,6 +96,7 @@ module.exports = class ConcurrentStep {
 	 */
 	constructor(concurrentStepYaml, taskRoles) {
 
+		this.subscenes = {};
 		this.taskRoles = taskRoles; // make this available for re-rendering steps later
 
 		// First, check if this is a simo
@@ -134,13 +135,11 @@ module.exports = class ConcurrentStep {
 		const actorInfo = getActorInfo(actorIdGuess, this.taskRoles);
 
 		if (typeof actorStepsDefinition === 'string') {
-			// actorSteps.push(new Step(actorStepsDefinition, actorInfo.idOrIds, taskRoles));
 			actorSteps.push(this.makeStep(actorIdGuess, actorStepsDefinition));
 
 		} else if (Array.isArray(actorStepsDefinition)) {
 
 			for (var stepDefinition of actorStepsDefinition) {
-				// actorSteps.push(new Step(stepYaml, actorInfo.idOrIds, taskRoles));
 				actorSteps.push(this.makeStep(actorIdGuess, stepDefinition));
 			}
 
@@ -150,7 +149,7 @@ module.exports = class ConcurrentStep {
 		}
 
 		// Set the actor and steps in the object
-		this[actorInfo.id] = actorSteps;
+		this.subscenes[actorInfo.id] = actorSteps;
 
 	}
 

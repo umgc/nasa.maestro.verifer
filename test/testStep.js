@@ -61,9 +61,7 @@ describe('Step constructor - Positive Testing', function() {
 
 		it('should return a procedure for normal input', () => {
 
-			const step = new Step();
-			step.mapTaskRolesToActor(taskRoles);
-			step.populateFromYaml(yamlObject);
+			const step = new Step(yamlObject, 'EV1', taskRoles);
 
 			expect(step).to.exist; // eslint-disable-line no-unused-expressions
 
@@ -147,9 +145,7 @@ describe('Step constructor - Positive Testing', function() {
 
 		it('should return a procedure for normal input', () => {
 
-			const step = new Step();
-			step.mapTaskRolesToActor(taskRoles);
-			step.populateFromYaml(yamlObject);
+			const step = new Step(yamlObject, 'EV1', taskRoles);
 
 			expect(step).to.exist; // eslint-disable-line no-unused-expressions
 

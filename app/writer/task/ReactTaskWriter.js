@@ -110,7 +110,7 @@ module.exports = class ReactTaskWriter extends TaskWriter {
 	}
 
 	/**
-	 * 
+	 *
 	 * ! FIXME Below is heavily ripped off from HtmlTaskWriter
 	 */
 

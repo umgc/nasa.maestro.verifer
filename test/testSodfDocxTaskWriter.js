@@ -83,7 +83,7 @@ describe('SodfDocxTaskWriter', function() {
 			const task = procedure.tasks[0];
 
 			const doAssertions = (divIndex, actor, stepText, seriesIndex = 0) => {
-				const steps = task.concurrentSteps[divIndex][actor];
+				const steps = task.concurrentSteps[divIndex].subscenes[actor];
 				const series = taskWriter.writeSeries(steps);
 
 				assert.strictEqual(series[seriesIndex].actor, actor);

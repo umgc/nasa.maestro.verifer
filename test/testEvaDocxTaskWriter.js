@@ -6,9 +6,13 @@
 const path = require('path');
 const assert = require('chai').assert;
 const docx = require('docx');
+const cloneDeep = require('lodash/cloneDeep');
 
 const CommanderProgram = require('../app/model/CommanderProgram');
 const Procedure = require('../app/model/Procedure');
+// const TaskRole = require('../app/model/TaskRole');
+const taskRoleTestHelper = require('./helpers/taskRoleTestHelper');
+const Step = require('../app/model/Step');
 
 const EvaDocxProcedureWriter = require('../app/writer/procedure/EvaDocxProcedureWriter');
 const EvaDocxTaskWriter = require('../app/writer/task/EvaDocxTaskWriter');
@@ -104,7 +108,10 @@ describe('EvaDocxTaskWriter', function() {
 
 	describe('writeSeries()', function() {
 		it('should handle series sourced from non-simo blocks', function() {
-			const series = taskWriter.writeSeries(taskWriter.task.concurrentSteps[2].IV, ['IV']);
+			const series = taskWriter.writeSeries(
+				taskWriter.task.concurrentSteps[2].subscenes.IV,
+				['IV']
+			);
 			assert.instanceOf(series[0], docx.Paragraph);
 			assert.instanceOf(series[0].root[1], docx.TextRun);
 			assert.equal(series[0].root[1].root[1].constructor.name, 'Text');
@@ -112,7 +119,10 @@ describe('EvaDocxTaskWriter', function() {
 		});
 
 		it('should handle series sourced from role variables', function() {
-			const series = taskWriter.writeSeries(taskWriter.task.concurrentSteps[0].EV1, ['EV1']);
+			const series = taskWriter.writeSeries(
+				taskWriter.task.concurrentSteps[0].subscenes.EV1,
+				['EV1']
+			);
 
 			// step 1
 			assert.instanceOf(series[0], docx.Paragraph);
@@ -128,7 +138,10 @@ describe('EvaDocxTaskWriter', function() {
 		});
 
 		it('should handle series sourced from simo blocks', function() {
-			const series = taskWriter.writeSeries(taskWriter.task.concurrentSteps[3].IV, ['IV']);
+			const series = taskWriter.writeSeries(
+				taskWriter.task.concurrentSteps[3].subscenes.IV,
+				['IV']
+			);
 			assert.instanceOf(series[0], docx.Paragraph);
 			assert.instanceOf(series[0].root[1], docx.TextRun);
 			assert.equal(series[0].root[1].root[1].constructor.name, 'Text');
@@ -136,7 +149,10 @@ describe('EvaDocxTaskWriter', function() {
 		});
 
 		it('should accept columnKeys as strings', function() {
-			const series = taskWriter.writeSeries(taskWriter.task.concurrentSteps[3].IV, 'IV');
+			const series = taskWriter.writeSeries(
+				taskWriter.task.concurrentSteps[3].subscenes.IV,
+				'IV'
+			);
 			assert.instanceOf(series[0], docx.Paragraph);
 			assert.instanceOf(series[0].root[1], docx.TextRun);
 			assert.equal(series[0].root[1].root[1].constructor.name, 'Text');
@@ -144,7 +160,10 @@ describe('EvaDocxTaskWriter', function() {
 		});
 
 		it('should apply actor prefixes if columnKeys don\'t match actors', function() {
-			const series = taskWriter.writeSeries(taskWriter.task.concurrentSteps[3].IV, 'NOT-IV');
+			const series = taskWriter.writeSeries(
+				taskWriter.task.concurrentSteps[3].subscenes.IV,
+				'NOT-IV'
+			);
 			assert.instanceOf(series[0], docx.Paragraph);
 
 			// create a bold "IV: " TextRun since actor "IV" not in column "NOT-IV"
@@ -160,7 +179,10 @@ describe('EvaDocxTaskWriter', function() {
 
 		it('should handle joint actor series', function() {
 			// console.log(taskWriter.task.concurrentSteps[5]);
-			const series = taskWriter.writeSeries(taskWriter.task.concurrentSteps[5]['EV1 + EV3'], ['EV1 + EV3', 'EV1', 'EV3']);
+			const series = taskWriter.writeSeries(
+				taskWriter.task.concurrentSteps[5].subscenes['EV1 + EV3'],
+				['EV1 + EV3', 'EV1', 'EV3']
+			);
 
 			// step 9
 			assert.instanceOf(series[0], docx.Paragraph);
@@ -248,6 +270,36 @@ describe('EvaDocxTaskWriter', function() {
 					);
 				}
 			}
+		});
+	});
+
+	// ! FIXME: Generalize this into helper module to run insertStep() idempotency checks on all
+	// !        task writers
+	describe('insertStep()', function() {
+
+		const definition = {
+			title: 'This is a step title',
+			step: 'This is step text',
+			checkboxes: [
+				'do stuff',
+				'do things'
+			],
+			duration: { hours: 1, minutes: 2, seconds: 3 }
+		};
+
+		const def1 = cloneDeep(definition);
+		const def2 = cloneDeep(definition);
+
+		const tr1 = taskRoleTestHelper.getSingleTaskRole('crewX', 'EV7');
+		const tr2 = taskRoleTestHelper.getSingleTaskRole('crewX', 'EV7');
+
+		const step1 = new Step(def1, 'EV7', tr1);
+		const step2 = new Step(def2, 'EV7', tr2);
+
+		taskWriter.insertStep(step1);
+
+		it('should not modify step object', function() {
+			assert.deepStrictEqual(step1, step2);
 		});
 	});
 });

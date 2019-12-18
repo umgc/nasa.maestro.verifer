@@ -102,10 +102,7 @@ module.exports = class EvaDivisionWriter {
 
 		let jointActors = [];
 
-		for (const actor in division) {
-			if (actor === 'taskRoles') {
-				continue;
-			}
+		for (const actor in division.subscenes) {
 			if (actor.indexOf('+') === -1) {
 				actorsInDivision.push(actor);
 
@@ -138,11 +135,12 @@ module.exports = class EvaDivisionWriter {
 
 			if (raw) {
 				columns[firstCol].stateColumnKey = actors.key;
-				columns[firstCol].series = division[actors.key];
+				columns[firstCol].series = division.subscenes[actors.key];
 				columns[firstCol].columnKeys = actors.columnKeys;
 			} else {
 				const series = taskWriter.writeSeries(
-					division[actors.key], // get the division info by the key like "EV1 + EV2"
+					// get the division info by the key like "EV1 + EV2"
+					division.subscenes[actors.key],
 					actors.columnKeys
 				);
 				if (Array.isArray(series)) {
@@ -167,10 +165,10 @@ module.exports = class EvaDivisionWriter {
 
 			if (raw) {
 				columns[col].stateColumnKey = columnKey;
-				columns[col].series = division[actor];
+				columns[col].series = division.subscenes[actor];
 				columns[col].columnKeys = [columnKey];
 			} else {
-				const series = taskWriter.writeSeries(division[actor], columnKey);
+				const series = taskWriter.writeSeries(division.subscenes[actor], columnKey);
 				if (Array.isArray(series)) {
 					columns[col].children.push(...series);
 				} else {

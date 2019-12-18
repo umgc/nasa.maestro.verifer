@@ -202,7 +202,7 @@ module.exports = class Task {
 		// ]
 		//
 		for (division of divisions) {
-			for (actorKey in division) {
+			for (actorKey in division.subscenes) {
 				colKey = this.procedure.getActorColumnKey(actorKey);
 
 				if (!taskColumnsHash[colKey]) {
