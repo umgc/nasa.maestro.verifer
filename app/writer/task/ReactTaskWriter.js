@@ -205,8 +205,8 @@ module.exports = class ReactTaskWriter extends TaskWriter {
 
 		// ! FIXME does not yet handle if step has text component and a module with JSX/react
 		// const stepTextComponent = typeof stepText === 'string' ?
-		// 	this.textTransform.transform(stepText) :
-		// 	stepText;
+		// this.textTransform.transform(stepText) :
+		// stepText;
 		let stepTextComponent;
 
 		if (typeof stepText === 'string') {

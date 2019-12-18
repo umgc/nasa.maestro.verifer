@@ -2,6 +2,8 @@
 /* eslint-env node, mocha */
 
 'use strict';
+const docx = require('docx');
+
 const StepModuleTester = require('./helpers/StepModuleTester');
 
 const goodSettings = [
@@ -18,7 +20,12 @@ const goodSettings = [
 				yaw: '6',
 				wif: 'SSRMS'
 			},
-			alterStepBase: 'Install APFR in SSRMS [6,PP,F,6]'
+			alterStepBase: {
+				body: {
+					content: 'Install APFR in SSRMS [6,PP,F,6]',
+					type: 'APPEND'
+				}
+			}
 		},
 		module: null
 	},
@@ -35,7 +42,12 @@ const goodSettings = [
 				yaw: '11',
 				wif: 'P6 WIF 1'
 			},
-			alterStepBase: 'Install APFR in P6 WIF 1 [12,RR,G,11]'
+			alterStepBase: {
+				body: {
+					content: 'Install APFR in P6 WIF 1 [12,RR,G,11]',
+					type: 'APPEND'
+				}
+			}
 		},
 		module: null
 	}
@@ -63,6 +75,6 @@ describe('ApfrInstall', function() {
 	});
 
 	describe('alterStepDocx()', function() {
-		tester.testAlterStepDocx();
+		tester.testAlterStepDocx({ body: { content: docx.TextRun, type: 'APPEND' } });
 	});
 });

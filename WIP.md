@@ -37,8 +37,8 @@ Stuff to do in this WIP branch
      - [ ] APFR (later so you can have both for testing both cases)
    - [ ] Possibly restructure StepModule `alterStep` methodology
      - [x] Make each step idempotent
-     - [ ] Make tests pass for apfr.install and pgt.set
-     - [ ] Add tests to verify idempotency
+     - [x] Make tests pass for apfr.install and pgt.set
+     - [ ] Add tests to verify idempotency of TaskWriter.insertStep()
      - [ ] Make things like warnings be modules?
 - [ ] fix numbering (currently starting at 1 for each division, and gets wonky when editing steps)
 - [ ] output full yaml of procedure and activities in browser console
@@ -46,7 +46,9 @@ Stuff to do in this WIP branch
 - [ ] add --html output type back in its full form for now (for XML output type learning)
 - [ ] Make `maestro conduct` not require a dummy html files
 - [ ] Fix any broken tests
-- [ ] Add new tests as required
+- [ ] Switch Mocha --> Jest (and maybe Chai --> Jest) for better React and screenshot handling
+  - [ ] Write tests for React components
+  - [ ] Write/alter other tests as required
 - [ ] Fix maintainability issues if required (probably required!)
 
 Fixes needed

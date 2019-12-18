@@ -3,6 +3,8 @@
 
 'use strict';
 
+const docx = require('docx');
+
 const StepModuleTester = require('./helpers/StepModuleTester');
 
 const goodSettings = [
@@ -15,7 +17,12 @@ const goodSettings = [
 				mtlCollar: null,
 				socket: null
 			},
-			alterStepBase: 'PGT [B7, CCW2] (25.5 ft-lb, 30 RPM, MTL 30.5)'
+			alterStepBase: {
+				body: {
+					content: 'PGT [B7, CCW2] (25.5 ft-lb, 30 RPM, MTL 30.5)',
+					type: 'APPEND'
+				}
+			}
 		},
 		module: null
 	},
@@ -28,7 +35,12 @@ const goodSettings = [
 				mtlCollar: null,
 				socket: '6" Wobble'
 			},
-			alterStepBase: 'PGT [B1, CCW1] (12.0 ft-lb, 10 RPM, MTL 30.5) - 6" Wobble'
+			alterStepBase: {
+				body: {
+					content: 'PGT [B1, CCW1] (12.0 ft-lb, 10 RPM, MTL 30.5) - 6" Wobble',
+					type: 'APPEND'
+				}
+			}
 		},
 		module: null
 	},
@@ -41,7 +53,12 @@ const goodSettings = [
 				mtlCollar: '30.5',
 				socket: null
 			},
-			alterStepBase: 'PGT [A7, CW2, 30.5] (9.2 ft-lb, 30 RPM, MTL 30.5)'
+			alterStepBase: {
+				body: {
+					content: 'PGT [A7, CW2, 30.5] (9.2 ft-lb, 30 RPM, MTL 30.5)',
+					type: 'APPEND'
+				}
+			}
 		},
 		module: null
 	},
@@ -54,7 +71,12 @@ const goodSettings = [
 				mtlCollar: '2.5',
 				socket: null
 			},
-			alterStepBase: 'PGT [B1, CW1, 2.5] (12.0 ft-lb, 10 RPM, MTL 2.5)'
+			alterStepBase: {
+				body: {
+					content: 'PGT [B1, CW1, 2.5] (12.0 ft-lb, 10 RPM, MTL 2.5)',
+					type: 'APPEND'
+				}
+			}
 		},
 		module: null
 	},
@@ -67,7 +89,12 @@ const goodSettings = [
 				mtlCollar: '2.5',
 				socket: '7/16 x 18" Wobble Socket'
 			},
-			alterStepBase: 'PGT [B7, CW2, 2.5] (25.5 ft-lb, 30 RPM, MTL 2.5) - 7/16 x 18" Wobble Socket'
+			alterStepBase: {
+				body: {
+					content: 'PGT [B7, CW2, 2.5] (25.5 ft-lb, 30 RPM, MTL 2.5) - 7/16 x 18" Wobble Socket',
+					type: 'APPEND'
+				}
+			}
 		},
 		module: null
 	},
@@ -81,7 +108,12 @@ const goodSettings = [
 				mtlCollar: null,
 				socket: null
 			},
-			alterStepBase: 'PGT [B7, CW2] (25.5 ft-lb, 30 RPM, MTL 30.5)'
+			alterStepBase: {
+				body: {
+					content: 'PGT [B7, CW2] (25.5 ft-lb, 30 RPM, MTL 30.5)',
+					type: 'APPEND'
+				}
+			}
 		},
 		module: null
 	}
@@ -112,7 +144,7 @@ describe('PgtSet', function() {
 	});
 
 	describe('alterStepDocx()', function() {
-		tester.testAlterStepDocx();
+		tester.testAlterStepDocx({ body: { content: docx.TextRun, type: 'APPEND' } });
 	});
 
 });

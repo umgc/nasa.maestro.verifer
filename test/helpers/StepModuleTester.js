@@ -4,7 +4,6 @@
 'use strict';
 
 const assert = require('chai').assert;
-const docx = require('docx');
 const Step = require('../../app/model/Step');
 const stepModules = require('../../app/step-mods/stepModules');
 
@@ -102,24 +101,50 @@ module.exports = class StepModuleTester {
 		for (const setting of this.goodInputs) {
 			const module = this.generateModule(setting);
 			it(`should create basic string version from input ${JSON.stringify(setting.actual)}`, function() {
-				assert.equal(
-					module.alterStepBase().text, // alterStepBase() returns this.step
+				assert.deepStrictEqual(
+					module.alterStepBase(),
 					setting.expected.alterStepBase
 				);
 			});
 		}
 	}
 
-	testAlterStepDocx() {
+	/**
+	 *
+	 * @param {Object} changeFormat  Format of alterStepDocx output, like:
+	 *                               {
+	 *                                 base: {
+	 *                                   -- content always is an array. Here an array of TextRuns
+	 *                                   content: docx.TextRun,
+	 *                                   type: 'APPEND'
+	 *                                 }
+	 *                               }
+	 */
+	testAlterStepDocx(changeFormat) {
 		for (const setting of this.goodInputs) {
-			const docxOutput = this.generateModule(setting).alterStepDocx();
-			it(`should return a Step when settings ${JSON.stringify(setting.actual)}`, function() {
-				assert.instanceOf(docxOutput, Step);
-			});
+			describe(`Settings: ${JSON.stringify(setting.actual)}`, () => {
+				const docxOutput = this.generateModule(setting).alterStepDocx();
+				it('should return a object', function() {
+					assert.isObject(docxOutput);
+				});
+				for (const element in changeFormat) {
+					// element is "base", "title", "checkboxes", etc
+					it(`should have .${element} as object`, function() {
+						assert.isObject(docxOutput[element]);
+					});
 
-			it(`should make Step.text an array of docx.TextRun objects when settings ${JSON.stringify(setting.actual)}`, function() {
-				assert.isArray(docxOutput.text);
-				assert.instanceOf(docxOutput.text[0], docx.TextRun);
+					it(`should have .${element}.content as array of ${changeFormat[element].content.name}`, function() {
+						assert.isArray(docxOutput[element].content);
+						assert.instanceOf(
+							docxOutput[element].content[0],
+							changeFormat[element].content
+						);
+					});
+
+					it(`should have .${element}.type equal to ${changeFormat[element].type}`, function() {
+						assert.strictEqual(docxOutput[element].type, changeFormat[element].type);
+					});
+				}
 			});
 		}
 	}
