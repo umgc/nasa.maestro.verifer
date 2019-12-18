@@ -210,11 +210,13 @@ module.exports = class TaskWriter extends Abstract {
 
 		}
 
-		elements.body = this.addStepText(elements.body, {
-			level: level,
-			actors: step.actors,
-			columnKeys: step.columnKeys
-		});
+		if (elements.body.length) {
+			elements.body = this.addStepText(elements.body, {
+				level: level,
+				actors: step.actors,
+				columnKeys: step.columnKeys
+			});
+		}
 
 		for (let t = 0; t < elements.title.length; t++) {
 			// why you'd want multiple titles I do not know...but just in case, apply addTitleText()

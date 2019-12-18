@@ -41,6 +41,7 @@ Stuff to do in this WIP branch
     - [ ] Add tests to verify idempotency of TaskWriter.insertStep()
 - [x] Fix: editing random step causes step-module steps to duplicate text
 - [x] Fix: colors via text like `GREEN` not showing
+- [x] Editing via web (in YAML) strips `actor` param from steps if set. Can't set it if not set.
 - [ ] Make things like warnings be StepModules?
 - [ ] fix numbering (currently starting at 1 for each division, and gets wonky when editing steps)
 - [ ] output full yaml of procedure and activities in browser console
@@ -53,6 +54,8 @@ Stuff to do in this WIP branch
   - [ ] Write tests for React components
   - [ ] Write/alter other tests as required
 - [ ] Fix maintainability issues if required (probably required!)
+  - [ ] Simplify EvaDivisionWriter
+  - [ ] Rename ConcurrentStep to Division? Or Scene? If scene, then series becomes what? Cutaway?
 
 Fixes needed
 ------------
@@ -60,7 +63,6 @@ Fixes needed
 - [ ] Series key showing as `act0,IV + EV1 + EV2`
   - [ ] Keys in general seem to be in format `act,div,series,step` vs `act-div-series-step`
 - [ ] Images still 100x100px
-- [ ] Editing via web (in YAML) strips `actor` param from steps if set. Can't set it if not set.
 
 Possible additional things for this WIP branch (but probably in a follow-on)
 ----------------------------------------------------------------------------

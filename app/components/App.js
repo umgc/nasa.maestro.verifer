@@ -21,12 +21,14 @@ class App extends React.Component {
 			procedureWriter: new ReactProcedureWriter(maestro.app, procObject)
 		});
 
-		stateHandler.modifyStep = (actIndex, divIndex, colKey, stepIndex, newStep) => {
-
+		stateHandler.modifyStep = (actIndex, divIndex, colKey, stepIndex, rawDefinition) => {
 			// overkill?
 			const newProc = cloneDeep(this.state.procedure);
 
-			newProc.tasks[actIndex].concurrentSteps[divIndex][colKey][stepIndex] = newStep;
+			const division = newProc.tasks[actIndex].concurrentSteps[divIndex];
+			const newStep = division.makeStep(colKey, rawDefinition);
+
+			division[colKey][stepIndex] = newStep;
 
 			this.setState({
 				procedure: newProc

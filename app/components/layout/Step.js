@@ -116,15 +116,12 @@ class Step extends React.Component {
 		// const newState = cloneDeep(this.props.stepState);
 		// newState.raw = newRaw;
 
-		const newStep = new StepModel();
-		newStep.populateFromYaml(newRaw);
-
 		stateHandler.modifyStep(
 			this.props.activityIndex,
 			this.props.divisionIndex,
 			this.props.primaryColumnKey,
 			this.props.stepIndex,
-			newStep
+			newRaw
 		);
 
 		this.setState({

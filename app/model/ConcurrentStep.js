@@ -1,8 +1,10 @@
 'use strict';
 
 const Step = require('./Step');
+const typeHelper = require('../helpers/typeHelper');
 
 function getRealActorId(taskRoles, actorIdGuess) {
+	typeHelper.required(taskRoles, 'taskRoles');
 
 	// "actorIdGuess" may be a proper actor ID like "EV1" or it may be a
 	// placeholder "role" like "crewA". Procedures will then have to
@@ -16,45 +18,20 @@ function getRealActorId(taskRoles, actorIdGuess) {
 	// real actor and must be replaced with whomever the procedure
 	// is passing in as an actor for the role.
 	if (taskRoles[actorIdGuess]) {
-		// console.log(taskRoles);
-		// console.log(`actorRole ${actorIdGuess} is in taskRoles`);
 		return taskRoles[actorIdGuess].actor;
 	} else {
 		return actorIdGuess;
 	}
 }
 
-function createStep(stepYaml, actorIdOrIds, taskRoles) {
-	const step = new Step();
-	step.mapTaskRolesToActor(taskRoles);
-	step.populateFromYaml(stepYaml);
-	step.setActors(stepYaml.actor ? stepYaml.actor : actorIdOrIds);
-	return step;
-}
-
-function getActorSteps(actorStepsYaml, taskRoles, actorIdOrIds) {
-
-	// Initiate the array of steps for the actor
-	const actorSteps = [];
-
-	if (typeof actorStepsYaml === 'string') {
-		actorSteps.push(createStep(actorStepsYaml, actorIdOrIds, taskRoles));
-
-	} else if (Array.isArray(actorStepsYaml)) {
-
-		for (var stepYaml of actorStepsYaml) {
-			actorSteps.push(createStep(stepYaml, actorIdOrIds, taskRoles));
-		}
-
-	// Don't know how to process this
-	} else {
-		throw new Error(`Was expecting either steps or string for actor. Instead found: ${JSON.stringify(actorStepsYaml)}`);
-	}
-
-	return actorSteps;
-}
-
 function getActorInfo(actorIdGuess, taskRoles) {
+	typeHelper.required(taskRoles, 'taskRoles');
+
+	const actorInfo = {};
+	// if (actorInfo[actorIdGuess]) {
+	// 	return actorInfo[actorIdGuess]; // get from cache if available
+	// }
+
 	let idOrIds,
 		id;
 	// check for joint actors
@@ -75,7 +52,10 @@ function getActorInfo(actorIdGuess, taskRoles) {
 		id = idOrIds;
 	}
 
-	return { id: id, idOrIds: idOrIds };
+	// cache
+	actorInfo[actorIdGuess] = { id: id, idOrIds: idOrIds };
+
+	return actorInfo[actorIdGuess];
 }
 
 module.exports = class ConcurrentStep {
@@ -116,12 +96,14 @@ module.exports = class ConcurrentStep {
 	 */
 	constructor(concurrentStepYaml, taskRoles) {
 
+		this.taskRoles = taskRoles; // make this available for re-rendering steps later
+
 		// First, check if this is a simo
 		if (concurrentStepYaml.simo) {
 
 			// Iterate over they keys (which are actor roles)
 			for (const actorIdGuess in concurrentStepYaml.simo) {
-				this.handleActorSteps(concurrentStepYaml, actorIdGuess, taskRoles);
+				this.handleActorSteps(concurrentStepYaml, actorIdGuess);
 			}
 
 		// Not a simo, so just an actor role
@@ -134,31 +116,53 @@ module.exports = class ConcurrentStep {
 
 			const actorIdGuess = Object.keys(concurrentStepYaml)[0];
 
-			this.handleActorSteps(concurrentStepYaml, actorIdGuess, taskRoles);
+			this.handleActorSteps(concurrentStepYaml, actorIdGuess);
 		}
 
 	}
 
-	handleActorSteps(concurrentStepYaml, actorIdGuess, taskRoles) {
+	handleActorSteps(concurrentStepYaml, actorIdGuess) {
 
 		// if .simo exists, use it. Otherwise it's not a simo block and directly access actor
-		const actorStepsYaml = concurrentStepYaml.simo ?
+		const actorStepsDefinition = concurrentStepYaml.simo ?
 			concurrentStepYaml.simo[actorIdGuess] :
 			concurrentStepYaml[actorIdGuess];
 
-		const actorInfo = getActorInfo(actorIdGuess, taskRoles);
+		// Initiate the array of steps for the actor
+		const actorSteps = [];
 
-		// Get the actor steps array
-		const actorSteps = getActorSteps(
-			// use the "guess" here since that's what's in the user-supplied yaml
-			actorStepsYaml,
-			taskRoles,
-			actorInfo.idOrIds
-		);
+		const actorInfo = getActorInfo(actorIdGuess, this.taskRoles);
+
+		if (typeof actorStepsDefinition === 'string') {
+			// actorSteps.push(new Step(actorStepsDefinition, actorInfo.idOrIds, taskRoles));
+			actorSteps.push(this.makeStep(actorIdGuess, actorStepsDefinition));
+
+		} else if (Array.isArray(actorStepsDefinition)) {
+
+			for (var stepDefinition of actorStepsDefinition) {
+				// actorSteps.push(new Step(stepYaml, actorInfo.idOrIds, taskRoles));
+				actorSteps.push(this.makeStep(actorIdGuess, stepDefinition));
+			}
+
+		// Don't know how to process this
+		} else {
+			throw new Error(`Was expecting either steps or string for actor. Instead found: ${JSON.stringify(actorStepsYaml)}`);
+		}
 
 		// Set the actor and steps in the object
 		this[actorInfo.id] = actorSteps;
 
+	}
+
+	/**
+	 * Make a Step based upon the context of this concurrentStep
+	 * @param {string}         actorIdGuess
+	 * @param {Object|string}  stepDefinition
+	 * @return {Step}          Resulting step object
+	 */
+	makeStep(actorIdGuess, stepDefinition) {
+		const actorInfo = getActorInfo(actorIdGuess, this.taskRoles);
+		return new Step(stepDefinition, actorInfo.idOrIds, this.taskRoles);
 	}
 
 };

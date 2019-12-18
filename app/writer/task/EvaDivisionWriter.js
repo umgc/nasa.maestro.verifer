@@ -55,7 +55,7 @@ function getJointActorColumnInfo(nonJointColumnsInDivision, jointActors, taskWri
 			consoleHelper.error(
 				[
 					'For joint actors (e.g. EV1 + EV2), actors cannot be used more than once.',
-					`The following actors used more than once: ${intersect1.toString()}`
+					`The following actors are used more than once: ${intersect1.toString()}`
 				],
 				'Joint actors error'
 			);
@@ -103,6 +103,9 @@ module.exports = class EvaDivisionWriter {
 		let jointActors = [];
 
 		for (const actor in division) {
+			if (actor === 'taskRoles') {
+				continue;
+			}
 			if (actor.indexOf('+') === -1) {
 				actorsInDivision.push(actor);
 
