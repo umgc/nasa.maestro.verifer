@@ -31,15 +31,17 @@ Stuff to do in this WIP branch
 - [x] Get React working in general for web version
 - [x] Allow basic modification of individual steps (YAML-editor only)
 - [ ] support stepmodules
-   - [x] without alterStepReact methods in step modules
-   - [ ] with alterStepReact methods
-     - [x] PGT
-     - [ ] APFR (later so you can have both for testing both cases)
-   - [ ] Possibly restructure StepModule `alterStep` methodology
-     - [x] Make each step idempotent
-     - [x] Make tests pass for apfr.install and pgt.set
-     - [ ] Add tests to verify idempotency of TaskWriter.insertStep()
-     - [ ] Make things like warnings be modules?
+  - [x] without alterStepReact methods in step modules
+  - [ ] with alterStepReact methods
+    - [x] PGT
+    - [ ] APFR (later so you can have both for testing both cases)
+  - [ ] Possibly restructure StepModule `alterStep` methodology
+    - [x] Make each step idempotent
+    - [x] Make tests pass for apfr.install and pgt.set
+    - [ ] Add tests to verify idempotency of TaskWriter.insertStep()
+- [x] Fix: editing random step causes step-module steps to duplicate text
+- [x] Fix: colors via text like `GREEN` not showing
+- [ ] Make things like warnings be StepModules?
 - [ ] fix numbering (currently starting at 1 for each division, and gets wonky when editing steps)
 - [ ] output full yaml of procedure and activities in browser console
 - [ ] save yaml to files
@@ -47,6 +49,7 @@ Stuff to do in this WIP branch
 - [ ] Make `maestro conduct` not require a dummy html files
 - [ ] Fix any broken tests
 - [ ] Switch Mocha --> Jest (and maybe Chai --> Jest) for better React and screenshot handling
+  - [ ] Use as opportunity to switch to `.test.js` method of keeping tests alongside files
   - [ ] Write tests for React components
   - [ ] Write/alter other tests as required
 - [ ] Fix maintainability issues if required (probably required!)
@@ -56,9 +59,7 @@ Fixes needed
 
 - [ ] Series key showing as `act0,IV + EV1 + EV2`
   - [ ] Keys in general seem to be in format `act,div,series,step` vs `act-div-series-step`
-- [ ] Editing random step causes step-module steps to duplicate text
 - [ ] Images still 100x100px
-- [ ] Colors via text like `GREEN` not showing
 - [ ] Editing via web (in YAML) strips `actor` param from steps if set. Can't set it if not set.
 
 Possible additional things for this WIP branch (but probably in a follow-on)

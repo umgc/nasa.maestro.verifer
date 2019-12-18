@@ -24,43 +24,34 @@ function getRealActorId(taskRoles, actorIdGuess) {
 	}
 }
 
+function createStep(stepYaml, actorIdOrIds, taskRoles) {
+	const step = new Step();
+	step.mapTaskRolesToActor(taskRoles);
+	step.populateFromYaml(stepYaml);
+	step.setActors(stepYaml.actor ? stepYaml.actor : actorIdOrIds);
+	return step;
+}
+
 function getActorSteps(actorStepsYaml, taskRoles, actorIdOrIds) {
-	var step;
 
 	// Initiate the array of steps for the actor
 	const actorSteps = [];
 
-	// Check if actorStepsYaml is a string
 	if (typeof actorStepsYaml === 'string') {
-		step = new Step();
-		step.mapTaskRolesToActor(taskRoles);
-		step.populateFromYaml(actorStepsYaml);
-		const actor = actorStepsYaml.actor ? actorStepsYaml.actor : actorIdOrIds;
-		step.setActors(actor);
-		actorSteps.push(step);
+		actorSteps.push(createStep(actorStepsYaml, actorIdOrIds, taskRoles));
 
-	// Check if actorStepsYaml is an array
 	} else if (Array.isArray(actorStepsYaml)) {
 
-		// This gets the values of each step in the array
 		for (var stepYaml of actorStepsYaml) {
-
-			// Create the step, and add it to the array
-			step = new Step();
-			step.mapTaskRolesToActor(taskRoles);
-			step.populateFromYaml(stepYaml);
-			const actor = stepYaml.actor ? stepYaml.actor : actorIdOrIds;
-			step.setActors(actor);
-			actorSteps.push(step);
+			actorSteps.push(createStep(stepYaml, actorIdOrIds, taskRoles));
 		}
 
 	// Don't know how to process this
 	} else {
-		throw new Error(`Was expecting either steps or string for actor.  Instead found: ${JSON.stringify(actorStepsYaml)}`);
+		throw new Error(`Was expecting either steps or string for actor. Instead found: ${JSON.stringify(actorStepsYaml)}`);
 	}
 
 	return actorSteps;
-
 }
 
 function getActorInfo(actorIdGuess, taskRoles) {
@@ -125,49 +116,42 @@ module.exports = class ConcurrentStep {
 	 */
 	constructor(concurrentStepYaml, taskRoles) {
 
-		let actorIdGuess,
-			actorSteps;
-
 		// First, check if this is a simo
 		if (concurrentStepYaml.simo) {
 
 			// Iterate over they keys (which are actor roles)
-			for (actorIdGuess in concurrentStepYaml.simo) {
-
-				const actorInfo = getActorInfo(actorIdGuess, taskRoles);
-
-				// Get the actor steps array
-				actorSteps = getActorSteps(
-					// use the "guess" here since that's what's in the user-supplied yaml
-					concurrentStepYaml.simo[actorIdGuess],
-					taskRoles,
-					actorInfo.idOrIds
-				);
-
-				// Set the actor and steps in the object
-				this[actorInfo.id] = actorSteps;
-
+			for (const actorIdGuess in concurrentStepYaml.simo) {
+				this.handleActorSteps(concurrentStepYaml, actorIdGuess, taskRoles);
 			}
 
-			return;
-		}
-
 		// Not a simo, so just an actor role
+		} else {
 
-		// Get the actor role
-		if (Object.keys(concurrentStepYaml).length !== 1) {
-			throw new Error(`Expected a single actor role, but instead got ${JSON.stringify(concurrentStepYaml)}`);
+			// Get the actor role
+			if (Object.keys(concurrentStepYaml).length !== 1) {
+				throw new Error(`Expected a single actor role, but instead got ${JSON.stringify(concurrentStepYaml)}`);
+			}
+
+			const actorIdGuess = Object.keys(concurrentStepYaml)[0];
+
+			this.handleActorSteps(concurrentStepYaml, actorIdGuess, taskRoles);
 		}
 
-		actorIdGuess = Object.keys(concurrentStepYaml)[0];
-		// const actorIdReal = getRealActorId(taskRoles, actorIdGuess);
+	}
+
+	handleActorSteps(concurrentStepYaml, actorIdGuess, taskRoles) {
+
+		// if .simo exists, use it. Otherwise it's not a simo block and directly access actor
+		const actorStepsYaml = concurrentStepYaml.simo ?
+			concurrentStepYaml.simo[actorIdGuess] :
+			concurrentStepYaml[actorIdGuess];
 
 		const actorInfo = getActorInfo(actorIdGuess, taskRoles);
 
-		// get the actor steps
-		actorSteps = getActorSteps(
+		// Get the actor steps array
+		const actorSteps = getActorSteps(
 			// use the "guess" here since that's what's in the user-supplied yaml
-			concurrentStepYaml[actorIdGuess],
+			actorStepsYaml,
 			taskRoles,
 			actorInfo.idOrIds
 		);

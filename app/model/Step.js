@@ -23,6 +23,8 @@ module.exports = class Step {
 		this.substeps = [];
 		this.raw = null;
 		this.taskRolesMap = {};
+
+		
 	}
 
 	populateFromYaml(stepYaml) {
