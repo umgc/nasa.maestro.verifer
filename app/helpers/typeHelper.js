@@ -60,14 +60,7 @@ function errorIfIsnt(value, ...types) {
 	return false; // didn't error
 }
 
-function required(value, name) {
-	if (typeof value === 'undefined') {
-		throw new Error(`${name} must be defined`);
-	}
-}
-
 module.exports = {
 	is: is,
-	errorIfIsnt: errorIfIsnt,
-	required: required
+	errorIfIsnt: errorIfIsnt
 };

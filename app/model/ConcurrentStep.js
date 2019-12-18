@@ -1,10 +1,8 @@
 'use strict';
 
 const Step = require('./Step');
-const typeHelper = require('../helpers/typeHelper');
 
 function getRealActorId(taskRoles, actorIdGuess) {
-	typeHelper.required(taskRoles, 'taskRoles');
 
 	// "actorIdGuess" may be a proper actor ID like "EV1" or it may be a
 	// placeholder "role" like "crewA". Procedures will then have to
@@ -25,15 +23,10 @@ function getRealActorId(taskRoles, actorIdGuess) {
 }
 
 function getActorInfo(actorIdGuess, taskRoles) {
-	typeHelper.required(taskRoles, 'taskRoles');
-
-	const actorInfo = {};
-	// if (actorInfo[actorIdGuess]) {
-	// 	return actorInfo[actorIdGuess]; // get from cache if available
-	// }
 
 	let idOrIds,
 		id;
+
 	// check for joint actors
 	if (actorIdGuess.indexOf('+') !== -1) {
 
@@ -52,10 +45,7 @@ function getActorInfo(actorIdGuess, taskRoles) {
 		id = idOrIds;
 	}
 
-	// cache
-	actorInfo[actorIdGuess] = { id: id, idOrIds: idOrIds };
-
-	return actorInfo[actorIdGuess];
+	return { id: id, idOrIds: idOrIds };
 }
 
 module.exports = class ConcurrentStep {
@@ -145,7 +135,9 @@ module.exports = class ConcurrentStep {
 
 		// Don't know how to process this
 		} else {
-			throw new Error(`Was expecting either steps or string for actor. Instead found: ${JSON.stringify(actorStepsYaml)}`);
+			throw new Error(
+				`Was expecting either steps or string for actor. Instead found: ${JSON.stringify(actorStepsDefinition)}`
+			);
 		}
 
 		// Set the actor and steps in the object

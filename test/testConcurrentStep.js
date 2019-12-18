@@ -51,7 +51,8 @@ describe('ConcurrentStep constructor - Positive Testing', function() {
 
 			const concurrentStep = new ConcurrentStep(fakeYamlObj, taskRoles);
 
-			expect(concurrentStep.subscenes.EV1).to.exist; // eslint-disable-line no-unused-expressions
+			// eslint-disable-next-line no-unused-expressions
+			expect(concurrentStep.subscenes.EV1).to.exist;
 			expect(concurrentStep.subscenes.EV1).to.be.an('array');
 			expect(concurrentStep.subscenes.EV1).to.have.all.keys(0);
 
@@ -71,7 +72,8 @@ describe('ConcurrentStep constructor - Positive Testing', function() {
 
 			const concurrentStep = new ConcurrentStep(fakeYamlObj, taskRoles);
 
-			expect(concurrentStep.subscenes.EV1).to.exist; // eslint-disable-line no-unused-expressions
+			// eslint-disable-next-line no-unused-expressions
+			expect(concurrentStep.subscenes.EV1).to.exist;
 			expect(concurrentStep.subscenes.EV1).to.be.an('array');
 			expect(concurrentStep.subscenes.EV1).to.have.all.keys(0);
 
@@ -94,13 +96,15 @@ describe('ConcurrentStep constructor - Positive Testing', function() {
 
 			const concurrentStep = new ConcurrentStep(fakeYamlObj, taskRoles);
 
-			expect(concurrentStep.subscenes.EV1).to.exist; // eslint-disable-line no-unused-expressions
+			// eslint-disable-next-line no-unused-expressions
+			expect(concurrentStep.subscenes.EV1).to.exist;
 			expect(concurrentStep.subscenes.EV1).to.be.an('array');
 			expect(concurrentStep.subscenes.EV1).to.have.all.keys(0);
 			expect(concurrentStep.subscenes.EV1[0].text).to.be.a('string');
 			expect(concurrentStep.subscenes.EV1[0].text).to.equal('Go Outside');
 
-			expect(concurrentStep.subscenes.EV2).to.exist; // eslint-disable-line no-unused-expressions
+			// eslint-disable-next-line no-unused-expressions
+			expect(concurrentStep.subscenes.EV2).to.exist;
 			expect(concurrentStep.subscenes.EV2).to.be.an('array');
 			expect(concurrentStep.subscenes.EV2).to.have.all.keys(0, 1);
 			expect(concurrentStep.subscenes.EV2[0].text).to.be.a('string');
@@ -124,13 +128,15 @@ describe('ConcurrentStep constructor - Positive Testing', function() {
 
 			const concurrentStep = new ConcurrentStep(fakeYamlObj, taskRoles);
 
-			expect(concurrentStep.subscenes.EV1).to.exist; // eslint-disable-line no-unused-expressions
+			// eslint-disable-next-line no-unused-expressions
+			expect(concurrentStep.subscenes.EV1).to.exist;
 			expect(concurrentStep.subscenes.EV1).to.be.an('array');
 			expect(concurrentStep.subscenes.EV1).to.have.all.keys(0);
 			expect(concurrentStep.subscenes.EV1[0].text).to.be.a('string');
 			expect(concurrentStep.subscenes.EV1[0].text).to.equal('Go Outside');
 
-			expect(concurrentStep.subscenes.EV2).to.exist; // eslint-disable-line no-unused-expressions
+			// eslint-disable-next-line no-unused-expressions
+			expect(concurrentStep.subscenes.EV2).to.exist;
 			expect(concurrentStep.subscenes.EV2).to.be.an('array');
 			expect(concurrentStep.subscenes.EV2).to.have.all.keys(0, 1);
 			expect(concurrentStep.subscenes.EV2[0].text).to.be.a('string');

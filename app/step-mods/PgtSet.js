@@ -149,6 +149,15 @@ module.exports = class PgtSet extends StepModule {
 		};
 	}
 
+	alterStepHtml() {
+		return {
+			body: {
+				content: `<strong>${getSetString(this)}</strong><br />${getValueString(this)}`,
+				type: 'APPEND'
+			}
+		};
+	}
+
 	alterStepDocx() {
 		const changes = {
 			body: {
@@ -156,11 +165,6 @@ module.exports = class PgtSet extends StepModule {
 				type: 'APPEND'
 			}
 		};
-
-		// const textRuns = [];
-		// if (this.step.text) {
-		// textRuns.push(...this.transform(this.step.text));
-		// }
 
 		const setPGT = new docx.TextRun({
 			text: getSetString(this),
@@ -178,9 +182,6 @@ module.exports = class PgtSet extends StepModule {
 				text: getValueString(this)
 			}).break()
 		);
-
-		// this.step.text = textRuns;
-		// return this.step;
 
 		return changes;
 	}

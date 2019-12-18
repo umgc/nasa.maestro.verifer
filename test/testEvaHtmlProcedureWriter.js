@@ -3,6 +3,7 @@
 
 'use strict';
 
+const fs = require('fs');
 const path = require('path');
 const assert = require('chai').assert;
 
@@ -47,7 +48,8 @@ describe('EvaHtmlProcedureWriter', function() {
 
 				const browser = await puppeteer.launch();
 				const page = await browser.newPage();
-				await page.goto(`file://${htmlPath}`);
+				const contentHtml = fs.readFileSync(htmlPath, 'utf8');
+				await page.setContent(contentHtml);
 
 				// Or use raw HTML rather than pulling from file. Pulling from file also tests
 				// EvaHtmlProcedureWriter.writeFile() though.

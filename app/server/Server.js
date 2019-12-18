@@ -62,7 +62,7 @@ module.exports = class Server {
 	serve() {
 		this.app.get('/', (req, res) => {
 			// res.sendFile(this.baseHtmlFile);
-			res.send(nunjucks.render('document.html', {
+			res.send(nunjucks.render('maestro-conduct.html', {
 				title: 'Maestro',
 				procedureFiles: this.procedureFiles
 			}));

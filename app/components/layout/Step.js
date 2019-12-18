@@ -4,8 +4,6 @@ const YAML = require('js-yaml');
 
 const stateHandler = require('../../state/index');
 
-const StepModel = require('../../model/Step');
-
 const liStyle = {
 	position: 'relative'
 };
