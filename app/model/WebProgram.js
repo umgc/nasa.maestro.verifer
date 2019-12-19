@@ -18,7 +18,7 @@ module.exports = class WebProgram extends Program {
 		super();
 		this.procedurePath = '/procedures';
 		this.tasksPath = '/tasks';
-		this.imagesPath = '/build';
+		this.imagesPath = '/images';
 		this.outputPath = '/build';
 		this.gitPath = '[NO GIT PATH IN BROWSER]';
 	}

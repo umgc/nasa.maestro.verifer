@@ -20,9 +20,9 @@ module.exports = class SodfDocxTaskWriter extends DocxTaskWriter {
 			return preRows[index].actor !== actor || preRows[index].location !== location;
 		};
 
-		for (const actor in division) {
+		for (const actor in division.subscenes) {
 			// actor, location, [stepParagraphs]
-			const series = this.writeSeries(division[actor]);
+			const series = this.writeSeries(division.subscenes[actor]);
 			for (const stepInfo of series) {
 
 				if (!preRows[index]) { // initiate the first row

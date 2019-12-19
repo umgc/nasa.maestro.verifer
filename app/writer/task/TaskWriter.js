@@ -141,61 +141,133 @@ module.exports = class TaskWriter extends Abstract {
 	}
 
 	insertStep(step, level = 0) {
-		const children = [];
 
-		for (const module of step.modules) {
-			// allow the module to alter this step, changing title, warnings, text, etc
-			step = module.alterStep(this.setModuleOutputType());
-		}
+		// const cloneDeep = require('lodash/cloneDeep');
+		// const step = cloneDeep(originalStep);
+
+		const elements = {
+			images: [],
+			title: [],
+			prebody: [],
+			body: [],
+			postbody: [],
+			checkboxes: []
+		};
 
 		if (step.images) {
-			children.push(...this.addImages(step.images));
+			elements.images.push(...this.addImages(step.images));
 		}
 
 		if (step.title) {
-			children.push(this.addTitleText(step));
+			elements.title.push(step.title);
 		}
 
 		if (step.warnings.length) {
-			children.push(this.addBlock('warning', step.warnings));
+			elements.prebody.push(this.addBlock('warning', step.warnings));
 		}
 		if (step.cautions.length) {
-			children.push(this.addBlock('caution', step.cautions));
+			elements.prebody.push(this.addBlock('caution', step.cautions));
 		}
 		if (step.notes.length) {
-			children.push(this.addBlock('note', step.notes));
+			elements.prebody.push(this.addBlock('note', step.notes));
 		}
 		if (step.comments.length) {
-			children.push(this.addBlock('comment', step.comments));
+			elements.prebody.push(this.addBlock('comment', step.comments));
 		}
 
 		if (step.text) {
-			children.push(this.addStepText(step.text, {
-				level: level,
-				actors: step.actors,
-				columnKeys: step.columnKeys
-			}));
-		}
-
-		if (step.substeps.length) {
-			this.preInsertSteps(level + 1);
-			for (const substep of step.substeps) {
-				children.push(...this.insertStep(substep, level + 1));
-			}
-			this.postInsertSteps(level + 1);
+			// todo: could make text optionally an array to do newlines
+			elements.body.push(step.text);
 		}
 
 		if (step.checkboxes.length) {
+			elements.checkboxes.push(...step.checkboxes);
+		}
+
+		for (const module of step.modules) {
+
+			// allow the module to alter this step, changing title, warnings, text, etc
+			const changes = module.alterStep(this.setModuleOutputType());
+			for (const elementName in changes) {
+				switch (changes[elementName].type) {
+					case 'APPEND':
+						elements[elementName].push(...changes[elementName].content);
+						break;
+
+					case 'PREPEND':
+						elements[elementName].unshift(...changes[elementName].content);
+						break;
+
+					case 'OVERWRITE':
+						elements[elementName] = changes[elementName].content;
+						break;
+
+					default:
+						console.log(changes);
+						throw new Error(`${changes[elementName].type} not a valid insertion type`);
+				}
+			}
+
+		}
+
+		if (elements.body.length) {
+			elements.body = this.addStepText(elements.body, {
+				level: level,
+				actors: step.actors,
+				columnKeys: step.columnKeys
+			});
+		}
+
+		for (let t = 0; t < elements.title.length; t++) {
+			// why you'd want multiple titles I do not know...but just in case, apply addTitleText()
+			// to each of them.
+			elements.title[t] = this.addTitleText(elements.title[t], step.duration);
+		}
+
+		if (elements.checkboxes.length) {
+			const grandChildren = [];
 			const preSteps = this.preInsertSteps(level + 1, true);
 			if (preSteps) {
-				children.push(preSteps);
+				grandChildren.push(preSteps);
 			}
-			for (const checkstep of step.checkboxes) {
-				children.push(this.addCheckStepText(checkstep, level + 1));
+			for (const checkstep of elements.checkboxes) {
+				grandChildren.push(this.addCheckStepText(checkstep, level + 1));
 			}
 			const postSteps = this.postInsertSteps(level + 1, true);
 			if (postSteps) {
-				children.push(postSteps);
+				grandChildren.push(postSteps);
+			}
+
+			if (this.wrapStepLists) {
+				elements.checkboxes = [this.wrapStepLists(grandChildren)];
+			} else {
+				elements.checkboxes = grandChildren;
+			}
+		}
+
+		const children = [
+			...elements.images,
+			...elements.title,
+			...elements.prebody,
+			elements.body,
+			...elements.postbody,
+			...elements.checkboxes
+		];
+
+		if (step.substeps.length) {
+			const grandChildren = [];
+
+			// FIXME why does substeps not push preInsertSteps to children?
+			this.preInsertSteps(level + 1);
+			for (const substep of step.substeps) {
+				grandChildren.push(...this.insertStep(substep, level + 1));
+			}
+			this.postInsertSteps(level + 1);
+
+			if (this.wrapStepLists) {
+				children.push(this.wrapStepLists(grandChildren));
+			} else {
+				children.push(...grandChildren);
 			}
 		}
 

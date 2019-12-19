@@ -16,7 +16,8 @@ module.exports = class StepModule extends Abstract {
 			Docx: ['Docx', 'Base'],
 			EvaHtml: ['EvaHtml', 'Html', 'Base'],
 			Html: ['Html', 'Base'],
-			SodfDocx: ['SodfDocx', 'Docx', 'Base']
+			SodfDocx: ['SodfDocx', 'Docx', 'Base'],
+			React: ['React', 'Base']
 		};
 		this.outputTypeFns = fns[outputType] || [];
 		return this.outputTypeFns;
@@ -43,6 +44,8 @@ module.exports = class StepModule extends Abstract {
 			xformType = 'docx';
 		} else if (this.outputTypeFns.indexOf('Html') !== -1) {
 			xformType = 'html';
+		} else if (this.outputTypeFns.indexOf('React') !== -1) {
+			xformType = 'react';
 		} else {
 			xformType = 'text'; // todo not really sure this will work...transforms text to text...
 		}
@@ -51,4 +54,5 @@ module.exports = class StepModule extends Abstract {
 		}
 		return this.transformer.transform(text);
 	}
+
 };

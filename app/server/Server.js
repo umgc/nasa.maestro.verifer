@@ -3,6 +3,7 @@
 const path = require('path');
 
 const express = require('express');
+const nunjucks = require('../model/nunjucksEnvironment');
 
 const consoleHelper = require('../helpers/consoleHelper');
 
@@ -10,18 +11,14 @@ module.exports = class Server {
 
 	constructor(program) {
 
-		this.baseHtmlFile = program.getProjectHtmlFile();
-		if (!this.baseHtmlFile) {
-			consoleHelper.noExitError('No HTML files found in /build directory. Try running `maestro compose --html` first');
-			process.exit();
-		}
+		this.procedureFiles = program.getProjectProcedureFiles();
 
 		this.app = express();
 		this.port = 8000;
 
 		this.staticResources = [
 			// Serve project resources
-			{ webPath: 'build', localBase: program.projectPath, localRelative: 'build' },
+			{ webPath: 'images', localBase: program.projectPath, localRelative: 'images' },
 			{ webPath: 'procedures', localBase: program.projectPath, localRelative: 'procedures' },
 			{ webPath: 'tasks', localBase: program.projectPath, localRelative: 'tasks' },
 
@@ -59,7 +56,11 @@ module.exports = class Server {
 
 	serve() {
 		this.app.get('/', (req, res) => {
-			res.sendFile(this.baseHtmlFile);
+			// res.sendFile(this.baseHtmlFile);
+			res.send(nunjucks.render('maestro-conduct.html', {
+				title: 'Maestro',
+				procedureFiles: this.procedureFiles
+			}));
 		});
 
 		this.app.listen(this.port, () => {

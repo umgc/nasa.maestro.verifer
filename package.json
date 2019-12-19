@@ -8,12 +8,36 @@
     "pre-commit-lint-complete": "node ./test/helpers/preCommitMsg.js lint",
     "lint": "eslint . --color",
     "lint:fix": "eslint . --color --fix",
-    "test": "mocha",
-    "test:colors": "mocha  --colors",
-    "test:coverage": "nyc --all --reporter=text --reporter=lcov npm run test",
-    "build": "./node_modules/.bin/webpack",
-    "build:prod": "./node_modules/.bin/webpack -p",
-    "watch": "./node_modules/.bin/webpack --watch"
+    "test": "env BABEL_ENV=test mocha",
+    "test:colors": "env BABEL_ENV=test npm run test -- --colors",
+    "test:coverage": "env BABEL_ENV=test nyc --all --reporter=text --reporter=lcov npm run test",
+    "test:watch": "env BABEL_ENV=test npm run test -- --watch",
+    "build": "env BABEL_ENV=build ./node_modules/.bin/webpack",
+    "build:watch": "env BABEL_ENV=build ./node_modules/.bin/webpack --watch",
+    "build:prod": "env BABEL_ENV=build ./node_modules/.bin/webpack -p"
+  },
+  "babel": {
+    "env": {
+      "build": {
+        "presets": [
+          "@babel/env",
+          "@babel/react"
+        ],
+        "plugins": [
+          "@babel/plugin-proposal-class-properties"
+        ]
+      },
+      "test": {
+        "presets": [
+          "@babel/env",
+          "@babel/react"
+        ],
+        "plugins": [
+          "@babel/plugin-proposal-class-properties",
+          "@babel/plugin-transform-runtime"
+        ]
+      }
+    }
   },
   "pre-commit": [
     "pre-commit-msg",
@@ -55,10 +79,17 @@
   },
   "homepage": "https://github.com/xOPERATIONS/maestro#readme",
   "dependencies": {
+    "@babel/core": "^7.7.5",
+    "@babel/plugin-proposal-class-properties": "^7.7.4",
+    "@babel/preset-env": "^7.7.6",
+    "@babel/preset-react": "^7.7.4",
     "@svgdotjs/svg.js": "^3.0.16",
     "ajv": "^6.10.2",
+    "babel-eslint": "^10.0.3",
+    "babel-loader": "^8.0.6",
     "colors": "^1.4.0",
     "commander": "^2.20.3",
+    "css-loader": "^3.3.2",
     "docx": "^5.0.0-rc7",
     "express": "^4.17.1",
     "filenamify": "^4.1.0",
@@ -66,15 +97,27 @@
     "js-yaml": "^3.13.1",
     "lodash": "^4.17.15",
     "nunjucks": "^3.2.0",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
+    "style-loader": "^1.0.1",
     "svg2img": "^0.6.1",
-    "svgdom": "0.0.20"
+    "svgdom": "0.0.21",
+    "uuid": "^3.3.3",
+    "webpack-dev-server": "^3.9.0"
   },
   "devDependencies": {
+    "@babel/plugin-transform-runtime": "^7.7.6",
+    "@babel/register": "^7.7.7",
+    "@babel/runtime": "^7.7.7",
     "chai": "^4.2.0",
+    "enzyme": "^3.10.0",
+    "enzyme-adapter-react-16": "^1.15.1",
     "eslint": "^6.6.0",
     "eslint-config-wikimedia": "^0.14.3",
+    "eslint-plugin-react": "^7.17.0",
     "jsdoc": "^3.6.3",
-    "mocha": "^5.2.0",
+    "jsdom": "^15.2.1",
+    "mocha": "^6.2.2",
     "mocha-junit-reporter": "^1.23.1",
     "node-resemble-js": "^0.2.0",
     "nyc": "^14.1.1",

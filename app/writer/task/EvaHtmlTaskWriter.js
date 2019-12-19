@@ -34,10 +34,10 @@ module.exports = class EvaHtmlTaskWriter extends HtmlTaskWriter {
 		}
 
 		const tableHeaderHtml = nunjucks.render(
-			// path.join(__dirname, '..', '..', 'view', 'eva-task-table-header.html'),
 			'eva-task-table-header.html',
 			{
-				columnNames: columnNames
+				columnNames: columnNames,
+				columnWidthPercent: (100 / this.numCols)
 			}
 		);
 

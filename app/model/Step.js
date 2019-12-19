@@ -9,7 +9,7 @@ const loadedModules = {};
 
 module.exports = class Step {
 
-	constructor() {
+	constructor(stepYaml, actorIdOrIds, taskRoles) {
 		// Initiate the vars as empty.
 		this.modules = [];
 		this.title = '';
@@ -21,9 +21,18 @@ module.exports = class Step {
 		this.comments = [];
 		this.notes = [];
 		this.substeps = [];
+		this.raw = null;
+		this.taskRolesMap = {};
+		this.taskRoles = taskRoles;
+
+		this.mapTaskRolesToActor(taskRoles);
+		this.setActors(stepYaml.actor ? stepYaml.actor : actorIdOrIds);
+		this.populateFromYaml(stepYaml);
 	}
 
 	populateFromYaml(stepYaml) {
+
+		this.raw = stepYaml;
 
 		// Check if the step is a simple string
 		if (typeof stepYaml === 'string') {
@@ -102,7 +111,7 @@ module.exports = class Step {
 
 	parseBlock(textOrArray) {
 		if (textOrArray) {
-			return arrayHelper.parseArray(textOrArray).map(this.replaceTaskRoles);
+			return arrayHelper.parseArray(textOrArray).map(this.replaceTaskRoles.bind(this));
 		} else {
 			return [];
 		}
@@ -129,16 +138,17 @@ module.exports = class Step {
 	 */
 	mapTaskRolesToActor(taskRoles) {
 		this.taskRoles = taskRoles;
-		const taskRolesMap = {};
+		this.taskRolesMap = {};
 		for (const role in taskRoles) {
-			taskRolesMap[role] = taskRoles[role].actor;
+			this.taskRolesMap[role] = taskRoles[role].actor;
 		}
-		this.replaceTaskRoles = function(text) {
-			for (const role in taskRolesMap) {
-				text = text.replace(`{{role:${role}}}`, taskRolesMap[role]);
-			}
-			return text;
-		};
+	}
+
+	replaceTaskRoles(text) {
+		for (const role in this.taskRolesMap) {
+			text = text.replace(`{{role:${role}}}`, this.taskRolesMap[role]);
+		}
+		return text;
 	}
 
 	setActors(actorIdOrIds) {
@@ -194,32 +204,29 @@ module.exports = class Step {
 	/**
 	 * Returns an array of substeps for the step, or an empty array if none are found.
 	 *
-	 * @param   {*} substepsYaml YAML for the substeps
+	 * @param   {string|Array} substepsDefinition YAML for the substeps
 	 * @return  {Array} array of substeps
 	 */
-	parseSubsteps(substepsYaml) {
+	parseSubsteps(substepsDefinition) {
 
 		const substeps = [];
 
-		// Check for string
-		if (typeof substepsYaml === 'string') {
-			const substep = new Step();
-			substep.mapTaskRolesToActor(this.taskRoles);
-			substep.populateFromYaml(substepsYaml);
-			substeps.push(substep);
+		// Check for string. If string, it's not multiple substeps but a single
+		// ! FIXME: Realistically why write a substep this way? Wouldn't you want it indented?
+		if (typeof substepsDefinition === 'string') {
+			substeps.push(new Step(substepsDefinition, this.actors, this.taskRoles));
 
 		// Check for array
-		} else if (Array.isArray(substepsYaml)) {
-			for (var substepYaml of substepsYaml) {
-				const substep = new Step();
-				substep.mapTaskRolesToActor(this.taskRoles);
-				substep.populateFromYaml(substepYaml);
-				substeps.push(substep);
+		} else if (Array.isArray(substepsDefinition)) {
+			for (const singleSubstepDef of substepsDefinition) {
+				substeps.push(new Step(singleSubstepDef, this.actors, this.taskRoles));
 			}
 
 		// Don't know how to process
 		} else {
-			throw new Error(`Expected substeps to be string or array.  Instead got: ${JSON.stringify(substepsYaml)}`);
+			throw new Error(
+				`Expected substeps to be string or array. Instead got: ${JSON.stringify(substepsDefinition)}`
+			);
 		}
 
 		return substeps;

@@ -312,7 +312,15 @@ module.exports = class DocxTaskWriter extends TaskWriter {
 		if (typeof stepText === 'string') {
 			paraOptions.children.push(...this.textTransform.transform(stepText));
 		} else if (Array.isArray(stepText)) {
-			paraOptions.children.push(...stepText);
+			for (let s = 0; s < stepText.length; s++) {
+				let elem = stepText[s];
+				if (typeof elem === 'string') {
+					elem = this.textTransform.transform(elem);
+				} else if (!Array.isArray(elem)) {
+					elem = [elem];
+				}
+				paraOptions.children.push(...elem);
+			}
 		} else {
 			throw new Error('addStepText() stepText must be string or array');
 		}
@@ -343,17 +351,17 @@ module.exports = class DocxTaskWriter extends TaskWriter {
 		return this.addParagraph(paraOptions);
 	}
 
-	addTitleText(step) {
+	addTitleText(title, duration) {
 		return this.addParagraph({
 			children: [
 				new docx.TextRun({
-					text: step.title.toUpperCase().trim(),
+					text: title.toUpperCase().trim(),
 					underline: {
 						type: 'single'
 					}
 				}),
 				new docx.TextRun({
-					text: ` (${step.duration.format('H:M')})`
+					text: ` (${duration.format('H:M')})`
 				})
 			]
 		});

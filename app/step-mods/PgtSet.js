@@ -2,6 +2,8 @@
 
 const StepModule = require('./StepModule');
 const docx = require('docx');
+// FIXME const uuidv4 = require('uuid/v4');
+let reactStepModuleFunctions;
 
 const validSettings = {
 	torque: {
@@ -64,7 +66,11 @@ function getSetString(instance) {
 }
 
 function getValueString(instance) {
-	return `(${getCollarValues(instance, true).join(', ')})`;
+	let valuesText = `(${getCollarValues(instance, true).join(', ')})`;
+	if (instance.socket) {
+		valuesText += ` - ${instance.socket}`;
+	}
+	return valuesText;
 }
 
 function validateSetting(setting, type) {
@@ -111,7 +117,7 @@ function getMtlAndSocket(mtlOrSocket, socketOrNull = null) {
 module.exports = class PgtSet extends StepModule {
 
 	constructor(step, stepYaml) {
-		super();
+		super('APPEND');
 		this.key = 'pgt.set';
 		this.step = step;
 		this.raw = stepYaml;
@@ -135,41 +141,61 @@ module.exports = class PgtSet extends StepModule {
 	}
 
 	alterStepBase() {
-		const socket = this.socket ? ` - ${this.socket}` : '';
-		this.step.text = `${getSetString(this)} ${getValueString(this)}${socket}`;
-		return this.step;
+		return {
+			body: {
+				content: `${getSetString(this)} ${getValueString(this)}`,
+				type: 'APPEND'
+			}
+		};
+	}
+
+	alterStepHtml() {
+		return {
+			body: {
+				content: `<strong>${getSetString(this)}</strong><br />${getValueString(this)}`,
+				type: 'APPEND'
+			}
+		};
 	}
 
 	alterStepDocx() {
-		const textRuns = [];
-		if (this.step.text) {
-			textRuns.push(...this.transform(this.step.text));
-		}
+		const changes = {
+			body: {
+				content: [],
+				type: 'APPEND'
+			}
+		};
 
 		const setPGT = new docx.TextRun({
 			text: getSetString(this),
 			bold: true
 		});
 
-		if (textRuns.length > 0) {
-			// if there is step text, put first PGT text on a new line
+		// if there is step text, put first PGT text on a new line
+		if (this.step.text) {
 			setPGT.break();
 		}
-		textRuns.push(setPGT);
+		changes.body.content.push(setPGT);
 
-		let valuesText = getValueString(this);
-		if (this.socket) {
-			valuesText += ` - ${this.socket}`;
-		}
-		textRuns.push(
+		changes.body.content.push(
 			new docx.TextRun({
-				text: valuesText
+				text: getValueString(this)
 			}).break()
 		);
 
-		this.step.text = textRuns;
+		return changes;
+	}
 
-		return this.step;
+	alterStepReact() {
+		if (!reactStepModuleFunctions) {
+			reactStepModuleFunctions = require('./PgtSetReact');
+		}
+		if (!this.doAlterStepReact) {
+			this.doAlterStepReact = reactStepModuleFunctions.doAlterStepReact;
+			PgtSet.prototype.doAlterStepReact = reactStepModuleFunctions.doAlterStepReact;
+		}
+
+		return this.doAlterStepReact(getSetString, getValueString);
 	}
 
 };

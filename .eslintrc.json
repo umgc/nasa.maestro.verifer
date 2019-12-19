@@ -3,6 +3,7 @@
 		"browser": true,
 		"node": true
 	},
+	"parser": "babel-eslint",
 	"extends": [
 		// Based upon Wikimedia Foundation guidelines [1]. Why WMF? It's
 		// maintained by a good-enough democracy that will probably make better
@@ -21,10 +22,12 @@
 		// [1] https://github.com/wikimedia/eslint-config-wikimedia
 		"wikimedia",
 		"wikimedia/node",
-		"wikimedia/language/es2016"
+		"wikimedia/language/es2019",
+		"plugin:react/recommended"
 	],
     "parserOptions": {
-        "ecmaVersion": 2017
+		"ecmaVersion": 2017,
+		"sourceType": "module"
     },
 	"rules": {
 		// can't have this without causing headaches on Windows
@@ -36,5 +39,10 @@
 		"computed-property-spacing": ["error", "never"],
 		"array-bracket-spacing": ["error", "never"],
 		"space-before-function-paren": ["error", "never"]
+	},
+	"settings": {
+		"react": {
+			"version": "detect"
+		}
 	}
 }

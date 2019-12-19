@@ -9,7 +9,6 @@ const consoleHelper = require('../../helpers/consoleHelper');
 const envHelper = require('../../helpers/envHelper');
 const TaskWriter = require('./TaskWriter');
 const TextTransform = require('../TextTransform');
-const settings = require('../../settings');
 
 module.exports = class HtmlTaskWriter extends TaskWriter {
 
@@ -48,7 +47,7 @@ module.exports = class HtmlTaskWriter extends TaskWriter {
 			}
 
 			const image = nunjucks.render('image.html', {
-				path: settings.htmlImagePrefix + imageMeta.path,
+				path: path.join('build', imageMeta.path),
 				width: imageSize.width,
 				height: imageSize.height
 			});
@@ -107,12 +106,35 @@ module.exports = class HtmlTaskWriter extends TaskWriter {
 			}
 		}
 
+		const texts = [];
+		if (typeof stepText === 'string') {
+			texts.push(...this.textTransform.transform(stepText));
+		} else if (Array.isArray(stepText)) {
+			for (let s = 0; s < stepText.length; s++) {
+				let elem = stepText[s];
+				if (typeof elem === 'string') {
+					elem = this.textTransform.transform(elem);
+				} else if (!Array.isArray(elem)) {
+					throw new Error('Expect string or array');
+				}
+				texts.push(...elem);
+			}
+		} else {
+			throw new Error('addStepText() stepText must be string or array');
+		}
+
+		// FIXMEFIXMEFIXME
+		// console.log('\n\n');
+		// console.log(texts);
+		// const transformed = texts.join('');
+		// console.log(transformed);
+
 		// added class li-level-${options.level} really just as a way to remind that
 		// some handling of this will be necessary
 		return nunjucks.render('step-text.html', {
 			level: options.level,
 			actorText,
-			stepText: this.textTransform.transform(stepText).join('')
+			stepText: texts.join('')
 		});
 	}
 
@@ -124,10 +146,10 @@ module.exports = class HtmlTaskWriter extends TaskWriter {
 		});
 	}
 
-	addTitleText(step) {
+	addTitleText(title, duration) {
 		const subtaskTitle = nunjucks.render('subtask-title.html', {
-			title: step.title.toUpperCase().trim(),
-			duration: step.duration.format('H:M')
+			title: title.toUpperCase().trim(),
+			duration: duration.format('H:M')
 		});
 
 		return subtaskTitle;

@@ -5,12 +5,16 @@ const Abstract = require('../../helpers/Abstract');
 
 module.exports = class ProcedureWriter extends Abstract {
 
-	constructor(program, procedure) {
+	constructor(program, procedure, clone = true) {
 		super(['writeFile']);
 		this.program = program;
 
 		// clone for gauranteed idempotency, so one Writer can't impact another
-		this.procedure = clonedeep(procedure);
+		if (clone) {
+			this.procedure = clonedeep(procedure);
+		} else {
+			this.procedure = procedure;
+		}
 	}
 
 	getTaskDurationDisplay(task) {

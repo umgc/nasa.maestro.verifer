@@ -1,0 +1,71 @@
+
+ignore:
+  - node_modules
+  - build
+  - coverage
+
+spec:
+  - app/**/*.spec.js
+
+require:
+  # Required in order to interpret files with React/JSX
+  - '@babel/register'
+
+  # Setup a mock DOM for React to use
+  - './test/helpers/dom.js'
+
+  # Setup enzyme boilerplate to test React components
+  - './test/helpers/enzyme-setup.js'
+
+
+# Probably add these if --watch option added
+# watch-ignore:
+#   - 'lib/vendor'
+# watch-files:
+#   - 'lib/**/*.js'
+#   - 'test/**/*.js'
+
+
+#
+# Below are options which are kept at their defaults. Some should be considered for update in the
+# future.
+#
+
+# check-leaks: false
+# color: true
+# delay: false
+# diff: true
+# exit: false # could be expressed as "no-exit: true"
+# fgrep and grep are mutually exclusive
+# fgrep: something
+# global:
+#   - jQuery
+#   - $
+# forbid-only: false
+# forbid-pending: false
+# full-trace: false
+# # fgrep and grep are mutually exclusive
+# # grep: something
+# growl: false
+# inline-diffs: false
+# needs to be used with grep or fgrep
+# invert: false
+# opts: false
+# recursive: false
+# timeout: false # same as "no-timeout: true" or "timeout: 0"
+# trace-warnings: true # node flags ok
+# ui: bdd
+# v8-stack-trace-limit: 100 # V8 flags are prepended with "v8-"
+# watch: false
+# retries: 1
+# slow: 75
+# sort: false
+# reporter: spec
+# reporter-option:
+#   - foo=bar
+#   - baz=quux
+# extension:
+#   - js
+# file:
+#   - /path/to/some/file
+#   - /path/to/some/other/file

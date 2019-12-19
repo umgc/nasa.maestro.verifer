@@ -2,6 +2,7 @@
 
 const docx = require('docx');
 const arrayHelper = require('../helpers/arrayHelper');
+let reactTextTransform; // only load this when needed, because JSX.
 
 function htmlColor(text, color) {
 	return `<span style="font-weight:bold;color:${color};">${text}</span>`;
@@ -19,41 +20,59 @@ const transforms = [
 	{
 		text: '{{CHECK}}',
 		html: '✓',
-		docx: '✓'
+		docx: '✓',
+		react: null // see ReactTextTransform
 	},
 	{
 		text: '{{CHECKBOX}}',
 		html: '☐',
 		docx: () => {
 			return new docx.SymbolRun('F071');
-		}
+		},
+		react: null // see ReactTextTransform
 	},
 	{
 		text: '{{CHECKEDBOX}}',
 		html: '☑',
-		docx: '☑'
+		docx: '☑',
+		react: null // see ReactTextTransform
 	},
 	{
 		text: '{{LEFT}}',
 		html: '←',
-		docx: new docx.SymbolRun('F0DF')
+		docx: new docx.SymbolRun('F0DF'),
+		react: null // see ReactTextTransform
 	},
 	{
 		text: '{{UP}}',
 		html: '↑',
-		docx: new docx.SymbolRun('F0E1')
+		docx: new docx.SymbolRun('F0E1'),
+		react: null // see ReactTextTransform
 	},
 	{
 		text: '{{RIGHT}}',
 		html: '→',
-		docx: new docx.SymbolRun('F0E0')
+		docx: new docx.SymbolRun('F0E0'),
+		react: null // see ReactTextTransform
 	},
 	{
 		text: '{{DOWN}}',
 		html: '↓',
-		docx: new docx.SymbolRun('F0E2')
+		docx: new docx.SymbolRun('F0E2'),
+		react: null // see ReactTextTransform
 	}
 ];
+
+/**
+ * Add colors to list of transforms. Will add color transforms:
+ *
+ *  {
+ *    text: 'BLACK',
+ *    html: '<span style="font-weight:bold;color:black;">BLACK</span>',
+ *    docx: TextRun {...}
+ *    react: (<span style="font-weight:bold;color:black;">BLACK</span>) // <-- only if react in use
+ *  }
+ */
 const colors = [
 	{ text: 'GREEN', color: 'green' },
 	{ text: 'RED', color: 'red' },
@@ -70,6 +89,7 @@ const colors = [
 	{ text: 'PURPLE', color: 'purple' },
 	{ text: 'ORANGE', color: 'orange' }
 ];
+const colorPointers = {};
 for (const item of colors) {
 	const texts = arrayHelper.parseArray(item.text);
 	for (const text of texts) {
@@ -78,6 +98,7 @@ for (const item of colors) {
 			html: htmlColor(text, item.color),
 			docx: docxColor(text, item.color)
 		});
+		colorPointers[text] = transforms.length - 1; // for React transforms to easily be added
 	}
 }
 
@@ -136,17 +157,29 @@ function docxStringsToTextRuns(transformArr) {
 module.exports = class TextTransform {
 
 	constructor(format) {
-		const validFormats = ['html', 'docx'];
+		const validFormats = ['html', 'docx', 'react'];
 		if (validFormats.indexOf(format) === -1) {
 			throw new Error('new TextWriter(format) requires format to be in ${validFormats.toString()}');
 		}
 		this.format = format;
+
+		// modify transforms to include React transforms if (1) using React and (2) prior
+		// TextTransform objects haven't already modified them
+		if (this.format === 'react' && !reactTextTransform) {
+			// console.log('Creating React text transforms');
+			const ReactTextTransform = require('./ReactTextTransform');
+
+			// instantiate in module context
+			reactTextTransform = new ReactTextTransform(transforms, colors, colorPointers);
+		}
 	}
 
 	transform(text) {
 		let transform = doTransform(text, this.format);
 		if (this.format === 'docx') {
 			transform = docxStringsToTextRuns(transform);
+		} else if (this.format === 'react') {
+			transform = reactTextTransform.reactStringsToJSX(transform);
 		}
 		return transform;
 	}

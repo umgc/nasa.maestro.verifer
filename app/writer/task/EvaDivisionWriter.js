@@ -55,7 +55,7 @@ function getJointActorColumnInfo(nonJointColumnsInDivision, jointActors, taskWri
 			consoleHelper.error(
 				[
 					'For joint actors (e.g. EV1 + EV2), actors cannot be used more than once.',
-					`The following actors used more than once: ${intersect1.toString()}`
+					`The following actors are used more than once: ${intersect1.toString()}`
 				],
 				'Joint actors error'
 			);
@@ -76,7 +76,21 @@ function getJointActorColumnInfo(nonJointColumnsInDivision, jointActors, taskWri
 
 module.exports = class EvaDivisionWriter {
 
-	prepareDivision(division, taskWriter) {
+	/**
+	 *
+	 * @param {ConcurrentStep} division  ConcurrentStep AKA division object. Looks like:
+	 *                                   { actorId: [...steps], actor2id: [...steps] }
+	 * @param {TaskWriter} taskWriter
+	 * @param {boolean} raw              If true, don't run taskWriter.writeSeries(), just return
+	 *                                   the raw data.
+	 * @return {Object}                  columns object in the form:
+	 *                                   { 0: { colspan: 1, children: [...children] },
+	 *                                     1: { colspan: 2, children: [...children] } }
+	 *                                   "children" is whatever is outputted by:
+	 *                                   taskWriter.writeSeries(), and thus is format-specific (e.g.
+	 *                                   docx vs web)
+	 */
+	prepareDivision(division, taskWriter, raw = false) {
 
 		const columns = {};
 
@@ -88,7 +102,7 @@ module.exports = class EvaDivisionWriter {
 
 		let jointActors = [];
 
-		for (const actor in division) {
+		for (const actor in division.subscenes) {
 			if (actor.indexOf('+') === -1) {
 				actorsInDivision.push(actor);
 
@@ -119,10 +133,22 @@ module.exports = class EvaDivisionWriter {
 				};
 			}
 
-			columns[firstCol].children.push(...taskWriter.writeSeries(
-				division[actors.key], // get the division info by the key like "EV1 + EV2"
-				actors.columnKeys
-			));
+			if (raw) {
+				columns[firstCol].stateColumnKey = actors.key;
+				columns[firstCol].series = division.subscenes[actors.key];
+				columns[firstCol].columnKeys = actors.columnKeys;
+			} else {
+				const series = taskWriter.writeSeries(
+					// get the division info by the key like "EV1 + EV2"
+					division.subscenes[actors.key],
+					actors.columnKeys
+				);
+				if (Array.isArray(series)) {
+					columns[firstCol].children.push(...series);
+				} else {
+					columns[firstCol].children.push(series);
+				}
+			}
 		}
 
 		// write series' the normal columns
@@ -137,9 +163,18 @@ module.exports = class EvaDivisionWriter {
 				};
 			}
 
-			columns[col].children.push(
-				...taskWriter.writeSeries(division[actor], columnKey)
-			);
+			if (raw) {
+				columns[col].stateColumnKey = columnKey;
+				columns[col].series = division.subscenes[actor];
+				columns[col].columnKeys = [columnKey];
+			} else {
+				const series = taskWriter.writeSeries(division.subscenes[actor], columnKey);
+				if (Array.isArray(series)) {
+					columns[col].children.push(...series);
+				} else {
+					columns[col].children.push(series);
+				}
+			}
 		}
 
 		return columns;
