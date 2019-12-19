@@ -9,12 +9,12 @@
     "lint": "eslint . --color",
     "lint:fix": "eslint . --color --fix",
     "test": "env BABEL_ENV=test mocha",
-    "test:colors": "npm run test -- --colors",
-    "test:coverage": "nyc --all --reporter=text --reporter=lcov npm run test",
-    "test:watch": "npm run test -- --watch",
+    "test:colors": "env BABEL_ENV=test npm run test -- --colors",
+    "test:coverage": "env BABEL_ENV=test nyc --all --reporter=text --reporter=lcov npm run test",
+    "test:watch": "env BABEL_ENV=test npm run test -- --watch",
     "build": "env BABEL_ENV=build ./node_modules/.bin/webpack",
-    "build:prod": "./node_modules/.bin/webpack -p",
-    "watch": "./node_modules/.bin/webpack --watch"
+    "build:watch": "env BABEL_ENV=build ./node_modules/.bin/webpack --watch",
+    "build:prod": "env BABEL_ENV=build ./node_modules/.bin/webpack -p"
   },
   "babel": {
     "env": {

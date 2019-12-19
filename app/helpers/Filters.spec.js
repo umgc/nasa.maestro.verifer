@@ -9,19 +9,28 @@ const filters = require('./filters');
 const tests = [
 	{
 		input: 'This is  my string',
-		expected: 'this-is-my-string-7493e4b59'
+		expected: 'this-is-my-string',
+		hash: '7493e4b59'
 	},
 	{
 		input: 'This ____-----  -----  is  my string',
-		expected: 'this-is-my-string-70b8926fa'
+		expected: 'this-is-my-string',
+		hash: '70b8926fa'
 	},
 	{
 		input: 'MÆVE is awesome',
-		expected: 'mve-is-awesome-ecbbe5d82'
+		expected: 'mve-is-awesome',
+		hash: 'ecbbe5d82'
 	},
 	{
 		input: 'This\nhas\nnewlines',
-		expected: 'this-has-newlines-15cbecec0'
+		expected: 'this-has-newlines',
+		hash: '15cbecec0'
+	},
+	{
+		input: 'IV + EV1 + EV2',
+		expected: 'iv-ev1-ev2',
+		hash: 'd13717272'
 	}
 ];
 
@@ -33,6 +42,10 @@ describe('filters', function() {
 			it(`should properly convert "${test.input}"`, function() {
 				assert.strictEqual(
 					filters.uniqueHtmlId(test.input),
+					`${test.expected}-${test.hash}`
+				);
+				assert.strictEqual(
+					filters.uniqueHtmlId(test.input, false),
 					test.expected
 				);
 			});
