@@ -1,5 +1,8 @@
 {
     "editor.rulers": [100],
     "eslint.autoFixOnSave": true,
-    "files.insertFinalNewline": true
+    "files.insertFinalNewline": true,
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": true
+    }
 }
