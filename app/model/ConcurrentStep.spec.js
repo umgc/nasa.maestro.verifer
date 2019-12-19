@@ -6,8 +6,8 @@
 const expect = require('chai').expect;
 const YAML = require('js-yaml');
 
-const ConcurrentStep = require('../app/model/ConcurrentStep');
-const TaskRole = require('../app/model/TaskRole');
+const ConcurrentStep = require('./ConcurrentStep');
+const TaskRole = require('./TaskRole');
 
 const taskRoles = {
 	crewA: new TaskRole(

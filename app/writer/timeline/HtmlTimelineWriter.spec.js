@@ -3,8 +3,8 @@
 
 'use strict';
 
-const TimelineWriterTester = require('./helpers/TimelineWriterTester');
-const HtmlTimelineWriter = require('../app/writer/timeline/HtmlTimelineWriter');
+const TimelineWriterTester = require('../../../test/helpers/TimelineWriterTester');
+const HtmlTimelineWriter = require('./HtmlTimelineWriter');
 
 const tester = new TimelineWriterTester(HtmlTimelineWriter);
 

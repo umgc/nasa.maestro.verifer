@@ -6,8 +6,8 @@
 const path = require('path');
 const assert = require('chai').assert;
 
-const Procedure = require('../app/model/Procedure');
-const TimeSync = require('../app/model/TimeSync');
+const Procedure = require('./Procedure');
+const TimeSync = require('./TimeSync');
 
 const expectedComplexToString = `Double 0
   EV1: 00:17 + 00:29 = 00:46
@@ -59,7 +59,10 @@ Double 5
 
 describe('TimeSync', function() {
 	const baseProcedure = new Procedure();
-	const procedureFilePath = path.join(__dirname, 'cases/complex-times/procedures/proc.yml');
+	const procedureFilePath = path.join(
+		__dirname,
+		'../../test/cases/complex-times/procedures/proc.yml'
+	);
 
 	const err = baseProcedure.addProcedureDefinitionFromFile(procedureFilePath);
 	if (err) {

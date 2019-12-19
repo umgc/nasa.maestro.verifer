@@ -7,15 +7,15 @@ const path = require('path');
 const assert = require('chai').assert;
 const docx = require('docx');
 
-const CommanderProgram = require('../app/model/CommanderProgram');
-const Procedure = require('../app/model/Procedure');
+const CommanderProgram = require('../../model/CommanderProgram');
+const Procedure = require('../../model/Procedure');
 
-const SodfDocxProcedureWriter = require('../app/writer/procedure/SodfDocxProcedureWriter');
-const SodfDocxTaskWriter = require('../app/writer/task/SodfDocxTaskWriter');
+const SodfDocxProcedureWriter = require('../procedure/SodfDocxProcedureWriter');
+const SodfDocxTaskWriter = require('./SodfDocxTaskWriter');
 
 describe('SodfDocxTaskWriter', function() {
 	const procedure = new Procedure();
-	const procedureFile = path.join(__dirname, 'cases/simple/procedures/proc.yml');
+	const procedureFile = path.join(__dirname, '../../../test/cases/simple/procedures/proc.yml');
 
 	const err = procedure.addProcedureDefinitionFromFile(procedureFile);
 	if (err) {

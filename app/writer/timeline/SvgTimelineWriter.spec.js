@@ -8,8 +8,8 @@ const path = require('path');
 const assert = require('chai').assert;
 // const PNG = require('pngjs').PNG; // attempted to use for PNG checking. See writePNG() below.
 
-const SvgTimelineWriter = require('../app/writer/timeline/SvgTimelineWriter');
-const TimelineWriterTester = require('./helpers/TimelineWriterTester');
+const SvgTimelineWriter = require('./SvgTimelineWriter');
+const TimelineWriterTester = require('../../../test/helpers/TimelineWriterTester');
 const tester = new TimelineWriterTester(SvgTimelineWriter);
 
 describe('SvgTimelineWriter', function() {

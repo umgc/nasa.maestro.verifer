@@ -6,7 +6,7 @@
 const expect = require('chai').expect;
 const YAML = require('js-yaml');
 
-const Task = require('../app/model/Task');
+const Task = require('./Task');
 
 const proceduresTaskInstance = {
 	file: 'some-task.yml',

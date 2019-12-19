@@ -4,7 +4,7 @@
 'use strict';
 
 const assert = require('chai').assert;
-const jsonHelper = require('../app/helpers/jsonHelper');
+const jsonHelper = require('./jsonHelper');
 
 const obj1 = { a: 1, b: 2, c: 3 };
 const obj2 = { d: { one: { one: 1 }, two: [2, 'two'] } };

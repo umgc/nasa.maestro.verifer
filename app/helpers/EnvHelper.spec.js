@@ -5,7 +5,7 @@
 
 const assert = require('chai').assert;
 
-const envHelper = require('../app/helpers/envHelper');
+const envHelper = require('./envHelper');
 
 describe('envHelper', function() {
 

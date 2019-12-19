@@ -1,6 +1,7 @@
 /* Specify environment to include mocha globals, and directly callout enzyme globals */
-/* eslint-env node, mocha, enzyme */
-/* global shallow */
+/* eslint-env node, mocha */
+/* eslint-disable-next-line no-unused-vars */
+/* global shallow render mount */
 
 'use strict';
 

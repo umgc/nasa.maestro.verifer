@@ -10,7 +10,7 @@ const path = require('path');
 const fs = require('fs');
 const YAML = require('js-yaml');
 
-const Procedure = require('../app/model/Procedure');
+const Procedure = require('./Procedure');
 
 function commonExpectations(procedure) {
 	expect(procedure).to.exist; // eslint-disable-line no-unused-expressions
@@ -116,8 +116,8 @@ describe('Procedure', function() {
 		}
 
 		// Read some files in for schema checking prior to stubbing the readFileSync method
-		const procedureFile = path.join(__dirname, '../app/schema/procedureSchema.json');
-		const taskFile = path.join(__dirname, '../app/schema/taskSchema.json');
+		const procedureFile = path.join(__dirname, '../schema/procedureSchema.json');
+		const taskFile = path.join(__dirname, '../schema/taskSchema.json');
 		const procedureSchema = fs.readFileSync(procedureFile, 'utf-8');
 		const taskSchema = fs.readFileSync(taskFile);
 
@@ -163,8 +163,8 @@ describe('Procedure', function() {
 		});
 
 		// Read some files in for schema checking prior to stubbing the readFileSync method
-		const procedureFile = path.join(__dirname, '../app/schema/procedureSchema.json');
-		const taskFile = path.join(__dirname, '../app/schema/taskSchema.json');
+		const procedureFile = path.join(__dirname, '../schema/procedureSchema.json');
+		const taskFile = path.join(__dirname, '../schema/taskSchema.json');
 		const procedureSchema = fs.readFileSync(procedureFile, 'utf-8');
 		const taskSchema = fs.readFileSync(taskFile);
 

@@ -6,8 +6,8 @@
 const assert = require('chai').assert;
 // const PNG = require('pngjs').PNG; // attempted to use for PNG checking. See writePNG() below.
 
-const TimelineWriter = require('../app/writer/timeline/TimelineWriter');
-const TimelineWriterTester = require('./helpers/TimelineWriterTester');
+const TimelineWriter = require('./TimelineWriter');
+const TimelineWriterTester = require('../../../test/helpers/TimelineWriterTester');
 const tester = new TimelineWriterTester(TimelineWriter);
 
 describe('TimelineWriter', function() {

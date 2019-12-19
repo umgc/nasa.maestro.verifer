@@ -4,7 +4,7 @@
 'use strict';
 
 const assert = require('chai').assert;
-const filters = require('../app/helpers/filters');
+const filters = require('./filters');
 
 const tests = [
 	{

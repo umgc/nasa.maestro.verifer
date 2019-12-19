@@ -8,18 +8,18 @@ const assert = require('chai').assert;
 const docx = require('docx');
 const cloneDeep = require('lodash/cloneDeep');
 
-const CommanderProgram = require('../app/model/CommanderProgram');
-const Procedure = require('../app/model/Procedure');
+const CommanderProgram = require('../../model/CommanderProgram');
+const Procedure = require('../../model/Procedure');
 // const TaskRole = require('../app/model/TaskRole');
-const taskRoleTestHelper = require('./helpers/taskRoleTestHelper');
-const Step = require('../app/model/Step');
+const taskRoleTestHelper = require('../../../test/helpers/taskRoleTestHelper');
+const Step = require('../../model/Step');
 
-const EvaDocxProcedureWriter = require('../app/writer/procedure/EvaDocxProcedureWriter');
-const EvaDocxTaskWriter = require('../app/writer/task/EvaDocxTaskWriter');
+const EvaDocxProcedureWriter = require('../procedure/EvaDocxProcedureWriter');
+const EvaDocxTaskWriter = require('./EvaDocxTaskWriter');
 
 describe('EvaDocxTaskWriter', function() {
 	const procedure = new Procedure();
-	const procedureFile = path.join(__dirname, 'cases/simple/procedures/proc.yml');
+	const procedureFile = path.join(__dirname, '../../../test/cases/simple/procedures/proc.yml');
 
 	const err = procedure.addProcedureDefinitionFromFile(procedureFile);
 	if (err) {

@@ -5,9 +5,7 @@ ignore:
   - coverage
 
 spec:
-  # While transitioning from keeping everything in ./test, allow both
   - app/**/*.spec.js
-  - test/*.spec.js
 
 require:
   # Required in order to interpret files with React/JSX

@@ -5,7 +5,7 @@
 
 const expect = require('chai').expect;
 const docx = require('docx');
-const TextTransform = require('../app/writer/TextTransform.js');
+const TextTransform = require('./TextTransform.js');
 
 /**
  * Positive testing for task

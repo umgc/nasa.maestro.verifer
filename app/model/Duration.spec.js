@@ -5,7 +5,7 @@
 
 const assert = require('chai').assert;
 
-const Duration = require('../app/model/Duration');
+const Duration = require('./Duration');
 
 const validInputs = [
 	{

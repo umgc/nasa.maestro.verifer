@@ -10,10 +10,10 @@ const assert = require('chai').assert;
 const puppeteer = require('puppeteer');
 const resemble = require('node-resemble-js');
 
-const CommanderProgram = require('../app/model/CommanderProgram');
-const Procedure = require('../app/model/Procedure');
+const CommanderProgram = require('../../model/CommanderProgram');
+const Procedure = require('../../model/Procedure');
 
-const EvaHtmlProcedureWriter = require('../app/writer/procedure/EvaHtmlProcedureWriter');
+const EvaHtmlProcedureWriter = require('./EvaHtmlProcedureWriter');
 
 const tests = [
 	{ file: 'simple/procedures/proc.yml', mismatchThreshold: 1.57 },
@@ -23,7 +23,7 @@ const tests = [
 describe('EvaHtmlProcedureWriter', function() {
 	for (const test of tests) {
 		const procedure = new Procedure();
-		const procedureFile = path.join(__dirname, 'cases', test.file);
+		const procedureFile = path.join(__dirname, '../../../test/cases', test.file);
 
 		const err = procedure.addProcedureDefinitionFromFile(procedureFile);
 		if (err) {

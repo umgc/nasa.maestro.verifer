@@ -5,7 +5,7 @@
 
 const assert = require('chai').assert;
 const cloneDeep = require('lodash/cloneDeep');
-const objectHelper = require('../app/helpers/objectHelper');
+const objectHelper = require('./objectHelper');
 
 describe('objectHelper', function() {
 	describe('requireProps()', function() {

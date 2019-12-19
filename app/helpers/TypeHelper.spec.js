@@ -5,7 +5,7 @@
 
 const assert = require('chai').assert;
 
-const typeHelper = require('../app/helpers/typeHelper');
+const typeHelper = require('./typeHelper');
 
 describe('typeHelper', function() {
 
