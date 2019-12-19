@@ -8,23 +8,36 @@
     "pre-commit-lint-complete": "node ./test/helpers/preCommitMsg.js lint",
     "lint": "eslint . --color",
     "lint:fix": "eslint . --color --fix",
-    "test": "mocha",
+    "test": "env BABEL_ENV=test mocha",
     "test:colors": "npm run test -- --colors",
     "test:coverage": "nyc --all --reporter=text --reporter=lcov npm run test",
     "test:watch": "npm run test -- --watch",
-    "build": "./node_modules/.bin/webpack",
+    "build": "env BABEL_ENV=build ./node_modules/.bin/webpack",
     "build:prod": "./node_modules/.bin/webpack -p",
     "watch": "./node_modules/.bin/webpack --watch"
   },
   "babel": {
-    "presets": [
-      "@babel/env",
-      "@babel/react"
-    ],
-    "plugins": [
-      "@babel/plugin-proposal-class-properties",
-      "@babel/plugin-transform-runtime"
-    ]
+    "env": {
+      "build": {
+        "presets": [
+          "@babel/env",
+          "@babel/react"
+        ],
+        "plugins": [
+          "@babel/plugin-proposal-class-properties"
+        ]
+      },
+      "test": {
+        "presets": [
+          "@babel/env",
+          "@babel/react"
+        ],
+        "plugins": [
+          "@babel/plugin-proposal-class-properties",
+          "@babel/plugin-transform-runtime"
+        ]
+      }
+    }
   },
   "pre-commit": [
     "pre-commit-msg",

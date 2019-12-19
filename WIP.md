@@ -51,6 +51,7 @@ Stuff to do in this WIP branch
   - [ ] Use as opportunity to switch to `.spec.js` method of keeping tests alongside files
   - [ ] Write tests for React components
   - [ ] Write/alter other tests as required
+- [ ] Make `maestro conduct` move images into build dir, or access images dir directly
 - [ ] fix numbering (currently starting at 1 for each division, and gets wonky when editing steps)
 - [ ] output full yaml of procedure and activities in browser console
 - [ ] save yaml to files
