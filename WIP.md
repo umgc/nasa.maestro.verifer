@@ -47,9 +47,9 @@ Stuff to do in this WIP branch
 - [x] Ensure good handling of role variables like `{{role:crewA}}`
 - [x] Make `maestro conduct` not require a dummy html files
 - [ ] Testing
-  - [ ] Modify mocha/babel/etc to make it possible to run React test
-  - [ ] Use as opportunity to switch to `.spec.js` method of keeping tests alongside files
-  - [ ] Write tests for React components
+  - [x] Modify mocha/babel/etc to make it possible to run React test
+  - [x] Use as opportunity to switch to `.spec.js` method of keeping tests alongside files
+  - [x] Write tests for at least some React components
   - [ ] Write/alter other tests as required
 - [ ] Make `maestro conduct` move images into build dir, or access images dir directly
 - [ ] fix numbering (currently starting at 1 for each division, and gets wonky when editing steps)

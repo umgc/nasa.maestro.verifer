@@ -4,6 +4,7 @@ const React = require('react');
 const uuidv4 = require('uuid/v4');
 const arrayHelper = require('../helpers/arrayHelper');
 
+// NOTE: The keys in the object below must all be present within TextTransform's 'transforms' array
 const reactTransforms = {
 	'{{CHECK}}': (<React.Fragment key={uuidv4()}>✓</React.Fragment>),
 	'{{CHECKBOX}}': (<React.Fragment key={uuidv4()}>☐</React.Fragment>),
@@ -16,6 +17,39 @@ const reactTransforms = {
 
 module.exports = class ReactTextTransform {
 
+	/**
+	 *
+	 * @param {Array} baseTransforms  Reference to transforms used by base TextTransform class
+	 *                                  [
+	 *                                    {
+	 *                                      text: 'sometext',
+	 *                                      html: 'html output of text',
+	 *                                      docx: 'docx output of text',
+	 *                                      react: null   <-- placeholder filed in by this class
+	 *                                    },
+	 *                                    ...
+	 *                                  ]
+	 * @param {Array} colors          Array of objects with .text being text to look for, and .color
+	 *                                being the color to change that text to. Example:
+	 *                                  colors = [{text: 'GREEN', color: 'green'}]
+	 *                                In this example any use of all-caps "GREEN" will be turned
+	 *                                green.
+	 * @param {Object} colorPointers  From 'colors' param, pointer to each transform created by
+	 *                                each color.text. This allows this class to find the correct
+	 *                                place to put React transforms. Example:
+	 *                                  colorPointers = {
+	 *                                    'GREEN': point to baseTransforms[0],
+	 *                                    'RED': point to baseTransforms[1]
+	 *                                  }
+	 *                                    when:
+	 *                                  colors = [{text: 'GREEN', color: 'green'}, { 'RED': ... }]
+	 *                                    and:
+	 *                                  baseTransforms started as empty [], but now is:
+	 *                                  baseTransforms = [
+	 *                                    { text: 'GREEN', ... },
+	 *                                    { text: 'RED', ... }
+	 *                                  ]
+	 */
 	constructor(baseTransforms, colors, colorPointers) {
 
 		for (const item of colors) {
@@ -29,9 +63,7 @@ module.exports = class ReactTextTransform {
 		for (const xform of baseTransforms) {
 			// skip over those already added above (colors)
 			if (!xform.react) {
-				// console.log(`Attempting to add react transfor for ${xform.text}...`);
 				if (reactTransforms[xform.text]) {
-					// console.log(`...added ${xform.text}`);
 					xform.react = reactTransforms[xform.text];
 				}
 			}
@@ -39,6 +71,12 @@ module.exports = class ReactTextTransform {
 
 	}
 
+	/**
+	 *
+	 * @param {string} text
+	 * @param {string} color
+	 * @return {any}   React <span> object
+	 */
 	reactColor(text, color) {
 		return (<span key={uuidv4()} style={{ fontWeight: 'bold', color: color }}>{text}</span>);
 	}
