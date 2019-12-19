@@ -97,8 +97,8 @@ class Step extends React.Component {
 						ref={this.editorInput}
 					/>
 				</div>
-				<button onClick={this.handleSave}>save</button>
-				<button onClick={this.handleCancel}>cancel</button>
+				<button className='save-button' onClick={this.handleSave}>save</button>
+				<button className='cancel-button' onClick={this.handleCancel}>cancel</button>
 			</li>
 		);
 

@@ -21,7 +21,7 @@ module.exports = class ReactTextTransform {
 		for (const item of colors) {
 			const texts = arrayHelper.parseArray(item.text);
 			for (const text of texts) {
-				console.log(`Adding react color transform for ${text} --> ${item.color}`);
+				// console.log(`Adding react color transform for ${text} --> ${item.color}`);
 				baseTransforms[colorPointers[text]].react = this.reactColor(text, item.color);
 			}
 		}
@@ -29,9 +29,9 @@ module.exports = class ReactTextTransform {
 		for (const xform of baseTransforms) {
 			// skip over those already added above (colors)
 			if (!xform.react) {
-				console.log(`Attempting to add react transfor for ${xform.text}...`);
+				// console.log(`Attempting to add react transfor for ${xform.text}...`);
 				if (reactTransforms[xform.text]) {
-					console.log(`...added ${xform.text}`);
+					// console.log(`...added ${xform.text}`);
 					xform.react = reactTransforms[xform.text];
 				}
 			}

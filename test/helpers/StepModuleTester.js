@@ -7,7 +7,7 @@ const assert = require('chai').assert;
 const Step = require('../../app/model/Step');
 const stepModules = require('../../app/step-mods/stepModules');
 
-const taskRoleTestHelper = require('./taskRoleTestHelper');
+const taskRoleGenerator = require('../generators/taskRoleGenerator');
 
 module.exports = class StepModuleTester {
 
@@ -68,7 +68,7 @@ module.exports = class StepModuleTester {
 	}
 
 	generateModule(setting) {
-		const taskRoles = taskRoleTestHelper.getSingleTaskRole('crewX', 'EV7');
+		const taskRoles = taskRoleGenerator.getSingleTaskRole('crewX', 'EV7');
 		const step = new Step(setting.actual, 'EV7', taskRoles);
 		return new this.ModuleClass(
 			step,
@@ -81,7 +81,7 @@ module.exports = class StepModuleTester {
 		for (const setting of this.badInputs) {
 			it(`should error if invalid input ${JSON.stringify(setting)} is supplied`, function() {
 				assert.throws(function() {
-					const taskRoles = taskRoleTestHelper.getSingleTaskRole('crewX', 'EV7');
+					const taskRoles = taskRoleGenerator.getSingleTaskRole('crewX', 'EV7');
 					const step = new Step(setting, 'EV7', taskRoles);
 					new this.ModuleClass(step, setting); // eslint-disable-line no-new
 				});

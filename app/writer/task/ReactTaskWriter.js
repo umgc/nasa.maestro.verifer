@@ -18,6 +18,11 @@ const filters = require('../../helpers/filters');
 
 module.exports = class ReactTaskWriter extends TaskWriter {
 
+	/**
+	 * Create a TaskWriter for web/React format
+	 * @param {Task} task
+	 * @param {ProcedureWriter} procedureWriter
+	 */
 	constructor(task, procedureWriter) {
 		super(task, procedureWriter);
 

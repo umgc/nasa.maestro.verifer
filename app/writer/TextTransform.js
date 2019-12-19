@@ -166,7 +166,7 @@ module.exports = class TextTransform {
 		// modify transforms to include React transforms if (1) using React and (2) prior
 		// TextTransform objects haven't already modified them
 		if (this.format === 'react' && !reactTextTransform) {
-			console.log('Creating React text transforms');
+			// console.log('Creating React text transforms');
 			const ReactTextTransform = require('./ReactTextTransform');
 
 			// instantiate in module context

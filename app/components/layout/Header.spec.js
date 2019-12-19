@@ -10,7 +10,7 @@ const assert = require('chai').assert;
 
 const Header = require('./Header');
 
-describe('Header Component', () => {
+describe('HeaderComponent', () => {
 
 	// NOTE: This is a trivial test created when first starting to test React components
 	it('renders the header with an H1', () => {
