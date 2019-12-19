@@ -4,9 +4,9 @@ const cloneDeep = require('lodash/cloneDeep');
 
 const stateHandler = require('../state/index');
 // const PropTypes = require('prop-types');
-const Header = require('./layout/Header');
-const ProcedureViewer = require('./pages/ProcedureViewer');
-const ProcedureSelector = require('./pages/ProcedureSelector');
+const HeaderComponent = require('./layout/HeaderComponent');
+const ProcedureViewerComponent = require('./pages/ProcedureViewerComponent');
+const ProcedureSelectorComponent = require('./pages/ProcedureSelectorComponent');
 const ReactProcedureWriter = require('../writer/procedure/ReactProcedureWriter');
 
 class App extends React.Component {
@@ -48,14 +48,14 @@ class App extends React.Component {
 		return (
 			<div className='app'>
 				<div className='container'>
-					<Header />
+					<HeaderComponent />
 					{!this.state.procedure ? (
-						<ProcedureSelector
+						<ProcedureSelectorComponent
 							procedureChoices={window.procedureChoices}
 							procedure={this.state.procedure}
 							setProcedure={this.setProcedure} />
 					) : (
-						<ProcedureViewer
+						<ProcedureViewerComponent
 							procedure={this.state.procedure}
 							getProcedureWriter={this.getProcedureWriter}
 						/>

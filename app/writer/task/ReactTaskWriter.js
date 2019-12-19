@@ -3,7 +3,7 @@
 const path = require('path');
 const React = require('react');
 
-const Series = require('../../components/layout/Series');
+const SeriesComponent = require('../../components/layout/SeriesComponent');
 
 const getImageFileDimensions = require('image-size');
 const TextTransform = require('../TextTransform');
@@ -90,7 +90,7 @@ module.exports = class ReactTaskWriter extends TaskWriter {
 					);
 
 					return (
-						<Series
+						<SeriesComponent
 							key={key}
 							startStep={startStep}
 							colspan={columns[colId].colspan}

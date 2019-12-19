@@ -4,9 +4,9 @@ const uuidv4 = require('uuid/v4');
 
 const maestroKey = require('../helpers/maestroKey');
 
-const Step = require('./Step');
+const Step = require('./StepComponent');
 
-class Series extends React.Component {
+class SeriesComponent extends React.Component {
 
 	render() {
 		const startStep = this.props.taskWriter.preInsertSteps();
@@ -42,7 +42,7 @@ class Series extends React.Component {
 
 }
 
-Series.propTypes = {
+SeriesComponent.propTypes = {
 	colspan: PropTypes.number.isRequired,
 	startStep: PropTypes.number.isRequired,
 	// steps: PropTypes.array.isRequired,
@@ -55,4 +55,4 @@ Series.propTypes = {
 	primaryColumnKey: PropTypes.string.isRequired
 };
 
-module.exports = Series;
+module.exports = SeriesComponent;

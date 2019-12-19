@@ -2,7 +2,7 @@ const React = require('react');
 const PropTypes = require('prop-types');
 const ReactTaskWriter = require('../../writer/task/ReactTaskWriter');
 
-class Division extends React.Component {
+class DivisionComponent extends React.Component {
 
 	constructor(props) {
 		super(props);
@@ -19,7 +19,7 @@ class Division extends React.Component {
 
 }
 
-Division.propTypes = {
+DivisionComponent.propTypes = {
 	procedure: PropTypes.object.isRequired,
 	activity: PropTypes.object.isRequired,
 	division: PropTypes.object.isRequired,
@@ -28,4 +28,4 @@ Division.propTypes = {
 	divisionIndex: PropTypes.number.isRequired
 };
 
-module.exports = Division;
+module.exports = DivisionComponent;

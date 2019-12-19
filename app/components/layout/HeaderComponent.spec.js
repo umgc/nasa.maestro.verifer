@@ -8,13 +8,13 @@
 const React = require('react');
 const assert = require('chai').assert;
 
-const Header = require('./Header');
+const HeaderComponent = require('./HeaderComponent');
 
 describe('HeaderComponent', () => {
 
 	// NOTE: This is a trivial test created when first starting to test React components
 	it('renders the header with an H1', () => {
-		const wrapper = shallow(<Header />);
+		const wrapper = shallow(<HeaderComponent />);
 		assert.lengthOf(wrapper.find('h1'), 1);
 	});
 

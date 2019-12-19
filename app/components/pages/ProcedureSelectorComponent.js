@@ -7,7 +7,7 @@ const btnStyle = {
 	cursor: 'pointer'
 };
 
-class ProcedureSelector extends React.Component {
+class ProcedureSelectorComponent extends React.Component {
 
 	onClick = (proc) => {
 		maestro.app.loadProcedure(proc)
@@ -29,10 +29,10 @@ class ProcedureSelector extends React.Component {
 	}
 }
 
-ProcedureSelector.propTypes = {
+ProcedureSelectorComponent.propTypes = {
 	procedure: PropTypes.object,
 	procedureChoices: PropTypes.array.isRequired,
 	setProcedure: PropTypes.func.isRequired
 };
 
-module.exports = ProcedureSelector;
+module.exports = ProcedureSelectorComponent;

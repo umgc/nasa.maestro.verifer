@@ -11,13 +11,13 @@ const assert = require('chai').assert;
 const taskWriterGenerator = require('../../../test/generators/taskWriterGenerator');
 const stepModelGenerator = require('../../../test/generators/stepModelGenerator');
 
-const Step = require('./Step');
+const StepComponent = require('./StepComponent');
 
 const baseStepText = 'Do some things';
 function makeStep() {
 	const activityIndex = 0;
 	const taskWriter = taskWriterGenerator('simple/procedures/proc.yml', 'React', activityIndex);
-	return (<Step
+	return (<StepComponent
 		stepState={stepModelGenerator(baseStepText, 'crewA', 'EV1')}
 		columnKeys={['EV1']}
 		taskWriter={taskWriter}

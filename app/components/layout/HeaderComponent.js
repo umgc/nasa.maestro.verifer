@@ -7,15 +7,7 @@ const headerStyle = {
 	padding: '10px'
 };
 
-// const linkStyle = {
-// color: '#fff',
-// textDecoration: 'none'
-// };
-
-/**
- * BOILERPLATE: edit/delete at will
- */
-class Header extends React.Component {
+class HeaderComponent extends React.Component {
 	render() {
 		return (
 			<header style={headerStyle}>
@@ -25,4 +17,4 @@ class Header extends React.Component {
 	}
 }
 
-module.exports = Header;
+module.exports = HeaderComponent;

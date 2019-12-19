@@ -17,7 +17,7 @@ const textareaStyle = {
 	width: '100%'
 };
 
-class Step extends React.Component {
+class StepComponent extends React.Component {
 
 	state = {
 		editMode: false
@@ -142,7 +142,7 @@ class Step extends React.Component {
 
 }
 
-Step.propTypes = {
+StepComponent.propTypes = {
 
 	stepState: PropTypes.object.isRequired,
 	columnKeys: PropTypes.array.isRequired,
@@ -155,4 +155,4 @@ Step.propTypes = {
 
 };
 
-module.exports = Step;
+module.exports = StepComponent;

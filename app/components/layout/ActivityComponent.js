@@ -1,19 +1,12 @@
 const React = require('react');
 const PropTypes = require('prop-types');
 
-const Division = require('./Division');
+const DivisionComponent = require('./DivisionComponent');
 
 const filters = require('../../helpers/filters');
 const maestroKey = require('../helpers/maestroKey');
 
-// const taskStyle = {
-// height: {{ height }}px;
-// backgroundColor: {{ fillColor }};
-// fontSize: {{ textSize }}px; {% if marginTop %}
-// marginTop: {{ marginTop }}px; {% endif %}
-// }
-
-class Activity extends React.Component {
+class ActivityComponent extends React.Component {
 
 	// FIXME: largely copied from a procedure writer class, setTaskTableHeader()
 	getTableHeaderCells() {
@@ -54,7 +47,7 @@ class Activity extends React.Component {
 					<tbody>
 						{this.props.activity.concurrentSteps.map((division, index) => {
 							return (
-								<Division
+								<DivisionComponent
 									key={maestroKey.getKey(this.props.activityIndex, index)}
 									procedure={this.props.procedure}
 									activity={this.props.activity}
@@ -73,11 +66,11 @@ class Activity extends React.Component {
 
 }
 
-Activity.propTypes = {
+ActivityComponent.propTypes = {
 	procedure: PropTypes.object.isRequired,
 	activity: PropTypes.object.isRequired,
 	getProcedureWriter: PropTypes.func.isRequired,
 	activityIndex: PropTypes.number.isRequired
 };
 
-module.exports = Activity;
+module.exports = ActivityComponent;
