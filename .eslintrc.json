@@ -39,5 +39,10 @@
 		"computed-property-spacing": ["error", "never"],
 		"array-bracket-spacing": ["error", "never"],
 		"space-before-function-paren": ["error", "never"]
+	},
+	"settings": {
+		"react": {
+			"version": "detect"
+		}
 	}
 }
