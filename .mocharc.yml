@@ -5,8 +5,20 @@ ignore:
   - coverage
 
 spec:
+  # While transitioning from keeping everything in ./test, allow both
   - app/**/*.spec.js
   - test/*.spec.js
+
+require:
+  # Required in order to interpret files with React/JSX
+  - '@babel/register'
+
+  # Setup a mock DOM for React to use
+  - './test/helpers/dom.js'
+
+  # Setup enzyme boilerplate to test React components
+  - './test/helpers/enzyme-setup.js'
+
 
 # Probably add these if --watch option added
 # watch-ignore:
@@ -47,7 +59,6 @@ spec:
 # ui: bdd
 # v8-stack-trace-limit: 100 # V8 flags are prepended with "v8-"
 # watch: false
-# require: '@babel/register'
 # retries: 1
 # slow: 75
 # sort: false
