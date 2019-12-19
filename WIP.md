@@ -45,11 +45,11 @@ Stuff to do in this WIP branch
 - [x] Fix any broken tests
 - [x] add --html output type back in its full form for now (for XML output type learning)
 - [x] Ensure good handling of role variables like `{{role:crewA}}`
-- [ ] Make `maestro conduct` not require a dummy html files
-- [ ] Make things like warnings be StepModules?
+- [x] Make `maestro conduct` not require a dummy html files
 - [ ] fix numbering (currently starting at 1 for each division, and gets wonky when editing steps)
 - [ ] output full yaml of procedure and activities in browser console
 - [ ] save yaml to files
+- [ ] Make things like warnings be StepModules?
 - [ ] Switch Mocha --> Jest (and maybe Chai --> Jest) for better React and screenshot handling
   - [ ] Use as opportunity to switch to `.test.js` method of keeping tests alongside files
   - [ ] Write tests for React components

@@ -12,11 +12,6 @@ module.exports = class Server {
 	constructor(program) {
 
 		this.procedureFiles = program.getProjectProcedureFiles();
-		this.baseHtmlFile = program.getProjectHtmlFile();
-		if (!this.baseHtmlFile) {
-			consoleHelper.noExitError('No HTML files found in /build directory. Try running `maestro compose --html` first');
-			process.exit();
-		}
 
 		this.app = express();
 		this.port = 8000;
