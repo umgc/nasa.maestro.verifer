@@ -4,7 +4,7 @@
 'use strict';
 const docx = require('docx');
 
-const StepModuleTester = require('./helpers/StepModuleTester');
+const StepModuleTester = require('../../test/helpers/StepModuleTester');
 
 const goodSettings = [
 	{

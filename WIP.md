@@ -35,7 +35,7 @@ Stuff to do in this WIP branch
   - [ ] with alterStepReact methods
     - [x] PGT
     - [ ] APFR (later so you can have both for testing both cases)
-  - [ ] Possibly restructure StepModule `alterStep` methodology
+  - [x] Possibly restructure StepModule `alterStep` methodology
     - [x] Make each step idempotent
     - [x] Make tests pass for apfr.install and pgt.set
     - [x] Add tests to verify idempotency of TaskWriter.insertStep()
@@ -46,14 +46,15 @@ Stuff to do in this WIP branch
 - [x] add --html output type back in its full form for now (for XML output type learning)
 - [x] Ensure good handling of role variables like `{{role:crewA}}`
 - [x] Make `maestro conduct` not require a dummy html files
+- [ ] Testing
+  - [ ] Modify mocha/babel/etc to make it possible to run React test
+  - [ ] Use as opportunity to switch to `.spec.js` method of keeping tests alongside files
+  - [ ] Write tests for React components
+  - [ ] Write/alter other tests as required
 - [ ] fix numbering (currently starting at 1 for each division, and gets wonky when editing steps)
 - [ ] output full yaml of procedure and activities in browser console
 - [ ] save yaml to files
 - [ ] Make things like warnings be StepModules?
-- [ ] Switch Mocha --> Jest (and maybe Chai --> Jest) for better React and screenshot handling
-  - [ ] Use as opportunity to switch to `.test.js` method of keeping tests alongside files
-  - [ ] Write tests for React components
-  - [ ] Write/alter other tests as required
 - [ ] Fix maintainability issues if required (probably required!)
   - [ ] Simplify EvaDivisionWriter
   - [ ] Rename ConcurrentStep to Division? Or Scene? If scene, then series becomes what? Cutaway?
@@ -89,3 +90,4 @@ Possible additional things for this WIP branch (but probably in a follow-on)
   - [ ] 'commit' button that gives a summary input box, then runs `git add . && git commit ...`
     - [ ] Force commit to branch? Maybe use your email as branch name?
   - [ ] 'push' button? Or make that part of 'commit'?
+- [ ] Switch Mocha --> Jest (and maybe Chai --> Jest)? Some indications it may be better for React

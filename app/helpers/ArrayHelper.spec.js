@@ -5,7 +5,7 @@
 
 const assert = require('chai').assert;
 
-const arrayHelper = require('../app/helpers/arrayHelper');
+const arrayHelper = require('./arrayHelper');
 
 describe('arrayHelper', function() {
 
