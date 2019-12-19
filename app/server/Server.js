@@ -18,7 +18,7 @@ module.exports = class Server {
 
 		this.staticResources = [
 			// Serve project resources
-			{ webPath: 'build', localBase: program.projectPath, localRelative: 'build' },
+			{ webPath: 'images', localBase: program.projectPath, localRelative: 'images' },
 			{ webPath: 'procedures', localBase: program.projectPath, localRelative: 'procedures' },
 			{ webPath: 'tasks', localBase: program.projectPath, localRelative: 'tasks' },
 

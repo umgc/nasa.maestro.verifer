@@ -7,7 +7,6 @@ const Series = require('../../components/layout/Series');
 
 const getImageFileDimensions = require('image-size');
 const TextTransform = require('../TextTransform');
-const settings = require('../../settings');
 
 const maestroKey = require('../../components/helpers/maestroKey');
 const uuidv4 = require('uuid/v4');
@@ -131,7 +130,7 @@ module.exports = class ReactTaskWriter extends TaskWriter {
 				imageMeta
 			);
 
-			const imgPath = settings.htmlImagePrefix + imageMeta.path;
+			const imgPath = path.join('images', imageMeta.path);
 
 			const image = (
 				<a href={imgPath} key={uuidv4()}>

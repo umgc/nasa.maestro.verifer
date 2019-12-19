@@ -1,12 +1,10 @@
 'use strict';
 
 const fs = require('fs');
-const path = require('path');
 const childProcess = require('child_process');
 
 const packageJson = require('../../package.json');
 const envHelper = require('../helpers/envHelper');
-const consoleHelper = require('../helpers/consoleHelper');
 
 const noGitMessage = 'Git not available in browser';
 
@@ -130,28 +128,6 @@ module.exports = class Program {
 	 */
 	getLastModifiedBy() {
 		return '';
-	}
-
-	/**
-	 * Get the path to an HTML file for a Maestro project. If multiple HTML files found, this will
-	 * lazily just pick one.
-	 *
-	 * @todo Add optional param to specify a single file or regex match certain files.
-	 *
-	 * @return {string}  Path to HTML file
-	 */
-	getProjectHtmlFile() {
-		const htmlFiles = fs.readdirSync(this.outputPath).filter((filename) => {
-			return filename.endsWith('.html');
-		});
-
-		if (htmlFiles.length > 1) {
-			consoleHelper.warn(`Multiple HTML files found in /build directory\nBeing lazy and using first one: ${htmlFiles[0]}`);
-		} else if (htmlFiles.length === 0) {
-			return false;
-		}
-		const htmlFile = path.join(this.outputPath, htmlFiles[0]);
-		return htmlFile;
 	}
 
 	getProjectProcedureFiles() {
