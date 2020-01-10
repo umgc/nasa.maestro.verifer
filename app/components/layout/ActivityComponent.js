@@ -15,7 +15,9 @@ class ActivityComponent extends React.Component {
 		const columnNames = [];
 
 		for (const colKey of columnKeys) {
-			columnNames.push(this.props.procedure.columnToDisplay[colKey]);
+			columnNames.push(
+				this.props.procedure.ColumnsHandler.getDisplayTextFromColumnKey(colKey)
+			);
 		}
 
 		return columnNames.map((name) => (

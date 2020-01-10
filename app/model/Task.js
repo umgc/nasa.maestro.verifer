@@ -1,10 +1,12 @@
 'use strict';
 
 const Duration = require('./Duration');
-const ConcurrentStep = require('./ConcurrentStep.js');
-const TaskRole = require('./TaskRole.js');
+const ConcurrentStep = require('./ConcurrentStep');
+const TaskRole = require('./TaskRole');
+const TaskRequirements = require('./TaskRequirements');
 const consoleHelper = require('../helpers/consoleHelper');
 const arrayHelper = require('../helpers/arrayHelper');
+const typeHelper = require('../helpers/typeHelper');
 
 const validTimeTypes = ['startTime', 'endTime', 'duration'];
 
@@ -107,35 +109,66 @@ module.exports = class Task {
 
 	/**
 	 * Constructor for Task object
-	 * @param  {Object} taskDefinition          All the task info from the task file (steps, etc)
-	 * @param  {Object} proceduresTaskInstance  Info about this usage of task from procedure file
-	 * @param  {Array}  procedureColumnKeys     Array of column keys
+	 * @param  {Object} taskRequirementsDef     Info about this usage of task from procedure file
 	 * @param  {Object} procedure               Procedure instance
 	 *                                          OPTIMIZE: the procedure param was added later when
 	 *                                          it became obvious that tasks would need general info
 	 *                                          about procedures. Now it seems excessive to have the
 	 *                                          prior two params be part of the procedure param
 	 */
-	constructor(taskDefinition, proceduresTaskInstance, procedureColumnKeys, procedure) {
+	constructor(taskRequirementsDef, procedure) {
+		this.title = '';
 
-		// Get the title
-		if (!taskDefinition.title) {
-			throw new Error(`Input YAML task missing title: ${JSON.stringify(taskDefinition)}`);
-		}
-		this.title = taskDefinition.title;
+		// Why "requirements"? See TaskRequirements
+		this.taskReqs = new TaskRequirements(taskRequirementsDef, this);
 
-		if (taskDefinition.roles) {
+		// was check for steps FIXME
+		this.concurrentSteps = [];
+
+		this.procedure = procedure;
+	}
+
+	getDefinition() {
+		return {
+			requirements: this.getRequirementsDefinition(),
+			task: this.getTaskDefinition()
+		};
+	}
+
+	getRequirementsDefinition() {
+		return this.taskReqs.getDefinition();
+	}
+
+	getTaskDefinition() {
+		return { error: 'not yet defined' };
+		// throw new Error('NOT YET DEFINED');
+	}
+
+	/**
+	 * Add the definition of the task itself (as opposed to a procedure's usage of the task)
+	 *
+	 * @param {Object} taskDef  All the task info from the task file (steps, etc), e.g. a file
+	 *                          within the ./tasks directory of a Maestro project.
+	 */
+	addTaskDefinition(taskDef) {
+
+		typeHelper.errorIfIsnt(taskDef.title, 'string');
+		typeHelper.errorIfIsnt(taskDef.steps, 'array');
+
+		this.title = taskDef.title;
+
+		if (taskDef.roles) {
 			this.rolesDict = {};
 			this.rolesArr = [];
 			this.actorRolesDict = {};
-			for (const role of taskDefinition.roles) {
+			for (const role of taskDef.roles) {
 				if (!role.name) {
 					consoleHelper.error([
 						'Roles require a name, none found in role definition',
 						role
 					], 'Task role definition error');
 				}
-				this.rolesDict[role.name] = new TaskRole(role, proceduresTaskInstance);
+				this.rolesDict[role.name] = new TaskRole(role, this.taskReqs);
 				this.rolesArr.push(this.rolesDict[role.name]);
 
 				// task defines roles, procedure applies actors to roles in TaskRole object. Get
@@ -146,36 +179,18 @@ module.exports = class Task {
 			}
 		}
 
-		this.color = proceduresTaskInstance.color || null;
-		this.filename = proceduresTaskInstance.file;
-
 		// Get the steps.  ConcurrentSteps class will handle the simo vs actor stuff in the yaml.
-		if (!taskDefinition.steps) {
-			throw new Error(`Input YAML task missing steps: ${JSON.stringify(taskDefinition)}`);
-		}
-		this.concurrentSteps = [];
-		for (var concurrentStepYaml of taskDefinition.steps) {
+		for (var concurrentStepYaml of taskDef.steps) {
 			this.concurrentSteps.push(new ConcurrentStep(concurrentStepYaml, this.rolesDict));
 		}
 
-		if (procedureColumnKeys) {
-			if (!Array.isArray(procedureColumnKeys) || procedureColumnKeys.length === 0) {
-				throw new Error('Procedure column keys must be an array with length > 0\n');
-			} else {
-				for (const key of procedureColumnKeys) {
-					if (typeof key !== 'string') {
-						throw new Error('Procedure column keys must be type string');
-					}
-				}
-			}
-			this.procedureColumnKeys = procedureColumnKeys;
-		}
-		this.procedure = procedure;
 	}
 
 	/**
 	 * Detect and return what columns are present on a task. A given task may
 	 * have 1 or more columns. Only return those present in a task.
+	 *
+	 * FIXME: This should be getColumnKeys(), I think
 	 *
 	 * @return {Array}             Array of column names in this task
 	 */
@@ -203,7 +218,7 @@ module.exports = class Task {
 		//
 		for (division of divisions) {
 			for (actorKey in division.subscenes) {
-				colKey = this.procedure.getActorColumnKey(actorKey);
+				colKey = this.procedure.ColumnsHandler.getActorColumnKey(actorKey);
 
 				if (!taskColumnsHash[colKey]) {
 					// insert into a hash table because lookup is faster than array
@@ -213,7 +228,7 @@ module.exports = class Task {
 		}
 
 		// create taskColumns in order specified by procedure
-		for (colKey of this.procedureColumnKeys) {
+		for (colKey of this.procedure.ColumnsHandler.getColumnKeys()) {
 			if (taskColumnsHash[colKey]) {
 				taskColumns.push(colKey);
 			}

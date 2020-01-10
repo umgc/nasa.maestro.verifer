@@ -13,7 +13,6 @@ const maestro = {
 	YAML: require('js-yaml'),
 
 	// models
-	Column: require('./app/model/Column'),
 	ConcurrentStep: require('./app/model/ConcurrentStep'),
 	Duration: require('./app/model/Duration'),
 	Procedure: require('./app/model/Procedure'),
@@ -28,6 +27,9 @@ const maestro = {
 	PgtSet: require('./app/step-mods/PgtSet'),
 	StepModule: require('./app/step-mods/StepModule'),
 	stepModules: require('./app/step-mods/stepModules'),
+
+	// helpers
+	typeHelper: require('./app/helpers/typeHelper'),
 
 	// writers
 	EvaHtmlProcedureWriter: require('./app/writer/procedure/EvaHtmlProcedureWriter'),

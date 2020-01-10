@@ -11,23 +11,23 @@ module.exports = class TaskRole {
 	 *                                      { name: 'crewA',
 	 *                                        description: 'Person who does XYZ'
 	 *                                        duration: { minutes: 20 } }
-	 * @param  {Object} procTaskInstance  Info about this usage of task from procedure file. Ex:
+	 * @param  {Object} taskRequirements  Info about this usage of task from procedure file. Ex:
 	 *                                      { file: 'colka-temporary-lid-removal.yml',
 	 *                                        roles: { crewA: 'EV1', crewB: 'EV2' },
 	 *                                        color: '#7FB3D5' }
 	 */
-	constructor(roleDef, procTaskInstance) {
+	constructor(roleDef, taskRequirements) {
 		this.name = roleDef.name;
 		this.description = roleDef.description;
 		this.duration = new Duration(roleDef.duration);
-		if (!procTaskInstance || !procTaskInstance.roles || !procTaskInstance.roles[this.name]) {
+		if (!taskRequirements || !taskRequirements.roles || !taskRequirements.roles[this.name]) {
 			consoleHelper.error([
 				'Roles defined within tasks must be filled by procedure actors',
-				`Within task "${procTaskInstance.file}", role "${this.name}" is defined`,
+				`Within task "${taskRequirements.file}", role "${this.name}" is defined`,
 				`Within the procedure, role "${this.name}" is not filled by an actor`
 			], 'TaskRole error');
 		} else {
-			this.actor = procTaskInstance.roles[this.name];
+			this.actor = taskRequirements.roles[this.name];
 		}
 	}
 };

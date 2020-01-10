@@ -34,7 +34,9 @@ module.exports = class EvaDocxTaskWriter extends DocxTaskWriter {
 		const tableCells = Array(this.numCols).fill(0).map((val, index) => {
 			return new docx.TableCell({
 				children: [new docx.Paragraph({
-					text: this.procedure.columnToDisplay[columnKeys[index]],
+					text: this.procedure.ColumnsHandler.getDisplayTextFromColumnKey(
+						columnKeys[index]
+					),
 					alignment: docx.AlignmentType.CENTER,
 					style: 'strong'
 				})]

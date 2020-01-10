@@ -8,13 +8,11 @@ const YAML = require('js-yaml');
 
 const Task = require('./Task');
 
-const proceduresTaskInstance = {
+const taskRequirementsDefinition = {
 	file: 'some-task.yml',
 	roles: { crewA: 'EV1', crewB: 'EV2' },
 	color: '#7FB3D5'
 };
-
-const procedureColumnKeys = ['IV', 'EV1', 'EV2'];
 
 /**
  * Positive testing for task
@@ -40,7 +38,8 @@ describe('Task constructor - Positive Testing', function() {
 
 		it('should return a task for normal input', () => {
 
-			const task = new Task(taskDefinition, proceduresTaskInstance, procedureColumnKeys);
+			const task = new Task(taskRequirementsDefinition);
+			task.addTaskDefinition(taskDefinition);
 
 			expect(task.title).to.be.a('string');
 			expect(task.title).to.equal('Egress');
@@ -75,7 +74,10 @@ describe('Task constructor - Negative Testing', function() {
 
 		it('should throw error if title doesn\'t exist', () => {
 
-			expect(() => new Task(fakeYamlObj)).to.throw('Input YAML task missing title: ');
+			expect(() => {
+				const task = new Task(taskRequirementsDefinition);
+				task.addTaskDefinition(fakeYamlObj);
+			}).to.throw('Value undefined must be one of these types:\n  - string');
 
 		});
 	});
@@ -90,8 +92,10 @@ describe('Task constructor - Negative Testing', function() {
 
 		it('should throw error if steps don\'t exist', () => {
 
-			expect(() => new Task(taskDefinition, proceduresTaskInstance, procedureColumnKeys))
-				.to.throw('Input YAML task missing steps: ');
+			expect(() => {
+				const task = new Task(taskRequirementsDefinition);
+				task.addTaskDefinition(taskDefinition);
+			}).to.throw('Value undefined must be one of these types:\n  - array');
 
 		});
 	});

@@ -10,9 +10,10 @@ const assert = require('chai').assert;
 
 const SvgTimelineWriter = require('./SvgTimelineWriter');
 const TimelineWriterTester = require('../../../test/helpers/TimelineWriterTester');
-const tester = new TimelineWriterTester(SvgTimelineWriter);
 
 describe('SvgTimelineWriter', function() {
+
+	const tester = new TimelineWriterTester(SvgTimelineWriter);
 
 	describe('create()', function() {
 		tester.testCreate();
@@ -21,19 +22,21 @@ describe('SvgTimelineWriter', function() {
 	describe('writeSVG()', function() {
 		for (const test of tester.tests) {
 
+			const { timeline, procedure, buildDir } = tester.setup(test);
+
 			// in case 'create()' tests haven't been run yet
-			if (!test.timeline.canvas) {
-				test.timeline.create();
-			}
+			// if (!test.timeline.canvas) {
+			timeline.create();
+			// }
 
 			const expectedPath = path.join(
-				test.buildDir, `${test.procedure.filename}.summary.timeline.svg`
+				buildDir, `${procedure.filename}.summary.timeline.svg`
 			);
 			const testPath = path.join(
-				test.buildDir, `test${test.procedure.filename}.summary.timeline.svg`
+				buildDir, `test${procedure.filename}.summary.timeline.svg`
 			);
 
-			test.timeline.writeSVG(testPath);
+			timeline.writeSVG(testPath);
 			const expectedSVG = fs.readFileSync(expectedPath).toString();
 			const testSVG = fs.readFileSync(testPath).toString();
 

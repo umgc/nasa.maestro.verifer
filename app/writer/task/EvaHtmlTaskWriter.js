@@ -30,7 +30,9 @@ module.exports = class EvaHtmlTaskWriter extends HtmlTaskWriter {
 		}
 
 		for (let c = 0; c < this.numCols; c++) {
-			columnNames.push(this.procedure.columnToDisplay[columnKeys[c]]);
+			columnNames.push(this.procedure.ColumnsHandler.getDisplayTextFromColumnKey(
+				columnKeys[c]
+			));
 		}
 
 		const tableHeaderHtml = nunjucks.render(

@@ -6,9 +6,8 @@
 const TimelineWriterTester = require('../../../test/helpers/TimelineWriterTester');
 const HtmlTimelineWriter = require('./HtmlTimelineWriter');
 
-const tester = new TimelineWriterTester(HtmlTimelineWriter);
-
 describe('HtmlTimelineWriter', function() {
+	const tester = new TimelineWriterTester(HtmlTimelineWriter);
 
 	describe('create()', function() {
 		tester.testCreate();

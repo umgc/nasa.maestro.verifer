@@ -5,8 +5,9 @@ const path = require('path');
 const YAML = require('js-yaml');
 const filenamify = require('filenamify');
 
-const Column = require('./Column');
-const Task = require('./Task');
+const ColumnsHandler = require('./ColumnsHandler');
+const TasksHandler = require('./TasksHandler');
+// const Task = require('./Task');
 const validateSchema = require('../schema/validateSchema');
 const Duration = require('./Duration');
 const TimeSync = require('./TimeSync');
@@ -30,112 +31,32 @@ function translatePath(procedureFilePath, taskFileName) {
 	return taskFilePath;
 }
 
-function mapActorToColumn(columnDefinition) {
-
-	// Create a mapping of actor --> column
-	const actorToColumn = {};
-
-	for (const col of columnDefinition) {
-		if (typeof col.actors === 'string') {
-			col.actors = [col.actors]; // array-ify
-		} else if (!Array.isArray(col.actors)) {
-			throw new Error('Procedure columns.actors must be array or string');
-		}
-
-		for (const actor of col.actors) {
-			actorToColumn[actor] = col.key;
-		}
-	}
-
-	return actorToColumn;
-}
-
-function mapColumnKeyToDisplay(columnDefinition) {
-
-	// Create a mapping of actor --> column
-	const columnToDisplay = {};
-
-	for (const col of columnDefinition) {
-		if (col.display) {
-			columnToDisplay[col.key] = col.display;
-		} else {
-			columnToDisplay[col.key] = col.key;
-		}
-	}
-
-	return columnToDisplay;
-}
-
 module.exports = class Procedure {
 
 	constructor() {
 		this.name = '';
 		this.filename = '';
 		this.actors = [];
-		this.columns = [];
-		this.tasks = [];
-		this.actorToColumn = {};
 
-		this.taskDefinitions = {};
+		// this.columns = []; // <-- switch to model below instead
+		this.ColumnsHandler = new ColumnsHandler();
+
+		this.tasks = []; // FIXME should this be here?
 	}
 
-	/**
-	 * May actor key to column key. Both strings. this.actorToColumn in form:
-	 *   {
-	 *     "*": "IV",
-	 *     "EV1": "EV1",
-	 *     "EV2": "EV2"
-	 *   }
-	 * A more complicated form may be:
-	 *   {
-	 *     "*": "IV",
-	 *     "EV1": "EV1",
-	 *     "ROBO": "EV1"
-	 *   }
-	 * In this second example the "ROBO" actor gets mapped to the EV1 column.
-	 *
-	 * @param  {string} actor   key for actor
-	 * @return {string}         key of column (key of primary actor of column)
-	 */
-	getActorColumnKey(actor) {
-		if (this.actorToColumn[actor]) {
-			return this.actorToColumn[actor];
-		} else if (this.actorToColumn['*']) {
-			return this.actorToColumn['*']; // wildcard for all others
-		} else {
-			throw new Error(`Unknown column for actor ${actor}. Consider adding wildcard * actor to a column`);
-		}
-	}
+	getDefinition() {
 
-	getColumnKeys() {
-		const keys = [];
-		for (const column of this.columns) {
-			keys.push(column.key);
-		}
-		return keys;
-	}
+		const procedure = {
+			// eslint-disable-next-line camelcase
+			procedure_name: this.name,
+			columns: this.ColumnsHandler.getDefinition(),
+			tasks: this.TasksHandler.getRequirementsDefinitions()
+		};
 
-	getColumnIndex(key) {
-		for (let c = 0; c < this.columns.length; c++) {
-			if (this.columns[c].key === key) {
-				return c;
-			}
-		}
-		throw new Error(`key ${key} not found in columns`);
-	}
-
-	getColumnHeaderText() {
-		const headerTexts = [];
-		for (const column of this.columns) {
-			headerTexts.push(column.display);
-		}
-		return headerTexts;
-	}
-
-	getColumnHeaderTextByActor(actor) {
-		const colKey = this.getActorColumnKey(actor);
-		const colIndex = this.getColumnIndex(colKey);
-		return this.getColumnHeaderText()[colIndex];
+		return {
+			procedureDefinition: procedure,
+			taskDefinitions: this.TasksHandler.getTaskDefinitions()
+		};
 	}
 
 	getActorsInLeadRoles() {
@@ -176,7 +97,7 @@ module.exports = class Procedure {
 	 */
 	getAllActorsDefinedInColumns(includeWildcard = false) {
 		const allActors = [];
-		for (const col of this.columns) {
+		for (const col of this.ColumnsHandler.columns) {
 			for (const actor of col.actors) {
 				if (includeWildcard || actor !== '*') {
 					allActors.push(actor);
@@ -231,9 +152,7 @@ module.exports = class Procedure {
 		for (const task of this.tasks) {
 			for (const actor in task.actorRolesDict) {
 				if (!actorColumnIndexes[actor]) {
-					actorColumnIndexes[actor] = task.procedure.getColumnIndex(
-						task.procedure.getActorColumnKey(actor)
-					);
+					actorColumnIndexes[actor] = this.ColumnsHandler.getActorColumnIndex(actor);
 				}
 			}
 		}
@@ -284,6 +203,11 @@ module.exports = class Procedure {
 		return longestEndTime.clone();
 	}
 
+	setName(value) {
+		this.name = value;
+		this.filename = filenamify(value.replace(/\s+/g, '_'));
+	}
+
 	/**
 	 * Populates data, reading in the specified file.
 	 * @param {string} fileName The full path to the YAML file
@@ -322,40 +246,29 @@ module.exports = class Procedure {
 		}
 
 		// Save the procedure Name
-		this.name = procDef.procedure_name;
-		this.filename = filenamify(this.name.replace(/\s+/g, '_'));
+		this.setName(procDef.procedure_name);
 
 		if (procDef.columns) {
-			for (var columnYaml of procDef.columns) {
-				this.columns.push(new Column(columnYaml));
-			}
+			this.ColumnsHandler.updateColumns(procDef.columns);
 		}
 
-		this.actorToColumn = mapActorToColumn(this.columns);
-		this.columnToDisplay = mapColumnKeyToDisplay(this.columns);
+		this.TasksHandler = new TasksHandler(procDef.tasks, this);
 
-		this.procedureDefinition = procDef;
-		this.proceduresTaskInstances = {};
-
-		for (const task of this.procedureDefinition.tasks) {
-			this.proceduresTaskInstances[task.file] = task;
-		}
+		// FIXME: Do this for now, rather than fixing all the cases of procedure.tasks out there...
+		this.tasks = this.TasksHandler.tasks;
 
 		return null;
 	}
 
-	/**
-	 * @throws Error if this.procedureDefinition not set. Run this.addProcedureDefinition() first.
-	 */
 	loadTaskDefinitionsFromFiles() {
 
-		if (!this.procedureDefinition) {
-			throw new Error('populate() requires "procedureDefinition" set');
+		if (!this.TasksHandler) {
+			throw new Error('this.TasksHandler must be set first');
 		}
 
 		const taskDefinitions = {};
 
-		for (const task of this.procedureDefinition.tasks) {
+		for (const task of this.TasksHandler.tasks) {
 			// Since the task file is in relative path to the procedure
 			// file, need to translate it!
 			const taskFileName = translatePath(this.procedureFile, task.file);
@@ -397,12 +310,12 @@ module.exports = class Procedure {
 	 */
 	updateTaskDefinition(taskFile, taskDef) {
 
-		if (!this.proceduresTaskInstances) {
-			throw new Error('populate() requires "proceduresTaskInstances" set');
+		if (!this.TasksHandler) {
+			throw new Error('Must setup procedure.TasksHandler first');
 		}
 
 		// info about task from procedure file
-		const proceduresTaskInstance = this.proceduresTaskInstances[taskFile];
+		const task = this.TasksHandler.getTaskByFile(taskFile);
 
 		try {
 			validateSchema('task', taskDef);
@@ -410,44 +323,12 @@ module.exports = class Procedure {
 			return err;
 		}
 
-		// Browser may load tasks asynchronously, and thus order may not be preserved.
-		// Thus, need to determine the location of taskFile from the procedure
-		// definition, and insert the new Task at that location within this.tasks
-		const index = this.getTaskIndexByFilename(taskFile);
-
-		if (index === -1) {
-			throw new Error(`Task file ${taskFile} not found.`);
-		}
-
-		// Create task model
-		this.tasks[index] = new Task(
-			taskDef,
-			proceduresTaskInstance,
-			this.getColumnKeys(),
-			this
-		);
-
-		// Save the raw definition
-		this.taskDefinitions[taskFile] = taskDef;
+		task.addTaskDefinition(taskDef);
 
 		return null;
-
-	}
-
-	getTaskIndexByFilename(filename) {
-		for (let i = 0; i < this.procedureDefinition.tasks.length; i++) {
-			if (this.procedureDefinition.tasks[i].file === filename) {
-				return i;
-			}
-		}
-		return -1;
 	}
 
 	setupTimeSync() {
-
-		if (!this.procedureDefinition || !this.taskDefinitions) {
-			throw new Error('populate() requires "procedureDefinition" and "taskDefinitions" set');
-		}
 
 		// For each role, make a pointer to the latest (most recent) activity
 		const roleLatestAct = {};

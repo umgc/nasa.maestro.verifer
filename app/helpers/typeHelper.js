@@ -10,7 +10,8 @@ const validTypes = {
 	string: (v) => { return typeof v === 'string'; },
 	array: (v) => { return Array.isArray(v); },
 	function: (v) => { return typeof v === 'function'; },
-	object: (v) => { return typeof v === 'object'; }
+	object: (v) => { return typeof v === 'object'; },
+	falsy: (v) => { return !v; }
 };
 
 /**
@@ -21,6 +22,8 @@ const validTypes = {
  * @param  {...string|Function} types  Strings matching keys in validTypes, to check if 'value' is
  *                                     one of those types. Also can pass in a constructor function
  *                                     to check if 'value' is an instance of that constructor class.
+ *                                     Valid inputs: scalar, boolean, integer, number, string,
+ *                                     array, function, object, falsy, a constructor function.
  * @return {string|Function|boolean}   Return the string or constructor function if found, or false.
  */
 function is(value, ...types) {
@@ -48,6 +51,17 @@ function is(value, ...types) {
 	return false;
 }
 
+/**
+ * Determine what type a value is within a list of possible values, or false if not one of those
+ * types.
+ *
+ * @param {*} value                    Any type of variable to check its type.
+ * @param  {...string|Function} types  Strings matching keys in validTypes, to check if 'value' is
+ *                                     one of those types. Also can pass in a constructor function
+ *                                     to check if 'value' is an instance of that constructor class.
+ * @return {bool}                      Either throws error or returns false
+ * @throws Error                       Throws if value doesn't match any of types
+ */
 function errorIfIsnt(value, ...types) {
 	// see comment above in is()
 	if (types.length === 1 && Array.isArray(types[0])) {

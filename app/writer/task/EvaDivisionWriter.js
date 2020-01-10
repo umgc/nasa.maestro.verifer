@@ -31,7 +31,7 @@ function getJointActorColumnInfo(nonJointColumnsInDivision, jointActors, taskWri
 			return str.trim();
 		});
 		const jointActorColumnKeys = actorsArr.map((act) => {
-			return taskWriter.procedure.getActorColumnKey(act);
+			return taskWriter.procedure.ColumnsHandler.getActorColumnKey(act);
 		});
 		const jointActorTaskColumnIndexes = jointActorColumnKeys.map((colKey) => {
 			return taskWriter.task.getColumnIndex(colKey);
@@ -106,7 +106,7 @@ module.exports = class EvaDivisionWriter {
 			if (actor.indexOf('+') === -1) {
 				actorsInDivision.push(actor);
 
-				const columnKey = taskWriter.procedure.getActorColumnKey(actor);
+				const columnKey = taskWriter.procedure.ColumnsHandler.getActorColumnKey(actor);
 				columnsInDivision.push(columnKey);
 				actorToColumn[actor] = columnKey;
 

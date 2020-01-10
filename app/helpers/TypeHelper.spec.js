@@ -96,7 +96,13 @@ describe('typeHelper', function() {
 			{ inputValue: fake, inputTypes: ['integer', FakeClass], expected: FakeClass },
 			{ inputValue: fake, inputTypes: ['integer', AnotherFake], expected: false },
 			{ inputValue: fake, inputTypes: [AnotherFake, 'object'], expected: 'object' },
-			{ inputValue: { x: 1 }, inputTypes: [FakeClass, 'integer'], expected: false }
+			{ inputValue: { x: 1 }, inputTypes: [FakeClass, 'integer'], expected: false },
+
+			// falsy
+			{ inputValue: '', inputTypes: ['falsy'], expected: 'falsy' },
+			{ inputValue: '1234', inputTypes: ['falsy'], expected: false },
+			{ inputValue: { x: 1 }, inputTypes: ['falsy', 'object'], expected: 'object' },
+			{ inputValue: { x: 1 }, inputTypes: ['falsy', 'array'], expected: false }
 
 		];
 
