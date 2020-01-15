@@ -44,9 +44,11 @@ module.exports = class TasksHandler {
 	}
 
 	getTaskDefinitions() {
-		return this.tasks.map((task) => {
-			return task.getTaskDefinition();
-		});
+		const def = {};
+		for (const task of this.tasks) {
+			def[task.taskReqs.file] = task.getTaskDefinition();
+		}
+		return def;
 	}
 
 	getTaskByFile(taskFile) {

@@ -2,6 +2,7 @@
 const React = require('react');
 const cloneDeep = require('lodash/cloneDeep');
 const jsdiff = require('diff');
+const YAML = require('js-yaml');
 
 const stateHandler = require('../state/index');
 // const PropTypes = require('prop-types');
@@ -10,7 +11,6 @@ const ProcedureViewerComponent = require('./pages/ProcedureViewerComponent');
 const ProcedureSelectorComponent = require('./pages/ProcedureSelectorComponent');
 const ReactProcedureWriter = require('../writer/procedure/ReactProcedureWriter');
 
-const YAML = require('js-yaml');
 const changes = {
 	lastDefinitionYaml: null,
 	diffs: []
@@ -48,6 +48,38 @@ function recordAndReportChange(latestProcedure) {
 
 }
 
+function saveChange(procedure, activityIndex) {
+	const activity = procedure.tasks[activityIndex];
+
+	// const xhr = new XMLHttpRequest();
+	// xhr.open('POST', `edit/tasks/${activity.taskReqs.file}`, true);
+	// xhr.setRequestHeader('Content-Type', 'application/json');
+	// xhr.send(JSON.stringify({
+	// yaml: YAML.dump(activity.getTaskDefinition())
+	// }));
+
+	fetch(
+		`edit/tasks/${activity.taskReqs.file}`,
+		{
+			method: 'POST', // or 'PUT'
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				yaml: YAML.dump(activity.getTaskDefinition())
+			})
+		}
+	)
+		.then((response) => response.json())
+		.then((data) => {
+			console.log('Success:', data);
+		})
+		.catch((error) => {
+			console.error('Error:', error);
+		});
+
+}
+
 class App extends React.Component {
 	state = {
 		procedure: null
@@ -63,7 +95,7 @@ class App extends React.Component {
 		});
 
 		stateHandler.modifyStep = (actIndex, divIndex, colKey, stepIndex, rawDefinition) => {
-			// overkill?
+			// overkill? FIXME try without
 			const newProc = cloneDeep(this.state.procedure);
 
 			const division = newProc.tasks[actIndex].concurrentSteps[divIndex];
@@ -72,6 +104,8 @@ class App extends React.Component {
 			division.subscenes[colKey][stepIndex] = newStep;
 
 			recordAndReportChange(newProc);
+
+			saveChange(newProc, actIndex);
 
 			this.setState({
 				procedure: newProc

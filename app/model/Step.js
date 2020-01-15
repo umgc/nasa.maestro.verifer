@@ -1,5 +1,7 @@
 'use strict';
 
+const cloneDeep = require('lodash/cloneDeep');
+
 const arrayHelper = require('../helpers/arrayHelper');
 const consoleHelper = require('../helpers/consoleHelper');
 const stepModules = require('../step-mods/stepModules');
@@ -9,7 +11,7 @@ const loadedModules = {};
 
 const props = {
 	strings: ['title'],
-	arrays: ['images', 'checkboxes', 'warnings', 'cautions', 'comments', 'notes']
+	arrays: ['checkboxes', 'warnings', 'cautions', 'comments', 'notes']
 };
 
 module.exports = class Step {
@@ -30,6 +32,7 @@ module.exports = class Step {
 		}
 
 		// handled differently by getDefinition()
+		this.images = [];
 		this.modules = [];
 		this.substeps = [];
 
@@ -54,6 +57,10 @@ module.exports = class Step {
 		// Currently YAML "step" prop maps to model "text" prop. See comment in constructor.
 		if (this.text) {
 			def.step = this.text;
+		}
+
+		if (this.images.length) {
+			def.images = cloneDeep(this.images);
 		}
 
 		for (const prop of props.arrays) {
@@ -114,10 +121,10 @@ module.exports = class Step {
 				const image = this.images[i];
 
 				if (image.width && !Number.isInteger(image.width) && image.width < 1) {
-					throw new Error(`Width should be empty or a positive integery: ${image.path}`);
+					throw new Error(`Width should be empty or a positive integer: ${image.path}`);
 				}
 				if (image.height && !Number.isInteger(image.height) && image.height < 1) {
-					throw new Error(`Height should be empty or a positive integery: ${image.path}`);
+					throw new Error(`Height should be empty or a positive integer: ${image.path}`);
 				}
 			}
 		}
