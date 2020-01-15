@@ -8,7 +8,7 @@ const Duration = require('./Duration');
 const loadedModules = {};
 
 const props = {
-	strings: ['title', 'text'],
+	strings: ['title'],
 	arrays: ['images', 'checkboxes', 'warnings', 'cautions', 'comments', 'notes']
 };
 
@@ -19,6 +19,11 @@ module.exports = class Step {
 		for (const prop of props.strings) {
 			this[prop] = '';
 		}
+
+		// FIXME: This can't be in props.strings because the YAML input is "step" not "text", and in
+		// getDefinition() it needs the proper YAML input name. Ultimately probably should change
+		// "step" to "text".
+		this.text = '';
 
 		for (const prop of props.arrays) {
 			this[prop] = [];
@@ -46,6 +51,11 @@ module.exports = class Step {
 			}
 		}
 
+		// Currently YAML "step" prop maps to model "text" prop. See comment in constructor.
+		if (this.text) {
+			def.step = this.text;
+		}
+
 		for (const prop of props.arrays) {
 			const parsedValue = arrayHelper.parseToArrayOrString(this[prop].slice());
 			if (parsedValue !== '' && !arrayHelper.isEmptyArray(parsedValue)) {
@@ -61,6 +71,11 @@ module.exports = class Step {
 
 		for (const module of this.modules) {
 			def[module.key] = module.getDefinition();
+		}
+
+		const durationDef = this.duration.getDefinition();
+		if (durationDef) {
+			def.duration = durationDef;
 		}
 
 		return def;

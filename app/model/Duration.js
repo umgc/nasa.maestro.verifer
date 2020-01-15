@@ -58,16 +58,22 @@ module.exports = class Duration {
 
 	getDefinition() {
 		const def = {};
+		let propsSet = 0;
 		for (const unit of ['hours', 'minutes', 'seconds']) {
 			if (this[unit]) {
 				def[unit] = this[unit];
+				propsSet++;
 			}
 		}
-		const offsetDef = this.offset ? this.offset.getDefinition() : {};
-		if (Object.keys(offsetDef).length > 0) {
+		const offsetDef = this.offset ? this.offset.getDefinition() : null;
+		if (offsetDef) {
 			def.offset = offsetDef;
+			propsSet++;
 		}
-		return def;
+		if (propsSet > 0) {
+			return def;
+		}
+		return null;
 	}
 
 	getTotalHours() {
