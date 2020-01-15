@@ -1,6 +1,7 @@
 /* global maestro */
 const React = require('react');
 const cloneDeep = require('lodash/cloneDeep');
+const jsdiff = require('diff');
 
 const stateHandler = require('../state/index');
 // const PropTypes = require('prop-types');
@@ -9,6 +10,44 @@ const ProcedureViewerComponent = require('./pages/ProcedureViewerComponent');
 const ProcedureSelectorComponent = require('./pages/ProcedureSelectorComponent');
 const ReactProcedureWriter = require('../writer/procedure/ReactProcedureWriter');
 
+const YAML = require('js-yaml');
+const changes = {
+	lastDefinitionYaml: null,
+	diffs: []
+};
+
+function recordAndReportChange(latestProcedure) {
+	const newYaml = YAML.dump(latestProcedure.getDefinition());
+
+	const diff = jsdiff.diffLines(
+		changes.lastDefinitionYaml,
+		newYaml
+	);
+
+	const css = [];
+
+	const diffText = diff
+		.map((change) => {
+			if (change.added) {
+				css.push('color: green');
+				return `%c+ ${change.value.trimEnd()}`;
+			} else if (change.removed) {
+				css.push('color: red');
+				return `%c- ${change.value.trimEnd()}`;
+			} else {
+				css.push('color: gray');
+				return `%c  (${change.count} unchanged line${change.count === 1 ? '' : 's'})`;
+			}
+		})
+		.join('\n');
+
+	changes.diffs.push(diffText);
+
+	console.log(diffText, ...css);
+	changes.lastDefinitionYaml = newYaml;
+
+}
+
 class App extends React.Component {
 	state = {
 		procedure: null
@@ -16,6 +55,8 @@ class App extends React.Component {
 
 	setProcedure = (procObject) => {
 		stateHandler.state.procedure = procObject;
+		changes.lastDefinitionYaml = YAML.dump(procObject.getDefinition());
+
 		this.setState({
 			procedure: stateHandler.state.procedure,
 			procedureWriter: new ReactProcedureWriter(maestro.app, procObject)
@@ -29,6 +70,8 @@ class App extends React.Component {
 			const newStep = division.makeStep(colKey, rawDefinition);
 
 			division.subscenes[colKey][stepIndex] = newStep;
+
+			recordAndReportChange(newProc);
 
 			this.setState({
 				procedure: newProc
