@@ -6,7 +6,7 @@ const Abstract = require('../helpers/Abstract');
 module.exports = class StepModule extends Abstract {
 
 	constructor() {
-		super(['alterStepBase']);
+		super(['alterStepBase', 'getDefinition']);
 	}
 
 	getOutputTypeFunctions(outputType) {

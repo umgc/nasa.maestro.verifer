@@ -60,6 +60,13 @@ module.exports = class ApfrInstall extends StepModule {
 		this.wif = validateWIF(stepYaml[this.key].wif);
 	}
 
+	getDefinition() {
+		return {
+			settings: getSettings(this).join(','),
+			wif: this.wif
+		};
+	}
+
 	alterStepBase() {
 		return {
 			body: {

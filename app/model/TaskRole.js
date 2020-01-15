@@ -30,4 +30,12 @@ module.exports = class TaskRole {
 			this.actor = taskRequirements.roles[this.name];
 		}
 	}
+
+	getDefinition() {
+		return {
+			name: this.name,
+			description: this.description,
+			duration: this.duration.getDefinition()
+		};
+	}
 };

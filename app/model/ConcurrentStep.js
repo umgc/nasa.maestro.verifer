@@ -112,6 +112,18 @@ module.exports = class ConcurrentStep {
 
 	}
 
+	getDefinition() {
+		const def = {};
+		for (const actor in this.subscenes) {
+			def[actor] = [];
+			for (const step of this.subscenes[actor]) {
+				def[actor].push(step.getDefinition());
+				// def[actor].push({ text: step.text, error: 'this is just a test' });
+			}
+		}
+		return def;
+	}
+
 	handleActorSteps(concurrentStepYaml, actorIdGuess) {
 
 		// if .simo exists, use it. Otherwise it's not a simo block and directly access actor

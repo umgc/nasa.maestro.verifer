@@ -7,20 +7,27 @@ const Duration = require('./Duration');
 
 const loadedModules = {};
 
+const props = {
+	strings: ['title', 'text'],
+	arrays: ['images', 'checkboxes', 'warnings', 'cautions', 'comments', 'notes']
+};
+
 module.exports = class Step {
 
 	constructor(stepYaml, actorIdOrIds, taskRoles) {
 		// Initiate the vars as empty.
+		for (const prop of props.strings) {
+			this[prop] = '';
+		}
+
+		for (const prop of props.arrays) {
+			this[prop] = [];
+		}
+
+		// handled differently by getDefinition()
 		this.modules = [];
-		this.title = '';
-		this.text = '';
-		this.images = [];
-		this.checkboxes = [];
-		this.warnings = [];
-		this.cautions = [];
-		this.comments = [];
-		this.notes = [];
 		this.substeps = [];
+
 		this.raw = null;
 		this.taskRolesMap = {};
 		this.taskRoles = taskRoles;
@@ -28,6 +35,35 @@ module.exports = class Step {
 		this.mapTaskRolesToActor(taskRoles);
 		this.setActors(stepYaml.actor ? stepYaml.actor : actorIdOrIds);
 		this.populateFromYaml(stepYaml);
+	}
+
+	getDefinition() {
+		const def = {};
+
+		for (const prop of props.strings) {
+			if (this[prop]) {
+				def[prop] = this[prop];
+			}
+		}
+
+		for (const prop of props.arrays) {
+			const parsedValue = arrayHelper.parseToArrayOrString(this[prop].slice());
+			if (parsedValue !== '' && !arrayHelper.isEmptyArray(parsedValue)) {
+				def[prop] = parsedValue;
+			}
+		}
+
+		if (!arrayHelper.isEmptyArray(this.substeps)) {
+			def.substeps = this.substeps.map((substep) => {
+				return substep.getDefinition();
+			});
+		}
+
+		for (const module of this.modules) {
+			def[module.key] = module.getDefinition();
+		}
+
+		return def;
 	}
 
 	populateFromYaml(stepYaml) {

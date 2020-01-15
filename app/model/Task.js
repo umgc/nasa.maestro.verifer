@@ -140,7 +140,21 @@ module.exports = class Task {
 	}
 
 	getTaskDefinition() {
-		return { error: 'not yet defined' };
+		const rolesDefs = [];
+		for (const role of this.rolesArr) {
+			rolesDefs.push(role.getDefinition());
+		}
+
+		const concurrentStepsDefs = [];
+		for (const cs of this.concurrentSteps) {
+			concurrentStepsDefs.push(cs.getDefinition());
+		}
+
+		return {
+			title: this.title,
+			roles: rolesDefs,
+			steps: concurrentStepsDefs
+		};
 		// throw new Error('NOT YET DEFINED');
 	}
 

@@ -56,6 +56,20 @@ module.exports = class Duration {
 		}
 	}
 
+	getDefinition() {
+		const def = {};
+		for (const unit of ['hours', 'minutes', 'seconds']) {
+			if (this[unit]) {
+				def[unit] = this[unit];
+			}
+		}
+		const offsetDef = this.offset ? this.offset.getDefinition() : {};
+		if (Object.keys(offsetDef).length > 0) {
+			def.offset = offsetDef;
+		}
+		return def;
+	}
+
 	getTotalHours() {
 		return this.hours + (this.minutes / 60) + (this.seconds / 3600);
 	}
