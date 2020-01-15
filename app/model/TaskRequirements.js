@@ -25,7 +25,7 @@ module.exports = class TaskRequirements {
 		const Task = require('./Task');
 
 		typeHelper.errorIfIsnt(definition.file, 'string');
-		typeHelper.errorIfIsnt(definition.roles, 'object'); // FIXME need "object-not-array"
+		typeHelper.errorIfIsnt(definition.roles, 'object-not-array');
 		typeHelper.errorIfIsnt(task, Task);
 
 		this.task = task;
@@ -39,8 +39,10 @@ module.exports = class TaskRequirements {
 
 	setFile(file) {
 		this.file = file;
+
+		// FIXME: Pick one. Both are used currently. Maybe only set it on this object, not on Task
 		this.task.file = file;
-		this.task.filename = file; // FIXME this is what's currently used. Pick one.
+		this.task.filename = file;
 	}
 
 	cloneRoles(source) {

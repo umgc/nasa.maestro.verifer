@@ -40,8 +40,6 @@ module.exports = class Procedure {
 
 		// this.columns = []; // <-- switch to model below instead
 		this.ColumnsHandler = new ColumnsHandler();
-
-		this.tasks = []; // FIXME should this be here?
 	}
 
 	getDefinition() {

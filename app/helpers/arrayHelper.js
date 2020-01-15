@@ -27,7 +27,6 @@ function parseArray(stringOrArray) {
 	return array;
 }
 
-// FIXME add tests
 /**
  * @param {Array|string} stringOrArray  An array or string to be converted to an array or string
  * @return {Array|string}               If input is a string, just return that string. If input is

@@ -92,6 +92,21 @@ describe('typeHelper', function() {
 			// object
 			{ inputValue: { my: 'obj' }, inputTypes: ['integer', 'object'], expected: 'object' },
 
+			// object, but possibly confusingly so
+			{ inputValue: [1, 2, 3], inputTypes: ['integer', 'object'], expected: 'object' },
+
+			// object-not-array
+			{
+				inputValue: { my: 'obj' },
+				inputTypes: ['integer', 'object-not-array'],
+				expected: 'object-not-array'
+			},
+			{
+				inputValue: [1, 2, 3],
+				inputTypes: ['integer', 'object-not-array'],
+				expected: false
+			},
+
 			// constructor
 			{ inputValue: fake, inputTypes: ['integer', FakeClass], expected: FakeClass },
 			{ inputValue: fake, inputTypes: ['integer', AnotherFake], expected: false },

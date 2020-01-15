@@ -122,7 +122,6 @@ module.exports = class Task {
 		// Why "requirements"? See TaskRequirements
 		this.taskReqs = new TaskRequirements(taskRequirementsDef, this);
 
-		// was check for steps FIXME
 		this.concurrentSteps = [];
 
 		this.procedure = procedure;
@@ -204,7 +203,7 @@ module.exports = class Task {
 	 * Detect and return what columns are present on a task. A given task may
 	 * have 1 or more columns. Only return those present in a task.
 	 *
-	 * FIXME: This should be getColumnKeys(), I think
+	 * Clarify: This should probably be getColumnKeys()
 	 *
 	 * @return {Array}             Array of column names in this task
 	 */

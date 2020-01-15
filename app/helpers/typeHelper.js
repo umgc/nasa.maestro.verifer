@@ -11,6 +11,7 @@ const validTypes = {
 	array: (v) => { return Array.isArray(v); },
 	function: (v) => { return typeof v === 'function'; },
 	object: (v) => { return typeof v === 'object'; },
+	'object-not-array': (v) => { return (typeof v === 'object' && !Array.isArray(v)); },
 	falsy: (v) => { return !v; }
 };
 

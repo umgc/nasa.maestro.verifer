@@ -126,8 +126,6 @@ module.exports = class ColumnsHandler {
 		return this.getColumnKeyIndex(colKey);
 	}
 
-	// check for usage FIXME
-
 	getColumnKeys() {
 		return this.columns.map((col) => col.key);
 	}

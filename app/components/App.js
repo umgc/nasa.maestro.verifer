@@ -1,6 +1,5 @@
 /* global maestro */
 const React = require('react');
-const cloneDeep = require('lodash/cloneDeep');
 const jsdiff = require('diff');
 const YAML = require('js-yaml');
 
@@ -95,8 +94,11 @@ class App extends React.Component {
 		});
 
 		stateHandler.modifyStep = (actIndex, divIndex, colKey, stepIndex, rawDefinition) => {
-			// overkill? FIXME try without
-			const newProc = cloneDeep(this.state.procedure);
+
+			// previously cloned-deep this because I thought I might need to. Doesn't seem necessary
+			// at this point but keeping this here for a while to make sure.
+			// const newProc = cloneDeep(this.state.procedure);
+			const newProc = this.state.procedure;
 
 			const division = newProc.tasks[actIndex].concurrentSteps[divIndex];
 			const newStep = division.makeStep(colKey, rawDefinition);
