@@ -427,4 +427,135 @@ module.exports = class TimeSync {
 		return presentActors;
 	}
 
+	/**
+	 * @return {Object}  Object with nodes and edges, in form:
+	 *                   const data = {
+	 *                     nodes: [
+	 *                       { id: 0, label: 'Start of Egress/Setup for EV1' },
+	 *                       { id: 1, label: 'Start of Egress/Setup for EV2' },
+ 	 *                       { id: 2, label: 'Start of Some Task for EV1' },
+ 	 *                       { id: 3, label: 'Start of Some Task for EV2' },
+ 	 *                       { id: 4, label: 'Start of Cleanup/Ingress for EV1' },
+ 	 *                       { id: 5, label: 'Start of Cleanup/Ingress for EV2' },
+ 	 *                       { id: 6, label: 'End of procedure for EV1' },
+ 	 *                       { id: 7, label: 'End of procedure for EV2' }
+ 	 *                     ],
+ 	 *                     links: [
+ 	 *                       { source: 0, target: 2, minutes: 60, actor: 'EV1' },
+	 *                       {
+	 *                         source: 0, target: 1, minutes: 0,
+	 *                         actor: 'EV1 --> EV2 sync offset for Egress/Setup'
+	 *                       },
+ 	 *                       { source: 1, target: 3, minutes: 45, actor: 'EV2' },
+ 	 *                       { source: 2, target: 4, minutes: 45, actor: 'EV1' },
+	 *                       {
+	 *                         source: 2, target: 3, minutes: 15,
+	 *                         actor: 'EV1 --> EV2 sync offset for Some Task'
+	 *                       },
+ 	 *                       { source: 3, target: 5, minutes: 60, actor: 'EV2' },
+ 	 *                       { source: 4, target: 6, minutes: 30, actor: 'EV1' },
+	 *                       {
+	 *                         source: 4, target: 5, minutes: 0,
+	 *                         actor: 'EV1 --> EV2 sync offset for Cleanup/Ingress'
+	 *                       },
+ 	 *                       { source: 5, target: 7, minutes: 30, actor: 'EV2' },
+	 *                       {
+	 *                         source: 6, target: 7, minutes: 0,
+	 *                         actor: 'EV1 --> EV2 sync offset for procedure end'
+	 *                       },
+ 	 *                     ]
+	 *                   };
+	 */
+	getStnGraph() {
+
+		// each task will have a node for _each actor on the task_
+		const nodes = [];
+		const edges = [];
+
+		const actorEndpoints = {};
+
+		const taskToIndexMap = new Map(); // for a given task get its 'nodes' indices for each actor
+		this.tasks.forEach((task) => {
+			const actorToNode = {};
+			for (const actor in task.actorRolesDict) {
+				const nodeId = nodes.length;
+				nodes.push({ id: nodeId, label: `Start of ${task.title} for ${actor}` });
+				actorToNode[actor] = nodeId; // for looking up nodes easily
+			}
+			taskToIndexMap.set(task, actorToNode);
+		});
+
+		this.tasks.forEach((task) => {
+
+			// if more than one actor on this task, we will need to establish sync requirements
+			// between their task-actor-nodes. Establish this boolean once here.
+			const allActors = Object.keys(task.actorRolesDict);
+			const addSyncEdges = allActors.length > 0;
+
+			// we'll be removing actors from this as we progress through. Start with all of them.
+			let otherActors = allActors.slice();
+
+			for (const actor in task.actorRolesDict) {
+
+				// remove actor from otherActors
+				otherActors = otherActors.splice(otherActors.indexOf(actor), 1);
+
+				const nextTask = task.actorRolesDict[actor].nextTask;
+				let target;
+				if (nextTask) {
+					target = taskToIndexMap.get(nextTask)[actor];
+				} else {
+					const nodeId = nodes.length;
+					nodes.push({ id: nodeId, label: `End of procedure for ${actor}` });
+					target = nodeId;
+					actorEndpoints[actor] = target;
+				}
+				edges.push({
+					source: taskToIndexMap.get(task)[actor],
+					target: target,
+					minutes: task.actorRolesDict[actor].duration.getTotalMinutes(),
+					action: `${actor} performing ${task.title}`
+				});
+
+				if (addSyncEdges) {
+
+					for (const otherActor of otherActors) {
+						edges.push({
+							source: taskToIndexMap.get(task)[actor],
+							target: taskToIndexMap.get(task)[otherActor],
+
+							// FIXME: subtraction may need to be reversed here. I didn't verify.
+							minutes: Duration.subtract(
+								task.actorRolesDict[actor].duration.offset,
+								task.actorRolesDict[otherActor].duration.offset
+							).getTotalMinutes(),
+							action: `${actor} --> ${otherActor} sync offset for ${task.title}`
+						});
+					}
+				}
+			}
+
+		});
+
+		let otherActors = Object.keys(actorEndpoints).slice();
+
+		for (const actor in actorEndpoints) {
+			otherActors = otherActors.splice(otherActors.indexOf(actor), 1);
+
+			for (const otherActor of otherActors) {
+				edges.push({
+					source: actorEndpoints[actor],
+					target: actorEndpoints[otherActor],
+
+					// FIXME: For simplicity, just assuming everyone ends at the same time. For all
+					// planned procedures this is currently true, but this should be generalized for
+					// cases that may include this.
+					minutes: 0,
+					action: `${actor} --> ${otherActor} sync offset for procedure end`
+				});
+			}
+		}
+
+		return { nodes, edges };
+	}
 };
