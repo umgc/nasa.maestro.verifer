@@ -31,7 +31,11 @@ module.exports = {
 		changes.body.content.push(
 			(
 				<React.Fragment key={uuidv4()}>
-					{ this.step.text ? <br /> : null }
+					{
+						this.step.text.length ?
+							this.step.text.map((text) => (<p key={uuidv4()}>{text}</p>)) :
+							null
+					}
 					<strong>{getSetString(this)}</strong>
 				</React.Fragment>
 			)

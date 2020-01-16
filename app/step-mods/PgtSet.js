@@ -180,7 +180,7 @@ module.exports = class PgtSet extends StepModule {
 		});
 
 		// if there is step text, put first PGT text on a new line
-		if (this.step.text) {
+		if (this.step.text.length) {
 			setPGT.break();
 		}
 		changes.body.content.push(setPGT);

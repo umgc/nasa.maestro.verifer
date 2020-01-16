@@ -78,11 +78,6 @@ module.exports = class ApfrInstall extends StepModule {
 
 	alterStepDocx() {
 
-		// const textRuns = [];
-		// if (this.step.text) {
-		// textRuns.push(...this.transform(this.step.text));
-		// }
-
 		const changes = {
 			body: {
 				content: [],
@@ -103,7 +98,7 @@ module.exports = class ApfrInstall extends StepModule {
 			text: `Install APFR in ${this.wif} `
 		});
 
-		if (this.step.text) {
+		if (this.step.text.length) {
 			// if there is step text, put first APFR text on a new line
 			installAPFR.break();
 		}

@@ -119,7 +119,6 @@ module.exports = class ConcurrentStep {
 			def[actor] = [];
 			for (const step of this.subscenes[actor]) {
 				def[actor].push(step.getDefinition());
-				// def[actor].push({ text: step.text, error: 'this is just a test' });
 			}
 		}
 		if (numActors > 1) {
