@@ -13,6 +13,7 @@ const maestro = {
 	YAML: require('js-yaml'),
 
 	// models
+	ColumnsHandler: require('./app/model/ColumnsHandler'),
 	ConcurrentStep: require('./app/model/ConcurrentStep'),
 	Duration: require('./app/model/Duration'),
 	Procedure: require('./app/model/Procedure'),

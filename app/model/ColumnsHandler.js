@@ -3,26 +3,23 @@
 const arrayHelper = require('../helpers/arrayHelper.js');
 const typeHelper = require('../helpers/typeHelper');
 
-let actorToColumn = {};
-let columnToDisplay = {};
-
 function remapActorToColumn(columnsHandler) {
-	actorToColumn = {};
+	columnsHandler.actorToColumn = {};
 	for (const col of columnsHandler.columns) {
 		for (const actor of col.actors) {
-			actorToColumn[actor] = col.key;
+			columnsHandler.actorToColumn[actor] = col.key;
 		}
 	}
 }
 
 function remapColumnKeyToDisplay(columnsHandler) {
-	columnToDisplay = {};
+	columnsHandler.columnToDisplay = {};
 
 	for (const col of columnsHandler.columns) {
 		if (col.display) {
-			columnToDisplay[col.key] = col.display;
+			columnsHandler.columnToDisplay[col.key] = col.display;
 		} else {
-			columnToDisplay[col.key] = col.key;
+			columnsHandler.columnToDisplay[col.key] = col.key;
 		}
 	}
 }
@@ -34,13 +31,32 @@ function doRemapFunctions(columnsHandler) {
 
 module.exports = class ColumnsHandler {
 
-	constructor(columnsDef) {
+	/**
+	 *
+	 * @param {*} columnsDef  Columns definition from procedure file. Example:
+	 *                        [
+	 *                          { key: 'IV', actors: "*", display: 'IV/SSRMS/MCC' },
+	 *                          { key: 'EV1', actors: ['EV1', 'Someone else'], display: 'EV1' }
+	 *                        ]
+	 */
+	constructor(columnsDef = false) {
+		// holds columns info
 		this.columns = [];
+
+		// holds pointers to info in array for convenience
+		this.actorToColumn = {};
+		this.columnToDisplay = {};
+
 		if (columnsDef) {
 			this.updateColumns(columnsDef);
 		}
 	}
 
+	/**
+	 *
+	 * @param {Array} newColumnsDefinition  Columns definition from procedure file. See example in
+	 *                                      constructor function.
+	 */
 	updateColumns(newColumnsDefinition) {
 		// if shrinking the number of columns, need to throw out any of the columns beyond the
 		// length of newColumnsDefinition. Run Array.pop() for each item to be removed. This, rather
@@ -57,6 +73,15 @@ module.exports = class ColumnsHandler {
 		doRemapFunctions(this);
 	}
 
+	/**
+	 *
+	 * @param {number} index      Index of column in this.columns array
+	 * @param {Object} colDef     Definition of a single column from procedures file. Example:
+	 *                              { key: 'IV', display: 'IV/SSRMS/MCC', actors: "*" }
+	 * @param {boolean} doRemaps  Whether to rebuild convenience maps like this.actorToColumn. Can
+	 *                            choose not to do it here so all columns can have updateColumn()
+	 *                            run on them first, then just run the re-maps once afterwards.
+	 */
 	updateColumn(index, colDef, doRemaps = true) {
 
 		if (!this.columns[index] || typeof this.columns[index] !== 'object') {
@@ -77,6 +102,14 @@ module.exports = class ColumnsHandler {
 		}
 	}
 
+	/**
+	 * Builds and returns columns definition like that in procedure file
+	 * @return {Array}  Columns definition. Example:
+	 *                  [
+	 *                    { key: 'IV', display: 'IV/SSRMS/MCC', actors: "*" },
+	 *                    { key: 'EV1', actors: 'EV1', display: 'EV1' }
+	 *                  ]
+	 */
 	getDefinition() {
 		const columnsDefinition = [];
 		this.columns.forEach(function(col, i) {
@@ -92,28 +125,35 @@ module.exports = class ColumnsHandler {
 	}
 
 	/**
-	 * Map actor key to column key. Both strings. Variable actorToColumn is in form:
-	 *   {
-	 *     "*": "IV",
-	 *     "EV1": "EV1",
-	 *     "EV2": "EV2"
-	 *   }
-	 * A more complicated form may be:
-	 *   {
-	 *     "*": "IV",
-	 *     "EV1": "EV1",
-	 *     "ROBO": "EV1"
-	 *   }
-	 * In this second example the "ROBO" actor gets mapped to the EV1 column.
+	 * Get the this.columns[someIndex].key for a given actor. If the actor supplied is not
+	 * explicitly specified in any this.columns[someIndex].actors, then it will return column key
+	 * for a column with a wildcard actor "*" (or error if no wildcard is specified).
 	 *
-	 * @param  {string} actor   key for actor
-	 * @return {string}         key of column (key of primary actor of column)
+	 * @param  {string} actor  actor id string
+	 * @return {string}        key of column (typically also key of primary actor of column), e.g.
+	 *                         this.columns[someIndex].key
 	 */
 	getActorColumnKey(actor) {
-		if (actorToColumn[actor]) {
-			return actorToColumn[actor];
-		} else if (actorToColumn['*']) {
-			return actorToColumn['*']; // wildcard for all others
+
+		/**
+		 * this.actorToColumn is in form:
+		 *   {
+		 *     "*": "IV",
+		 *     "EV1": "EV1",
+		 *     "EV2": "EV2"
+		 *   }
+		 * A more complicated form may be:
+		 *   {
+		 *     "*": "IV",     <-- wildcard to IV column, e.g. getActorColumnKey('anything') --> IV
+		 *     "EV1": "EV1",  <-- EV1 actor maps to EV1 column
+		 *     "ROBO": "EV1"  <-- ROBO actor maps to EV1 column
+		 *   }
+		 * In this second example the "ROBO" actor gets mapped to the EV1 column.
+		 */
+		if (this.actorToColumn[actor]) {
+			return this.actorToColumn[actor];
+		} else if (this.actorToColumn['*']) {
+			return this.actorToColumn['*']; // wildcard for all others
 		} else {
 			throw new Error(
 				`Unknown column for actor ${actor}. Consider adding wildcard * actor to a column`
@@ -121,15 +161,28 @@ module.exports = class ColumnsHandler {
 		}
 	}
 
+	/**
+	 * @param  {string} actor  actor id string
+	 * @return {number}        index of of column object in this.columns
+	 */
 	getActorColumnIndex(actor) {
 		const colKey = this.getActorColumnKey(actor);
 		return this.getColumnKeyIndex(colKey);
 	}
 
+	/**
+	 * Get all values of .key in this.columns[ALL_INDICES].key as an array
+	 * @return {Array}  Example: ['column0key', 'column1key', 'column2key']
+	 */
 	getColumnKeys() {
 		return this.columns.map((col) => col.key);
 	}
 
+	/**
+	 * @param {string} key  key of column (typically also key of primary actor of column), e.g.
+	 *                      this.columns[someIndex].key
+	 * @return {number}     index of of column object in this.columns
+	 */
 	getColumnKeyIndex(key) { // was getColumnIndex
 		for (let c = 0; c < this.columns.length; c++) {
 			if (this.columns[c].key === key) {
@@ -139,13 +192,22 @@ module.exports = class ColumnsHandler {
 		throw new Error(`key ${key} not found in columns`);
 	}
 
+	/**
+	 * @param  {string} actor  actor id string
+	 * @return {string}        Display text for the column, e.g. this.columns[someIndex].display
+	 */
 	getColumnDisplayTextByActor(actor) {
 		const colIndex = this.getActorColumnIndex(actor);
 		return this.columns[colIndex].display.slice();
 	}
 
+	/**
+	 * @param {string} colKey  key of column (typically also key of primary actor of column), e.g.
+	 *                         this.columns[someIndex].key
+	 * @return {string}        Display text for the column, e.g. this.columns[someIndex].display
+	 */
 	getDisplayTextFromColumnKey(colKey) {
-		return columnToDisplay[colKey];
+		return this.columnToDisplay[colKey];
 	}
 
 };
