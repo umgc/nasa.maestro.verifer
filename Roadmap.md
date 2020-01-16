@@ -7,8 +7,10 @@ to maintain the work being done in this document versus opening issues on GitHub
 Up next
 -------
 
-- [ ] output full yaml of procedure and activities in browser console
-- [ ] save yaml to files
+- [x] output full yaml of procedure and activities in browser console
+- [x] show diff of what changed on each step save in console (later maybe show in UI)
+- [x] save yaml to files
+- [ ] push changes to github
 
 Fixes needed
 ------------

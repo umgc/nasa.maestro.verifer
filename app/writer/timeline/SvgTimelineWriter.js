@@ -72,7 +72,7 @@ function addActivity(writer, columnIndex, task, actor) {
 		)
 	};
 	boxOpts.stroke = '#000';
-	boxOpts.fillColor = task.color || '#F0FFFF';
+	boxOpts.fillColor = task.taskReqs.color || '#F0FFFF';
 
 	addBox(canvas, boxOpts);
 
@@ -219,7 +219,7 @@ module.exports = class SvgTimelineWriter extends TimelineWriter {
 
 		// Create the headers for each column
 		this.columns.forEach((actor, index) => {
-			const headerDisplay = this.procedure.getColumnHeaderTextByActor(actor);
+			const headerDisplay = this.procedure.ColumnsHandler.getColumnDisplayTextByActor(actor);
 			addColumnHeader(this, index, headerDisplay);
 		});
 

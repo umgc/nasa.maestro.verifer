@@ -39,7 +39,7 @@ module.exports = class ReactTaskWriter extends TaskWriter {
 		const columnNames = [];
 
 		for (const colKey of columnKeys) {
-			columnNames.push(this.procedure.columnToDisplay[colKey]);
+			columnNames.push(this.procedure.ColumnsHandler.getDisplayTextFromColumnKey(colKey));
 		}
 
 		return columnNames.map((name) => (

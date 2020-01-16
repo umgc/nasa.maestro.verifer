@@ -18,19 +18,27 @@ const EvaDocxProcedureWriter = require('../procedure/EvaDocxProcedureWriter');
 const EvaDocxTaskWriter = require('./EvaDocxTaskWriter');
 
 describe('EvaDocxTaskWriter', function() {
-	const procedure = new Procedure();
-	const procedureFile = path.join(__dirname, '../../../test/cases/simple/procedures/proc.yml');
 
-	const err = procedure.addProcedureDefinitionFromFile(procedureFile);
-	if (err) {
-		throw new Error(err);
-	}
+	let procedure;
+	let procedureFile;
+	let procWriter;
+	let taskWriter;
 
-	const procWriter = new EvaDocxProcedureWriter(new CommanderProgram(), procedure);
-	const taskWriter = new EvaDocxTaskWriter(
-		procedure.tasks[0],
-		procWriter
-	);
+	before(function() {
+		procedure = new Procedure();
+		procedureFile = path.join(__dirname, '../../../test/cases/simple/procedures/proc.yml');
+
+		const err = procedure.addProcedureDefinitionFromFile(procedureFile);
+		if (err) {
+			throw new Error(err);
+		}
+
+		procWriter = new EvaDocxProcedureWriter(new CommanderProgram(), procedure);
+		taskWriter = new EvaDocxTaskWriter(
+			procedure.tasks[0],
+			procWriter
+		);
+	});
 
 	describe('constructor', function() {
 		it('should have correct task columns', function() {
@@ -71,9 +79,14 @@ describe('EvaDocxTaskWriter', function() {
 	});
 
 	describe('writeDivision()', function() {
-		const division0 = taskWriter.writeDivision(taskWriter.task.concurrentSteps[0]);
-		const division4 = taskWriter.writeDivision(taskWriter.task.concurrentSteps[4]);
-		const division5 = taskWriter.writeDivision(taskWriter.task.concurrentSteps[5]);
+
+		let division0, division4, division5;
+
+		before(function() {
+			division0 = taskWriter.writeDivision(taskWriter.task.concurrentSteps[0]);
+			division4 = taskWriter.writeDivision(taskWriter.task.concurrentSteps[4]);
+			division5 = taskWriter.writeDivision(taskWriter.task.concurrentSteps[5]);
+		});
 
 		it('should be a single element array', function() {
 			assert.lengthOf(division0, 1);
@@ -213,6 +226,7 @@ describe('EvaDocxTaskWriter', function() {
 					}
 					it(
 						`should not prefix text with actors=${JSON.stringify(actors)} and columnKeys=${JSON.stringify(colKeys)}`,
+						// eslint-disable-next-line no-loop-func
 						function() {
 							assert.deepEqual(
 								taskWriter.alterStepParagraphOptions(
@@ -233,6 +247,7 @@ describe('EvaDocxTaskWriter', function() {
 				for (const colKeys of [['one'], ['one', 'two', 'three']]) {
 					it(
 						`should prefix text with actors=${JSON.stringify(actors)} and columnKeys=${JSON.stringify(colKeys)}`,
+						// eslint-disable-next-line no-loop-func
 						function() {
 							assert.deepEqual(
 								taskWriter.alterStepParagraphOptions(
@@ -258,6 +273,7 @@ describe('EvaDocxTaskWriter', function() {
 				for (const colKeys of [['one'], ['one', 'two', 'three']]) {
 					it(
 						`should not prefix text with actors=${JSON.stringify(actors)} and columnKeys=${JSON.stringify(colKeys)}`,
+						// eslint-disable-next-line no-loop-func
 						function() {
 							assert.deepEqual(
 								taskWriter.alterStepParagraphOptions(
@@ -277,26 +293,30 @@ describe('EvaDocxTaskWriter', function() {
 	// !        task writers
 	describe('insertStep()', function() {
 
-		const definition = {
-			title: 'This is a step title',
-			step: 'This is step text',
-			checkboxes: [
-				'do stuff',
-				'do things'
-			],
-			duration: { hours: 1, minutes: 2, seconds: 3 }
-		};
+		let step1, step2;
 
-		const def1 = cloneDeep(definition);
-		const def2 = cloneDeep(definition);
+		before(function() {
+			const definition = {
+				title: 'This is a step title',
+				step: 'This is step text',
+				checkboxes: [
+					'do stuff',
+					'do things'
+				],
+				duration: { hours: 1, minutes: 2, seconds: 3 }
+			};
 
-		const tr1 = taskRoleGenerator.getSingleTaskRole('crewX', 'EV7');
-		const tr2 = taskRoleGenerator.getSingleTaskRole('crewX', 'EV7');
+			const def1 = cloneDeep(definition);
+			const def2 = cloneDeep(definition);
 
-		const step1 = new Step(def1, 'EV7', tr1);
-		const step2 = new Step(def2, 'EV7', tr2);
+			const tr1 = taskRoleGenerator.getSingleTaskRole('crewX', 'EV7');
+			const tr2 = taskRoleGenerator.getSingleTaskRole('crewX', 'EV7');
 
-		taskWriter.insertStep(step1);
+			step1 = new Step(def1, 'EV7', tr1);
+			step2 = new Step(def2, 'EV7', tr2);
+
+			taskWriter.insertStep(step1);
+		});
 
 		it('should not modify step object', function() {
 			assert.deepStrictEqual(step1, step2);

@@ -1,5 +1,7 @@
 'use strict';
 
+const cloneDeep = require('lodash/cloneDeep');
+
 const arrayHelper = require('../helpers/arrayHelper');
 const consoleHelper = require('../helpers/consoleHelper');
 const stepModules = require('../step-mods/stepModules');
@@ -7,20 +9,33 @@ const Duration = require('./Duration');
 
 const loadedModules = {};
 
+const props = {
+	strings: ['title'],
+	arrays: ['checkboxes', 'warnings', 'cautions', 'comments', 'notes']
+};
+
 module.exports = class Step {
 
 	constructor(stepYaml, actorIdOrIds, taskRoles) {
 		// Initiate the vars as empty.
-		this.modules = [];
-		this.title = '';
+		for (const prop of props.strings) {
+			this[prop] = '';
+		}
+
+		// FIXME: This can't be in props.strings because the YAML input is "step" not "text", and in
+		// getDefinition() it needs the proper YAML input name. Ultimately probably should change
+		// "step" to "text".
 		this.text = '';
+
+		for (const prop of props.arrays) {
+			this[prop] = [];
+		}
+
+		// handled differently by getDefinition()
 		this.images = [];
-		this.checkboxes = [];
-		this.warnings = [];
-		this.cautions = [];
-		this.comments = [];
-		this.notes = [];
+		this.modules = [];
 		this.substeps = [];
+
 		this.raw = null;
 		this.taskRolesMap = {};
 		this.taskRoles = taskRoles;
@@ -28,6 +43,49 @@ module.exports = class Step {
 		this.mapTaskRolesToActor(taskRoles);
 		this.setActors(stepYaml.actor ? stepYaml.actor : actorIdOrIds);
 		this.populateFromYaml(stepYaml);
+	}
+
+	getDefinition() {
+		const def = {};
+
+		for (const prop of props.strings) {
+			if (this[prop]) {
+				def[prop] = this[prop];
+			}
+		}
+
+		// Currently YAML "step" prop maps to model "text" prop. See comment in constructor.
+		if (this.text) {
+			def.step = this.text;
+		}
+
+		if (this.images.length) {
+			def.images = cloneDeep(this.images);
+		}
+
+		for (const prop of props.arrays) {
+			const parsedValue = arrayHelper.parseToArrayOrString(this[prop].slice());
+			if (parsedValue !== '' && !arrayHelper.isEmptyArray(parsedValue)) {
+				def[prop] = parsedValue;
+			}
+		}
+
+		if (!arrayHelper.isEmptyArray(this.substeps)) {
+			def.substeps = this.substeps.map((substep) => {
+				return substep.getDefinition();
+			});
+		}
+
+		for (const module of this.modules) {
+			def[module.key] = module.getDefinition();
+		}
+
+		const durationDef = this.duration.getDefinition();
+		if (durationDef) {
+			def.duration = durationDef;
+		}
+
+		return def;
 	}
 
 	populateFromYaml(stepYaml) {
@@ -63,10 +121,10 @@ module.exports = class Step {
 				const image = this.images[i];
 
 				if (image.width && !Number.isInteger(image.width) && image.width < 1) {
-					throw new Error(`Width should be empty or a positive integery: ${image.path}`);
+					throw new Error(`Width should be empty or a positive integer: ${image.path}`);
 				}
 				if (image.height && !Number.isInteger(image.height) && image.height < 1) {
-					throw new Error(`Height should be empty or a positive integery: ${image.path}`);
+					throw new Error(`Height should be empty or a positive integer: ${image.path}`);
 				}
 			}
 		}

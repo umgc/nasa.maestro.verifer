@@ -8,15 +8,15 @@ function getSingle(roleName = 'crewX', actorName = 'EV7') {
 		description: 'Person who does XYZ',
 		duration: Object.create({ minutes: 20 })
 	};
-	const procedureTaskInstance = {
+	const taskRequirements = {
 		file: 'foo-task.yml',
 		roles: {},
 		color: '#7FB3D5'
 	};
-	procedureTaskInstance.roles[roleName] = actorName;
+	taskRequirements.roles[roleName] = actorName;
 	const taskRole = new TaskRole(
 		Object.create(roleDef),
-		Object.create(procedureTaskInstance)
+		Object.create(taskRequirements)
 	);
 	const out = {};
 	out[roleName] = taskRole;

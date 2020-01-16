@@ -10,7 +10,7 @@ const typeHelper = require('./typeHelper');
  * @param   {Array|string} stringOrArray  String or array of strings
  * @return  {Array}                       Array of strings
  */
-exports.parseArray = function(stringOrArray) {
+function parseArray(stringOrArray) {
 
 	const array = [];
 
@@ -25,7 +25,41 @@ exports.parseArray = function(stringOrArray) {
 	}
 
 	return array;
-};
+}
+
+/**
+ * @param {Array|string} stringOrArray  An array or string to be converted to an array or string
+ * @return {Array|string}               If input is a string, just return that string. If input is
+ *                                      an array:
+ *                                        (1) of length 0  --> return an empty string
+ *                                        (2) of length 1  --> return the one element as a string
+ *                                        (3) of length >1 --> return the array
+ */
+function parseToArrayOrString(stringOrArray) {
+
+	if (typeof stringOrArray === 'string') {
+		return stringOrArray;
+
+	} else if (Array.isArray(stringOrArray)) {
+
+		// strip any empty strings from the array
+		stringOrArray = stringOrArray.filter((value) => {
+			return value !== '';
+		});
+
+		if (stringOrArray.length === 0) {
+			return '';
+		} else if (stringOrArray.length === 1) {
+			return stringOrArray[0];
+		} else {
+			return stringOrArray;
+		}
+
+	} else {
+		throw new Error(`Expected string or array. Instead got: ${JSON.stringify(stringOrArray)}`);
+	}
+
+}
 
 /**
  * Determine if all array values (must be integer) are 1 or 0 difference from values before and
@@ -34,7 +68,7 @@ exports.parseArray = function(stringOrArray) {
  *                          check for adjacency.
  * @return {boolean}        Whether or not all items are adjacent
  */
-exports.allAdjacent = function(inputArr) {
+function allAdjacent(inputArr) {
 	return inputArr.reduce((acc, cur, i, arr) => {
 		if (!acc) {
 			return false;
@@ -48,7 +82,7 @@ exports.allAdjacent = function(inputArr) {
 			return true;
 		}
 	}, true);
-};
+}
 
 /**
  * If the length of `arr` is less than `count`, repeat the contents of `arr` until it matches count.
@@ -57,7 +91,7 @@ exports.allAdjacent = function(inputArr) {
  * @param  {integer} count How long the array should be
  * @return {Array}         The lengthened (or kept the same) array
  */
-exports.repeatArray = function(arr, count) {
+function repeatArray(arr, count) {
 	typeHelper.errorIfIsnt(arr, 'array');
 	if (arr.length === 0) {
 		throw new Error('Array must have at least one element');
@@ -74,7 +108,7 @@ exports.repeatArray = function(arr, count) {
 		}
 		return b;
 	}
-};
+}
 
 /**
  * Check if an item is within an array
@@ -82,10 +116,26 @@ exports.repeatArray = function(arr, count) {
  * @param {Array} haystack  Array of items to check if needle is within
  * @return {boolean}        Whether or not needle is in haystack
  */
-exports.isAnyOf = function(needle, haystack) {
+function isAnyOf(needle, haystack) {
 	if (haystack.indexOf(needle) === -1) {
 		return false; // needle not in array haystack
 	} else {
 		return true;
 	}
+}
+
+function isEmptyArray(check) {
+	if (!Array.isArray(check)) {
+		return false;
+	}
+	return check.length === 0;
+}
+
+module.exports = {
+	parseArray,
+	parseToArrayOrString,
+	allAdjacent,
+	repeatArray,
+	isAnyOf,
+	isEmptyArray
 };

@@ -36,7 +36,7 @@ module.exports = class WebProgram extends Program {
 					} else {
 						console.log('Procedure loaded. See maestro.app.procedure');
 						const taskLoadPromises = [];
-						for (const task of this.procedure.procedureDefinition.tasks) {
+						for (const task of this.procedure.TasksHandler.tasks) {
 							taskLoadPromises.push(this.loadTask(task.file));
 						}
 						Promise.all(taskLoadPromises)

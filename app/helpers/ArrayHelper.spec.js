@@ -35,6 +35,23 @@ describe('arrayHelper', function() {
 
 	});
 
+	describe('parseToArrayOrString()', function() {
+		const tests = [
+			{ input: 'a string', expected: 'a string' },
+			{ input: ['a string'], expected: 'a string' },
+			{ input: ['two', 'strings'], expected: ['two', 'strings'] },
+			{ input: ['', 'and not empty'], expected: 'and not empty' },
+			{ input: [], expected: '' },
+			{ input: ['', '', '', ''], expected: '' }
+		];
+
+		for (const test of tests) {
+			it(`should return ${test.expected} on input ${test.input}`, function() {
+				assert.deepStrictEqual(arrayHelper.parseToArrayOrString(test.input), test.expected);
+			});
+		}
+	});
+
 	describe('allAdjacent()', function() {
 		const tests = [
 			{ input: [1, 2, 3], expected: true },

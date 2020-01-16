@@ -11,7 +11,7 @@ function getActivity(writer, columnIndex, task, actor) {
 			task.actorRolesDict[actor].duration.getTotalMinutes(), false) + 1
 	};
 	opts.stroke = '#000';
-	opts.fillColor = task.color || '#F0FFFF';
+	opts.fillColor = task.taskReqs.color || '#F0FFFF';
 	opts.marginTop = 0;
 
 	opts.title = task.title.toUpperCase();
@@ -90,7 +90,7 @@ module.exports = class HtmlTimelineWriter extends TimelineWriter {
 
 				if (!columnDisplay[columnIndex]) {
 					columnDisplay[columnIndex] = {
-						header: this.procedure.getColumnHeaderTextByActor(actor),
+						header: this.procedure.ColumnsHandler.getColumnDisplayTextByActor(actor),
 						activityBlocks: []
 					};
 				}

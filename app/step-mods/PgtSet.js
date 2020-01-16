@@ -140,6 +140,14 @@ module.exports = class PgtSet extends StepModule {
 		this.mtlDefault = '30.5';
 	}
 
+	getDefinition() {
+		let def = getCollars(this).join(', ');
+		if (this.socket) {
+			def += `, ${this.socket}`;
+		}
+		return def;
+	}
+
 	alterStepBase() {
 		return {
 			body: {
