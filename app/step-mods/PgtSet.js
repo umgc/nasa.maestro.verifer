@@ -168,29 +168,26 @@ module.exports = class PgtSet extends StepModule {
 	}
 
 	alterStepDocx() {
-		const changes = {
-			body: this.formatStepModAlterations('APPEND')
-		};
 
 		const setPGT = new docx.TextRun({
 			text: getSetString(this),
 			bold: true
 		});
 
-		// if there is step text, put first PGT text on a new line
-		// if (this.step.text.length) {
-		// 	setPGT.break();
-		// }
-		changes.body.content.push(setPGT);
+		// Previously had to do this to separate initial pgt.set text from ordinary step.text, but
+		// now TaskWriter handles putting newlines between all step body elements. See each
+		// (FormatType)TaskWriter.addStepText(). Also no longer have to explicitly add a break
+		// between setPgt and pgtValues TextRuns.
+		// if (this.step.text.length) { setPGT.break(); }
 
-		changes.body.content.push(
-			new docx.TextRun({
-				text: getValueString(this)
-			})
-			// .break() no longer required because now all lines in content have breaks between them
-		);
+		const pgtValues = new docx.TextRun({
+			text: getValueString(this)
+		});
 
-		return changes;
+		return {
+			body: this.formatStepModAlterations('APPEND', [setPGT, pgtValues])
+		};
+
 	}
 
 	alterStepReact() {

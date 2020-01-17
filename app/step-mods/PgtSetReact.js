@@ -16,20 +16,18 @@ module.exports = {
 	 */
 	doAlterStepReact: function(getSetString, getValueString) {
 
-		const setText = (
-			<React.Fragment key={uuidv4()}>
-				<strong>{getSetString(this)}</strong>
-			</React.Fragment>
-		);
-
-		const valuesText = (
-			<React.Fragment key={uuidv4()}>
-				<span>{getValueString(this)}</span>
-			</React.Fragment>
-		);
-
 		return {
-			body: this.formatStepModAlterations('APPEND', [setText, valuesText])
+			body: this.formatStepModAlterations(
+				'APPEND',
+				(
+					<React.Fragment key={uuidv4()}>
+						<strong>{getSetString(this)}</strong>
+						<br />
+						<span>{getValueString(this)}</span>
+					</React.Fragment>
+				)
+			)
+
 		};
 	}
 
