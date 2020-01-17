@@ -1,7 +1,7 @@
 'use strict';
 
 const docx = require('docx');
-const arrayHelper = require('../helpers/arrayHelper');
+const arrayHelper = require('../../helpers/arrayHelper');
 let reactTextTransform; // only load this when needed, because JSX.
 
 function htmlColor(text, color) {

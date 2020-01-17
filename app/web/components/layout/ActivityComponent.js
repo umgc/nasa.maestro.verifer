@@ -3,7 +3,7 @@ const PropTypes = require('prop-types');
 
 const DivisionComponent = require('./DivisionComponent');
 
-const filters = require('../../helpers/filters');
+const filters = require('../../../helpers/filters');
 const maestroKey = require('../helpers/maestroKey');
 
 class ActivityComponent extends React.Component {

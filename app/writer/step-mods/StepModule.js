@@ -1,7 +1,7 @@
 'use strict';
 
-const TextTransform = require('../writer/TextTransform');
-const Abstract = require('../helpers/Abstract');
+const TextTransform = require('../text-transform/TextTransform');
+const Abstract = require('../../helpers/Abstract');
 module.exports = class StepModule extends Abstract {
 
 	constructor() {

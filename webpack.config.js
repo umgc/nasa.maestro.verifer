@@ -25,19 +25,19 @@ module.exports = {
 		// or replacements that provide functionality in the browser.
 		new webpack.NormalModuleReplacementPlugin(
 			/^fs$/,
-			path.resolve(__dirname, './app/mocks/fs.js')
+			path.resolve(__dirname, './app/web/mocks/fs.js')
 		),
 		new webpack.NormalModuleReplacementPlugin(
 			/^child_process$/,
-			path.resolve(__dirname, './app/mocks/child_process.js')
+			path.resolve(__dirname, './app/web/mocks/child_process.js')
 		),
 		new webpack.NormalModuleReplacementPlugin(
 			/^.*\/envHelper$/,
-			path.resolve(__dirname, './app/mocks/envHelper.js')
+			path.resolve(__dirname, './app/web/mocks/envHelper.js')
 		),
 		new webpack.NormalModuleReplacementPlugin(
 			/^image-size$/,
-			path.resolve(__dirname, './app/mocks/image-size.js')
+			path.resolve(__dirname, './app/web/mocks/image-size.js')
 		)
 	],
 

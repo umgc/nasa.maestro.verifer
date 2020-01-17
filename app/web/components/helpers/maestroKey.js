@@ -1,6 +1,6 @@
 'use strict';
 
-const filters = require('../../helpers/filters');
+const filters = require('../../../helpers/filters');
 
 module.exports = {
 	getKey: function(actIndex, divIndex, colKey, stepIndex) {

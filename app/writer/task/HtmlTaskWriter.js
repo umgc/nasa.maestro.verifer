@@ -8,7 +8,7 @@ const nunjucks = require('../../model/nunjucksEnvironment');
 const consoleHelper = require('../../helpers/consoleHelper');
 const envHelper = require('../../helpers/envHelper');
 const TaskWriter = require('./TaskWriter');
-const TextTransform = require('../TextTransform');
+const TextTransform = require('../text-transform/TextTransform');
 
 module.exports = class HtmlTaskWriter extends TaskWriter {
 

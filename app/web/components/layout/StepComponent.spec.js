@@ -8,8 +8,8 @@
 const React = require('react');
 const assert = require('chai').assert;
 
-const taskWriterGenerator = require('../../../test/generators/taskWriterGenerator');
-const stepModelGenerator = require('../../../test/generators/stepModelGenerator');
+const taskWriterGenerator = require('../../../../test/generators/taskWriterGenerator');
+const stepModelGenerator = require('../../../../test/generators/stepModelGenerator');
 
 const StepComponent = require('./StepComponent');
 
