@@ -273,7 +273,11 @@ module.exports = class Procedure {
 			taskDefinitions[task.file] = YAML.safeLoad(fs.readFileSync(taskFileName, 'utf8'));
 		}
 
-		this.updateTaskDefinitions(taskDefinitions);
+		const err = this.updateTaskDefinitions(taskDefinitions);
+		if (err) {
+			throw err;
+		}
+
 	}
 
 	/**
