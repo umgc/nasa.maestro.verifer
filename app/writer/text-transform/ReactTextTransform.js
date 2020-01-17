@@ -2,7 +2,7 @@
 
 const React = require('react');
 const uuidv4 = require('uuid/v4');
-const arrayHelper = require('../helpers/arrayHelper');
+const arrayHelper = require('../../helpers/arrayHelper');
 
 // NOTE: The keys in the object below must all be present within TextTransform's 'transforms' array
 const reactTransforms = {

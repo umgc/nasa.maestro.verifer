@@ -6,7 +6,7 @@ const React = require('react');
 const SeriesComponent = require('../../web/components/layout/SeriesComponent');
 
 const getImageFileDimensions = require('image-size');
-const TextTransform = require('../TextTransform');
+const TextTransform = require('../text-transform/TextTransform');
 
 const maestroKey = require('../../web/components/helpers/maestroKey');
 const uuidv4 = require('uuid/v4');

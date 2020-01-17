@@ -8,7 +8,7 @@ const arrayHelper = require('../../helpers/arrayHelper');
 const typeHelper = require('../../helpers/typeHelper');
 
 const TaskWriter = require('./TaskWriter');
-const TextTransform = require('../TextTransform');
+const TextTransform = require('../text-transform/TextTransform');
 
 module.exports = class DocxTaskWriter extends TaskWriter {
 
