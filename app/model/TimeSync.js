@@ -431,39 +431,12 @@ module.exports = class TimeSync {
 	 * @return {Object}  Object with nodes and edges, in form:
 	 *                   const data = {
 	 *                     nodes: [
-	 *                       { id: 0, label: 'Start of Egress/Setup for EV1' },
-	 *                       { id: 1, label: 'Start of Egress/Setup for EV2' },
- 	 *                       { id: 2, label: 'Start of Some Task for EV1' },
- 	 *                       { id: 3, label: 'Start of Some Task for EV2' },
- 	 *                       { id: 4, label: 'Start of Cleanup/Ingress for EV1' },
- 	 *                       { id: 5, label: 'Start of Cleanup/Ingress for EV2' },
- 	 *                       { id: 6, label: 'End of procedure for EV1' },
- 	 *                       { id: 7, label: 'End of procedure for EV2' }
- 	 *                     ],
+	 *                       { id: 0, label: "some label" }, { id: 1, ... }, ...
+	 *                     ],
  	 *                     links: [
- 	 *                       { source: 0, target: 2, minutes: 60, actor: 'EV1' },
-	 *                       {
-	 *                         source: 0, target: 1, minutes: 0,
-	 *                         actor: 'EV1 --> EV2 sync offset for Egress/Setup'
-	 *                       },
- 	 *                       { source: 1, target: 3, minutes: 45, actor: 'EV2' },
- 	 *                       { source: 2, target: 4, minutes: 45, actor: 'EV1' },
-	 *                       {
-	 *                         source: 2, target: 3, minutes: 15,
-	 *                         actor: 'EV1 --> EV2 sync offset for Some Task'
-	 *                       },
- 	 *                       { source: 3, target: 5, minutes: 60, actor: 'EV2' },
- 	 *                       { source: 4, target: 6, minutes: 30, actor: 'EV1' },
-	 *                       {
-	 *                         source: 4, target: 5, minutes: 0,
-	 *                         actor: 'EV1 --> EV2 sync offset for Cleanup/Ingress'
-	 *                       },
- 	 *                       { source: 5, target: 7, minutes: 30, actor: 'EV2' },
-	 *                       {
-	 *                         source: 6, target: 7, minutes: 0,
-	 *                         actor: 'EV1 --> EV2 sync offset for procedure end'
-	 *                       },
- 	 *                     ]
+	 *                       { source: 0, target: 2, minutes: 25, action: "some text" },
+	 *                       { source: 1, ... }, ...
+	 *                     ]
 	 *                   };
 	 */
 	getStnGraph() {
