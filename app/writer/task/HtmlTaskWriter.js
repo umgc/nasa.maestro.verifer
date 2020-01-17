@@ -120,7 +120,6 @@ module.exports = class HtmlTaskWriter extends TaskWriter {
 
 				// if there is more than one line, separate them with break
 				if (s > 0) {
-					console.log(stepText);
 					texts.push('<br />');
 				}
 
@@ -129,12 +128,6 @@ module.exports = class HtmlTaskWriter extends TaskWriter {
 		} else {
 			throw new Error('addStepText() stepText must be string or array');
 		}
-
-		// FIXMEFIXMEFIXME
-		// console.log('\n\n');
-		// console.log(texts);
-		// const transformed = texts.join('');
-		// console.log(transformed);
 
 		// added class li-level-${options.level} really just as a way to remind that
 		// some handling of this will be necessary

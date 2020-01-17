@@ -148,7 +148,10 @@ module.exports = class PgtSet extends StepModule {
 
 	alterStepBase() {
 		return {
-			body: this.formatStepModAlterations('APPEND', `${getSetString(this)} ${getValueString(this)}`)
+			body: this.formatStepModAlterations(
+				'APPEND',
+				`${getSetString(this)} ${getValueString(this)}`
+			)
 		};
 	}
 
@@ -156,7 +159,10 @@ module.exports = class PgtSet extends StepModule {
 		return {
 			body: this.formatStepModAlterations(
 				'APPEND',
-				`<strong>${getSetString(this)}</strong><br />${getValueString(this)}`
+				[
+					`<strong>${getSetString(this)}</strong>`,
+					getValueString(this)
+				]
 			)
 		};
 	}
@@ -172,15 +178,16 @@ module.exports = class PgtSet extends StepModule {
 		});
 
 		// if there is step text, put first PGT text on a new line
-		if (this.step.text.length) {
-			setPGT.break();
-		}
+		// if (this.step.text.length) {
+		// 	setPGT.break();
+		// }
 		changes.body.content.push(setPGT);
 
 		changes.body.content.push(
 			new docx.TextRun({
 				text: getValueString(this)
-			}).break()
+			})
+			// .break() no longer required because now all lines in content have breaks between them
 		);
 
 		return changes;

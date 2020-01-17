@@ -18,19 +18,12 @@ module.exports = {
 
 		const setText = (
 			<React.Fragment key={uuidv4()}>
-				{
-					// Note: if there is step text, put first PGT text on a new line
-					this.step.text.length ?
-						this.step.text.map((text) => (<p key={uuidv4()}>{text}</p>)) :
-						null
-				}
 				<strong>{getSetString(this)}</strong>
 			</React.Fragment>
 		);
 
 		const valuesText = (
 			<React.Fragment key={uuidv4()}>
-				<br />
 				<span>{getValueString(this)}</span>
 			</React.Fragment>
 		);
