@@ -6,7 +6,7 @@ const envHelper = require('../helpers/envHelper');
 
 let loader;
 if (envHelper.isNode) {
-	loader = new nunjucks.FileSystemLoader(path.join(__dirname, '../view'));
+	loader = new nunjucks.FileSystemLoader(path.join(__dirname, '../writer/nunjucks-templates'));
 } else {
 	loader = new nunjucks.WebLoader('/maestro-views');
 }

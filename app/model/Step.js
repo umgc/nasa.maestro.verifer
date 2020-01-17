@@ -4,7 +4,7 @@ const cloneDeep = require('lodash/cloneDeep');
 
 const arrayHelper = require('../helpers/arrayHelper');
 const consoleHelper = require('../helpers/consoleHelper');
-const stepModules = require('../step-mods/stepModules');
+const stepModules = require('../writer/step-mods/stepModules');
 const Duration = require('./Duration');
 
 const loadedModules = {};
@@ -154,7 +154,7 @@ module.exports = class Step {
 		for (const module of stepModules) {
 			if (stepYaml[module.key]) {
 				if (!loadedModules[module.key]) {
-					loadedModules[module.key] = require(`../step-mods/${module.class}`);
+					loadedModules[module.key] = require(`../writer/step-mods/${module.class}`);
 				}
 
 				// todo for any modules already in this.modules:

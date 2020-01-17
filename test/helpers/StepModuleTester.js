@@ -5,7 +5,7 @@
 
 const assert = require('chai').assert;
 const Step = require('../../app/model/Step');
-const stepModules = require('../../app/step-mods/stepModules');
+const stepModules = require('../../app/writer/step-mods/stepModules');
 
 const taskRoleGenerator = require('../generators/taskRoleGenerator');
 
@@ -13,7 +13,7 @@ module.exports = class StepModuleTester {
 
 	constructor(moduleKey) {
 		this.moduleInfo = this.getModuleInfo(moduleKey);
-		this.ModuleClass = require(`../../app/step-mods/${this.moduleInfo.class}`);
+		this.ModuleClass = require(`../../app/writer/step-mods/${this.moduleInfo.class}`);
 		this.goodInputs = [];
 		this.badInputs = [];
 		// const asdf = new Asdf();

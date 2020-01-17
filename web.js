@@ -24,10 +24,10 @@ const maestro = {
 	WebProgram: require('./app/model/WebProgram'),
 
 	// Step Modules
-	ApfrInstall: require('./app/step-mods/ApfrInstall'),
-	PgtSet: require('./app/step-mods/PgtSet'),
-	StepModule: require('./app/step-mods/StepModule'),
-	stepModules: require('./app/step-mods/stepModules'),
+	ApfrInstall: require('./app/writer/step-mods/ApfrInstall'),
+	PgtSet: require('./app/writer/step-mods/PgtSet'),
+	StepModule: require('./app/writer/step-mods/StepModule'),
+	stepModules: require('./app/writer/step-mods/stepModules'),
 
 	// helpers
 	typeHelper: require('./app/helpers/typeHelper'),

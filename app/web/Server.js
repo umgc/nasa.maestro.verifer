@@ -26,7 +26,11 @@ module.exports = class Server {
 
 			// Serve application resources
 			{ webPath: 'maestro', localBase: __dirname, localRelative: '../../build' },
-			{ webPath: 'maestro-views', localBase: __dirname, localRelative: '../view' }
+			{
+				webPath: 'maestro-views',
+				localBase: __dirname,
+				localRelative: '../writer/nunjucks-templates'
+			}
 		];
 
 		this.app.use(express.json());
