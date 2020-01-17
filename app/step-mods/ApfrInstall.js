@@ -69,29 +69,26 @@ module.exports = class ApfrInstall extends StepModule {
 
 	alterStepBase() {
 		return {
-			body: {
-				content: [`Install APFR in ${this.wif} [${getSettings(this).join(',')}]`],
-				type: 'APPEND'
-			}
+			body: this.formatStepModAlterations(
+				'APPEND',
+				`Install APFR in ${this.wif} [${getSettings(this).join(',')}]`
+			)
 		};
 	}
 
 	alterStepDocx() {
 
 		const changes = {
-			body: {
-				content: [],
-				type: 'APPEND'
-			},
-			checkboxes: {
+			body: this.formatStepModAlterations('APPEND'),
+			checkboxes: this.formatStepModAlterations(
+				'PREPEND',
 				// push some checkboxes onto the front
-				content: [
+				[
 					'Pull/twist test',
 					'Black-on-black',
 					'pitch knob locked, can be depressed'
-				],
-				type: 'PREPEND'
-			}
+				]
+			)
 		};
 
 		const installAPFR = new docx.TextRun({

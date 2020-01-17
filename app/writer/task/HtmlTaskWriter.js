@@ -115,8 +115,6 @@ module.exports = class HtmlTaskWriter extends TaskWriter {
 				if (typeof elem === 'string') {
 					elem = this.textTransform.transform(elem);
 				} else if (!Array.isArray(elem)) {
-					console.log('This should not happen'); // FIXME
-					console.log(elem);
 					throw new Error('Expect string or array');
 				}
 

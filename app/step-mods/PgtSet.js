@@ -2,8 +2,6 @@
 
 const StepModule = require('./StepModule');
 const docx = require('docx');
-// FIXME const uuidv4 = require('uuid/v4');
-let reactStepModuleFunctions;
 
 const validSettings = {
 	torque: {
@@ -117,7 +115,7 @@ function getMtlAndSocket(mtlOrSocket, socketOrNull = null) {
 module.exports = class PgtSet extends StepModule {
 
 	constructor(step, stepYaml) {
-		super('APPEND');
+		super();
 		this.key = 'pgt.set';
 		this.step = step;
 		this.raw = stepYaml;
@@ -150,28 +148,22 @@ module.exports = class PgtSet extends StepModule {
 
 	alterStepBase() {
 		return {
-			body: {
-				content: [`${getSetString(this)} ${getValueString(this)}`],
-				type: 'APPEND'
-			}
+			body: this.formatStepModAlterations('APPEND', `${getSetString(this)} ${getValueString(this)}`)
 		};
 	}
 
 	alterStepHtml() {
 		return {
-			body: {
-				content: [`<strong>${getSetString(this)}</strong><br />${getValueString(this)}`],
-				type: 'APPEND'
-			}
+			body: this.formatStepModAlterations(
+				'APPEND',
+				`<strong>${getSetString(this)}</strong><br />${getValueString(this)}`
+			)
 		};
 	}
 
 	alterStepDocx() {
 		const changes = {
-			body: {
-				content: [],
-				type: 'APPEND'
-			}
+			body: this.formatStepModAlterations('APPEND')
 		};
 
 		const setPGT = new docx.TextRun({
@@ -195,14 +187,7 @@ module.exports = class PgtSet extends StepModule {
 	}
 
 	alterStepReact() {
-		if (!reactStepModuleFunctions) {
-			reactStepModuleFunctions = require('./PgtSetReact');
-		}
-		if (!this.doAlterStepReact) {
-			this.doAlterStepReact = reactStepModuleFunctions.doAlterStepReact;
-			PgtSet.prototype.doAlterStepReact = reactStepModuleFunctions.doAlterStepReact;
-		}
-
+		this.setupAlterStepReact();
 		return this.doAlterStepReact(getSetString, getValueString);
 	}
 
