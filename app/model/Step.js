@@ -80,7 +80,7 @@ module.exports = class Step {
 			def[module.key] = module.getDefinition();
 		}
 
-		const durationDef = this.duration.getDefinition();
+		const durationDef = this.duration ? this.duration.getDefinition() : false;
 		if (durationDef) {
 			def.duration = durationDef;
 		}
