@@ -8,7 +8,7 @@ const stateHandler = require('../state/index');
 const HeaderComponent = require('./layout/HeaderComponent');
 const ProcedureViewerComponent = require('./pages/ProcedureViewerComponent');
 const ProcedureSelectorComponent = require('./pages/ProcedureSelectorComponent');
-const ReactProcedureWriter = require('../writer/procedure/ReactProcedureWriter');
+const ReactProcedureWriter = require('../../writer/procedure/ReactProcedureWriter');
 
 const changes = {
 	lastDefinitionYaml: null,

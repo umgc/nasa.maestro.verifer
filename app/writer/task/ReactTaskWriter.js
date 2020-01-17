@@ -3,12 +3,12 @@
 const path = require('path');
 const React = require('react');
 
-const SeriesComponent = require('../../components/layout/SeriesComponent');
+const SeriesComponent = require('../../web/components/layout/SeriesComponent');
 
 const getImageFileDimensions = require('image-size');
 const TextTransform = require('../TextTransform');
 
-const maestroKey = require('../../components/helpers/maestroKey');
+const maestroKey = require('../../web/components/helpers/maestroKey');
 const uuidv4 = require('uuid/v4');
 
 const TaskWriter = require('./HtmlTaskWriter');

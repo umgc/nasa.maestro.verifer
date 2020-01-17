@@ -11,7 +11,7 @@ const EvaDocxProcedureWriter = require('../writer/procedure/EvaDocxProcedureWrit
 const SodfDocxProcedureWriter = require('../writer/procedure/SodfDocxProcedureWriter');
 const EvaHtmlProcedureWriter = require('../writer/procedure/EvaHtmlProcedureWriter');
 
-const Server = require('../server/Server');
+const Server = require('../web/Server');
 
 function handleProjectPath(projectPath) {
 	if (projectPath) {

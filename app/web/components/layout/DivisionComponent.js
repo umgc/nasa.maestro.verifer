@@ -1,6 +1,6 @@
 const React = require('react');
 const PropTypes = require('prop-types');
-const ReactTaskWriter = require('../../writer/task/ReactTaskWriter');
+const ReactTaskWriter = require('../../../writer/task/ReactTaskWriter');
 
 class DivisionComponent extends React.Component {
 

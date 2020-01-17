@@ -2,7 +2,7 @@
 
 const React = require('react');
 const ReactDOM = require('react-dom');
-const App = require('./app/components/App');
+const App = require('./app/web/components/App');
 
 /**
  * NOTE: Below is deliberately over-exposing modules for now. This is intended for exploring how
@@ -39,11 +39,11 @@ const maestro = {
 	// state
 	// for now just a lazy way to make a globalish-accessible state container
 	// this will get replaced by redux or something at some point, or just made less stupid
-	state: require('./app/state/index')
+	state: require('./app/web/state/index')
 
 };
 
-// require('./app/ui/timeline');
+// require('./app/web/ui/timeline');
 
 maestro.app = new maestro.WebProgram();
 
