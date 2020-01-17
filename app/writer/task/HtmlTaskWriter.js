@@ -116,11 +116,13 @@ module.exports = class HtmlTaskWriter extends TaskWriter {
 					elem = this.textTransform.transform(elem);
 				} else if (!Array.isArray(elem)) {
 					console.log('This should not happen'); // FIXME
+					console.log(elem);
 					throw new Error('Expect string or array');
 				}
 
 				// if there is more than one line, separate them with break
 				if (s > 0) {
+					console.log(stepText);
 					texts.push('<br />');
 				}
 

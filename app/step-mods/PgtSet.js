@@ -151,7 +151,7 @@ module.exports = class PgtSet extends StepModule {
 	alterStepBase() {
 		return {
 			body: {
-				content: `${getSetString(this)} ${getValueString(this)}`,
+				content: [`${getSetString(this)} ${getValueString(this)}`],
 				type: 'APPEND'
 			}
 		};
@@ -160,7 +160,7 @@ module.exports = class PgtSet extends StepModule {
 	alterStepHtml() {
 		return {
 			body: {
-				content: `<strong>${getSetString(this)}</strong><br />${getValueString(this)}`,
+				content: [`<strong>${getSetString(this)}</strong><br />${getValueString(this)}`],
 				type: 'APPEND'
 			}
 		};

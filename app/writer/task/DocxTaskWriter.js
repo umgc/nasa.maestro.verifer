@@ -317,7 +317,7 @@ module.exports = class DocxTaskWriter extends TaskWriter {
 				if (typeof elem === 'string') {
 					elem = this.textTransform.transform(elem);
 				} else if (!Array.isArray(elem)) {
-					console.log('This should not happen'); // FIXME
+					// elem is a TextRun object
 					elem = [elem];
 				}
 

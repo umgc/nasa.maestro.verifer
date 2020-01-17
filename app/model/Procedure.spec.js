@@ -3,7 +3,9 @@
 
 'use strict';
 
+const assert = require('chai').assert;
 const expect = require('chai').expect;
+
 const sinon = require('sinon');
 const path = require('path');
 
@@ -37,8 +39,11 @@ describe('Procedure', function() {
 		expect(procedure.tasks[0].concurrentSteps[0].subscenes.EV1).to.be.an('array');
 		expect(procedure.tasks[0].concurrentSteps[0].subscenes.EV1).to.have.all.keys(0);
 
-		expect(procedure.tasks[0].concurrentSteps[0].subscenes.EV1[0].text).to.be.a('string');
-		expect(procedure.tasks[0].concurrentSteps[0].subscenes.EV1[0].text).to.equal('Go Outside');
+		assert.isArray(procedure.tasks[0].concurrentSteps[0].subscenes.EV1[0].text);
+		assert.strictEqual(
+			procedure.tasks[0].concurrentSteps[0].subscenes.EV1[0].text[0],
+			'Go Outside'
+		);
 	};
 
 	const procedureDefinition1 = {

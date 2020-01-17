@@ -70,7 +70,7 @@ module.exports = class ApfrInstall extends StepModule {
 	alterStepBase() {
 		return {
 			body: {
-				content: `Install APFR in ${this.wif} [${getSettings(this).join(',')}]`,
+				content: [`Install APFR in ${this.wif} [${getSettings(this).join(',')}]`],
 				type: 'APPEND'
 			}
 		};
