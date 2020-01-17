@@ -22,7 +22,7 @@ const goodSettings = [
 			},
 			alterStepBase: {
 				body: {
-					content: 'Install APFR in SSRMS [6,PP,F,6]',
+					content: ['Install APFR in SSRMS [6,PP,F,6]'],
 					type: 'APPEND'
 				}
 			}
@@ -44,7 +44,7 @@ const goodSettings = [
 			},
 			alterStepBase: {
 				body: {
-					content: 'Install APFR in P6 WIF 1 [12,RR,G,11]',
+					content: ['Install APFR in P6 WIF 1 [12,RR,G,11]'],
 					type: 'APPEND'
 				}
 			}

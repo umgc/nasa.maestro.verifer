@@ -2,8 +2,6 @@
 
 const StepModule = require('./StepModule');
 const docx = require('docx');
-// FIXME const uuidv4 = require('uuid/v4');
-let reactStepModuleFunctions;
 
 const validSettings = {
 	torque: {
@@ -117,7 +115,7 @@ function getMtlAndSocket(mtlOrSocket, socketOrNull = null) {
 module.exports = class PgtSet extends StepModule {
 
 	constructor(step, stepYaml) {
-		super('APPEND');
+		super();
 		this.key = 'pgt.set';
 		this.step = step;
 		this.raw = stepYaml;
@@ -150,59 +148,50 @@ module.exports = class PgtSet extends StepModule {
 
 	alterStepBase() {
 		return {
-			body: {
-				content: `${getSetString(this)} ${getValueString(this)}`,
-				type: 'APPEND'
-			}
+			body: this.formatStepModAlterations(
+				'APPEND',
+				`${getSetString(this)} ${getValueString(this)}`
+			)
 		};
 	}
 
 	alterStepHtml() {
 		return {
-			body: {
-				content: `<strong>${getSetString(this)}</strong><br />${getValueString(this)}`,
-				type: 'APPEND'
-			}
+			body: this.formatStepModAlterations(
+				'APPEND',
+				[
+					`<strong>${getSetString(this)}</strong>`,
+					getValueString(this)
+				]
+			)
 		};
 	}
 
 	alterStepDocx() {
-		const changes = {
-			body: {
-				content: [],
-				type: 'APPEND'
-			}
-		};
 
 		const setPGT = new docx.TextRun({
 			text: getSetString(this),
 			bold: true
 		});
 
-		// if there is step text, put first PGT text on a new line
-		if (this.step.text) {
-			setPGT.break();
-		}
-		changes.body.content.push(setPGT);
+		// Previously had to do this to separate initial pgt.set text from ordinary step.text, but
+		// now TaskWriter handles putting newlines between all step body elements. See each
+		// (FormatType)TaskWriter.addStepText(). Also no longer have to explicitly add a break
+		// between setPgt and pgtValues TextRuns.
+		// if (this.step.text.length) { setPGT.break(); }
 
-		changes.body.content.push(
-			new docx.TextRun({
-				text: getValueString(this)
-			}).break()
-		);
+		const pgtValues = new docx.TextRun({
+			text: getValueString(this)
+		});
 
-		return changes;
+		return {
+			body: this.formatStepModAlterations('APPEND', [setPGT, pgtValues])
+		};
+
 	}
 
 	alterStepReact() {
-		if (!reactStepModuleFunctions) {
-			reactStepModuleFunctions = require('./PgtSetReact');
-		}
-		if (!this.doAlterStepReact) {
-			this.doAlterStepReact = reactStepModuleFunctions.doAlterStepReact;
-			PgtSet.prototype.doAlterStepReact = reactStepModuleFunctions.doAlterStepReact;
-		}
-
+		this.setupAlterStepReact();
 		return this.doAlterStepReact(getSetString, getValueString);
 	}
 

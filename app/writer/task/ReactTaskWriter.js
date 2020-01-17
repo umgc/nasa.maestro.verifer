@@ -224,6 +224,8 @@ module.exports = class ReactTaskWriter extends TaskWriter {
 				let elem = stepText[s];
 				if (typeof elem === 'string') {
 					elem = this.textTransform.transform(elem);
+				} else {
+					console.log(elem);
 				}
 				// else { assume it's a react object }
 
@@ -240,7 +242,7 @@ module.exports = class ReactTaskWriter extends TaskWriter {
 					(<strong>{actorText}: </strong>) :
 					(<React.Fragment></React.Fragment>)
 				}
-				{stepTextComponent}
+				{stepTextComponent.map((t) => (<p key={uuidv4()}>{t}</p>))}
 			</div>
 		);
 	}

@@ -19,7 +19,7 @@ const goodSettings = [
 			},
 			alterStepBase: {
 				body: {
-					content: 'PGT [B7, CCW2] (25.5 ft-lb, 30 RPM, MTL 30.5)',
+					content: ['PGT [B7, CCW2] (25.5 ft-lb, 30 RPM, MTL 30.5)'],
 					type: 'APPEND'
 				}
 			}
@@ -37,7 +37,7 @@ const goodSettings = [
 			},
 			alterStepBase: {
 				body: {
-					content: 'PGT [B1, CCW1] (12.0 ft-lb, 10 RPM, MTL 30.5) - 6" Wobble',
+					content: ['PGT [B1, CCW1] (12.0 ft-lb, 10 RPM, MTL 30.5) - 6" Wobble'],
 					type: 'APPEND'
 				}
 			}
@@ -55,7 +55,7 @@ const goodSettings = [
 			},
 			alterStepBase: {
 				body: {
-					content: 'PGT [A7, CW2, 30.5] (9.2 ft-lb, 30 RPM, MTL 30.5)',
+					content: ['PGT [A7, CW2, 30.5] (9.2 ft-lb, 30 RPM, MTL 30.5)'],
 					type: 'APPEND'
 				}
 			}
@@ -73,7 +73,7 @@ const goodSettings = [
 			},
 			alterStepBase: {
 				body: {
-					content: 'PGT [B1, CW1, 2.5] (12.0 ft-lb, 10 RPM, MTL 2.5)',
+					content: ['PGT [B1, CW1, 2.5] (12.0 ft-lb, 10 RPM, MTL 2.5)'],
 					type: 'APPEND'
 				}
 			}
@@ -91,7 +91,7 @@ const goodSettings = [
 			},
 			alterStepBase: {
 				body: {
-					content: 'PGT [B7, CW2, 2.5] (25.5 ft-lb, 30 RPM, MTL 2.5) - 7/16 x 18" Wobble Socket',
+					content: ['PGT [B7, CW2, 2.5] (25.5 ft-lb, 30 RPM, MTL 2.5) - 7/16 x 18" Wobble Socket'],
 					type: 'APPEND'
 				}
 			}
@@ -110,7 +110,7 @@ const goodSettings = [
 			},
 			alterStepBase: {
 				body: {
-					content: 'PGT [B7, CW2] (25.5 ft-lb, 30 RPM, MTL 30.5)',
+					content: ['PGT [B7, CW2] (25.5 ft-lb, 30 RPM, MTL 30.5)'],
 					type: 'APPEND'
 				}
 			}

@@ -3,6 +3,7 @@
 
 'use strict';
 
+const assert = require('chai').assert;
 const expect = require('chai').expect;
 const YAML = require('js-yaml');
 
@@ -56,8 +57,8 @@ describe('ConcurrentStep constructor - Positive Testing', function() {
 			expect(concurrentStep.subscenes.EV1).to.be.an('array');
 			expect(concurrentStep.subscenes.EV1).to.have.all.keys(0);
 
-			expect(concurrentStep.subscenes.EV1[0].text).to.be.a('string');
-			expect(concurrentStep.subscenes.EV1[0].text).to.equal('Go Outside');
+			assert.isArray(concurrentStep.subscenes.EV1[0].text);
+			assert.strictEqual(concurrentStep.subscenes.EV1[0].text[0], 'Go Outside');
 		});
 	});
 
@@ -77,8 +78,8 @@ describe('ConcurrentStep constructor - Positive Testing', function() {
 			expect(concurrentStep.subscenes.EV1).to.be.an('array');
 			expect(concurrentStep.subscenes.EV1).to.have.all.keys(0);
 
-			expect(concurrentStep.subscenes.EV1[0].text).to.be.a('string');
-			expect(concurrentStep.subscenes.EV1[0].text).to.equal('Go Outside');
+			assert.isArray(concurrentStep.subscenes.EV1[0].text);
+			assert.strictEqual(concurrentStep.subscenes.EV1[0].text[0], 'Go Outside');
 		});
 	});
 
@@ -100,17 +101,18 @@ describe('ConcurrentStep constructor - Positive Testing', function() {
 			expect(concurrentStep.subscenes.EV1).to.exist;
 			expect(concurrentStep.subscenes.EV1).to.be.an('array');
 			expect(concurrentStep.subscenes.EV1).to.have.all.keys(0);
-			expect(concurrentStep.subscenes.EV1[0].text).to.be.a('string');
-			expect(concurrentStep.subscenes.EV1[0].text).to.equal('Go Outside');
+			assert.isArray(concurrentStep.subscenes.EV1[0].text);
+			assert.strictEqual(concurrentStep.subscenes.EV1[0].text[0], 'Go Outside');
 
 			// eslint-disable-next-line no-unused-expressions
 			expect(concurrentStep.subscenes.EV2).to.exist;
 			expect(concurrentStep.subscenes.EV2).to.be.an('array');
 			expect(concurrentStep.subscenes.EV2).to.have.all.keys(0, 1);
-			expect(concurrentStep.subscenes.EV2[0].text).to.be.a('string');
-			expect(concurrentStep.subscenes.EV2[0].text).to.equal('Stay Inside');
-			expect(concurrentStep.subscenes.EV2[1].text).to.be.a('string');
-			expect(concurrentStep.subscenes.EV2[1].text).to.equal('Watch EV1');
+
+			assert.isArray(concurrentStep.subscenes.EV2[0].text);
+			assert.strictEqual(concurrentStep.subscenes.EV2[0].text[0], 'Stay Inside');
+			assert.isArray(concurrentStep.subscenes.EV2[1].text);
+			assert.strictEqual(concurrentStep.subscenes.EV2[1].text[0], 'Watch EV1');
 		});
 	});
 
@@ -132,17 +134,17 @@ describe('ConcurrentStep constructor - Positive Testing', function() {
 			expect(concurrentStep.subscenes.EV1).to.exist;
 			expect(concurrentStep.subscenes.EV1).to.be.an('array');
 			expect(concurrentStep.subscenes.EV1).to.have.all.keys(0);
-			expect(concurrentStep.subscenes.EV1[0].text).to.be.a('string');
-			expect(concurrentStep.subscenes.EV1[0].text).to.equal('Go Outside');
+			assert.isArray(concurrentStep.subscenes.EV1[0].text);
+			assert.strictEqual(concurrentStep.subscenes.EV1[0].text[0], 'Go Outside');
 
 			// eslint-disable-next-line no-unused-expressions
 			expect(concurrentStep.subscenes.EV2).to.exist;
 			expect(concurrentStep.subscenes.EV2).to.be.an('array');
 			expect(concurrentStep.subscenes.EV2).to.have.all.keys(0, 1);
-			expect(concurrentStep.subscenes.EV2[0].text).to.be.a('string');
-			expect(concurrentStep.subscenes.EV2[0].text).to.equal('Stay Inside');
-			expect(concurrentStep.subscenes.EV2[1].text).to.be.a('string');
-			expect(concurrentStep.subscenes.EV2[1].text).to.equal('Watch EV1');
+			assert.isArray(concurrentStep.subscenes.EV2[0].text);
+			assert.strictEqual(concurrentStep.subscenes.EV2[0].text[0], 'Stay Inside');
+			assert.isArray(concurrentStep.subscenes.EV2[1].text);
+			assert.strictEqual(concurrentStep.subscenes.EV2[1].text[0], 'Watch EV1');
 		});
 	});
 });

@@ -4,6 +4,8 @@
 'use strict';
 
 const expect = require('chai').expect;
+const assert = require('chai').assert;
+
 const YAML = require('js-yaml');
 
 const Task = require('./Task');
@@ -52,8 +54,9 @@ describe('Task constructor - Positive Testing', function() {
 			expect(task.concurrentSteps[0].subscenes.EV1).to.be.an('array');
 			expect(task.concurrentSteps[0].subscenes.EV1).to.have.all.keys(0);
 
-			expect(task.concurrentSteps[0].subscenes.EV1[0].text).to.be.a('string');
-			expect(task.concurrentSteps[0].subscenes.EV1[0].text).to.equal('Go Outside');
+			assert.isArray(task.concurrentSteps[0].subscenes.EV1[0].text);
+			assert.strictEqual(task.concurrentSteps[0].subscenes.EV1[0].text[0], 'Go Outside');
+
 		});
 	});
 });

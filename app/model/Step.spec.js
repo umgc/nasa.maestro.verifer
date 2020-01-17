@@ -3,7 +3,9 @@
 
 'use strict';
 
+const assert = require('chai').assert;
 const expect = require('chai').expect;
+
 const YAML = require('js-yaml');
 
 const Step = require('./Step');
@@ -65,11 +67,11 @@ describe('Step constructor - Positive Testing', function() {
 
 			expect(step).to.exist; // eslint-disable-line no-unused-expressions
 
-			expect(step.title).to.be.a('string');
-			expect(step.title).to.equal('Initial Configuration');
+			assert.isString(step.title);
+			assert.strictEqual(step.title, 'Initial Configuration');
 
-			expect(step.text).to.be.a('string');
-			expect(step.text).to.equal('{{CHECK}} All gates closed & hooks locked');
+			assert.isArray(step.text);
+			assert.strictEqual(step.text[0], '{{CHECK}} All gates closed & hooks locked');
 
 			expect(step.images).to.be.a('array');
 			expect(step.images).to.have.all.keys(0);
@@ -105,8 +107,9 @@ describe('Step constructor - Positive Testing', function() {
 			expect(step.substeps).to.be.a('array');
 			expect(step.substeps).to.have.all.keys(0);
 			expect(step.substeps[0]).to.be.a('Object');
-			expect(step.substeps[0].text).to.be.a('string');
-			expect(step.substeps[0].text).to.equal('select page - RF camera.');
+
+			assert.isArray(step.substeps[0].text);
+			assert.strictEqual(step.substeps[0].text[0], 'select page - RF camera.');
 
 		});
 	});
@@ -152,8 +155,8 @@ describe('Step constructor - Positive Testing', function() {
 			expect(step.title).to.be.a('string');
 			expect(step.title).to.equal('Initial Configuration');
 
-			expect(step.text).to.be.a('string');
-			expect(step.text).to.equal('{{CHECK}} All gates closed & hooks locked');
+			assert.isArray(step.text);
+			assert.strictEqual(step.text[0], '{{CHECK}} All gates closed & hooks locked');
 
 			expect(step.images).to.be.a('array');
 			expect(step.images).to.have.all.keys(0, 1);
@@ -202,11 +205,12 @@ describe('Step constructor - Positive Testing', function() {
 			expect(step.substeps).to.be.a('array');
 			expect(step.substeps).to.have.all.keys(0, 1);
 			expect(step.substeps[0]).to.be.a('Object');
-			expect(step.substeps[0].text).to.be.a('string');
-			expect(step.substeps[0].text).to.equal('select page - RF camera.');
-			expect(step.substeps[1]).to.be.a('Object');
-			expect(step.substeps[1].text).to.be.a('string');
-			expect(step.substeps[1].text).to.equal('second substep');
+
+			assert.isArray(step.substeps[0].text);
+			assert.strictEqual(step.substeps[0].text[0], 'select page - RF camera.');
+			assert.isObject(step.substeps[1]);
+			assert.isArray(step.substeps[1].text);
+			assert.strictEqual(step.substeps[1].text[0], 'second substep');
 
 		});
 	});

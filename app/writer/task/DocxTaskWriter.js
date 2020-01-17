@@ -317,7 +317,14 @@ module.exports = class DocxTaskWriter extends TaskWriter {
 				if (typeof elem === 'string') {
 					elem = this.textTransform.transform(elem);
 				} else if (!Array.isArray(elem)) {
+					// elem is a TextRun object
 					elem = [elem];
+				}
+
+				// if there is more than one line of step text, make all but the first have a line
+				// break in front
+				if (s > 0) {
+					elem[0].break();
 				}
 				paraOptions.children.push(...elem);
 			}

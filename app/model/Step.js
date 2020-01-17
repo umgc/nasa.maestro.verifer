@@ -25,7 +25,7 @@ module.exports = class Step {
 		// FIXME: This can't be in props.strings because the YAML input is "step" not "text", and in
 		// getDefinition() it needs the proper YAML input name. Ultimately probably should change
 		// "step" to "text".
-		this.text = '';
+		this.text = [];
 
 		for (const prop of props.arrays) {
 			this[prop] = [];
@@ -55,8 +55,10 @@ module.exports = class Step {
 		}
 
 		// Currently YAML "step" prop maps to model "text" prop. See comment in constructor.
-		if (this.text) {
-			def.step = this.text;
+		if (this.text.length > 1) {
+			def.step = this.text.slice(); // copy the array
+		} else if (this.text.length === 1) {
+			def.step = this.text[0];
 		}
 
 		if (this.images.length) {
@@ -94,7 +96,7 @@ module.exports = class Step {
 
 		// Check if the step is a simple string
 		if (typeof stepYaml === 'string') {
-			this.text = this.parseStepText(stepYaml);
+			this.text = [this.parseStepText(stepYaml)];
 			return;
 		}
 
@@ -107,7 +109,8 @@ module.exports = class Step {
 
 		// Check for the text
 		if (stepYaml.step) {
-			this.text = this.parseStepText(stepYaml.step);
+			const preStep = arrayHelper.parseArray(stepYaml.step);
+			this.text = preStep.map((text) => this.parseStepText(text));
 		}
 
 		// Check for images

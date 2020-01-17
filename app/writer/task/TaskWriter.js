@@ -175,9 +175,9 @@ module.exports = class TaskWriter extends Abstract {
 			elements.prebody.push(this.addBlock('comment', step.comments));
 		}
 
-		if (step.text) {
+		if (step.text.length) {
 			// todo: could make text optionally an array to do newlines
-			elements.body.push(step.text);
+			elements.body.push(...step.text);
 		}
 
 		if (step.checkboxes.length) {
