@@ -22,10 +22,7 @@ module.exports = class WebProgram extends Program {
 
 	constructor() {
 		super();
-		this.procedurePath = '/procedures';
-		this.tasksPath = '/tasks';
-		this.imagesPath = '/images';
-		this.outputPath = '/build';
+		this.setPathsFromProject(false);
 		this.gitPath = '[NO GIT PATH IN BROWSER]';
 	}
 

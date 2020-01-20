@@ -1,4 +1,6 @@
 /* global maestro */
+const fs = require('fs');
+const path = require('path');
 const React = require('react');
 const jsdiff = require('diff');
 const YAML = require('js-yaml');
@@ -57,42 +59,56 @@ function recordAndReportChange(latestProcedure) {
 /**
  * Save changes for a particular Activity
  *
- * @param {Procedure} procedure   Procedure with latest changes to be saved back to files
- * @param {number} activityIndex  Activity file to save
+ * @param {WebProgram|ElectronProgram} program
+ * @param {Procedure} procedure                 Procedure with latest changes to be saved back to
+ *                                              files
+ * @param {number} activityIndex                Activity file to save
  */
-function saveChange(procedure, activityIndex) {
+function saveChange(program, procedure, activityIndex) {
 	const activity = procedure.tasks[activityIndex];
+	const yamlString = YAML.dump(activity.getTaskDefinition());
 
-	// const xhr = new XMLHttpRequest();
-	// xhr.open('POST', `edit/tasks/${activity.taskReqs.file}`, true);
-	// xhr.setRequestHeader('Content-Type', 'application/json');
-	// xhr.send(JSON.stringify({
-	// yaml: YAML.dump(activity.getTaskDefinition())
-	// }));
-
-	fetch(
-		`edit/tasks/${activity.taskReqs.file}`,
-		{
-			method: 'POST', // or 'PUT'
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({
-				yaml: YAML.dump(activity.getTaskDefinition())
+	if (window.isElectron) {
+		fs.writeFile(
+			path.join(program.tasksPath, activity.taskReqs.file),
+			yamlString,
+			{},
+			(err) => {
+				if (err) {
+					throw err;
+				}
+			}
+		);
+	} else {
+		fetch(
+			`edit/tasks/${activity.taskReqs.file}`,
+			{
+				method: 'POST', // or 'PUT'
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					yaml: yamlString
+				})
+			}
+		)
+			.then((response) => response.json())
+			.then((data) => {
+				console.log('Success:', data);
 			})
-		}
-	)
-		.then((response) => response.json())
-		.then((data) => {
-			console.log('Success:', data);
-		})
-		.catch((error) => {
-			console.error('Error:', error);
-		});
-
+			.catch((error) => {
+				console.error('Error:', error);
+			});
+	}
 }
 
 class App extends React.Component {
+
+	constructor() {
+		super();
+		window.appComponent = this;
+	}
+
 	state = {
 		procedure: null
 	};
@@ -120,7 +136,7 @@ class App extends React.Component {
 
 			recordAndReportChange(newProc);
 
-			saveChange(newProc, actIndex);
+			saveChange(this.program, newProc, actIndex);
 
 			this.setState({
 				procedure: newProc
@@ -128,7 +144,6 @@ class App extends React.Component {
 
 		};
 
-		maestro.react = { app: this }; // for testing/playing with react FIXME remove later
 		console.log(`Procedure set to ${procObject.name}`);
 	};
 
@@ -136,22 +151,37 @@ class App extends React.Component {
 		return this.state.procedureWriter;
 	}
 
+	setProgram(program) {
+		this.program = program;
+	}
+
+	renderNoProcedure() {
+		if (window.isElectron) {
+			return (<p>Please select a procedure file from the file:open menu</p>);
+		} else {
+			return (
+				<ProcedureSelectorComponent
+					procedureChoices={window.procedureChoices}
+					procedure={this.state.procedure}
+					setProcedure={this.setProcedure} />
+			);
+		}
+	}
+
 	render() {
 		return (
 			<div className='app'>
 				<div className='container'>
 					<HeaderComponent />
-					{!this.state.procedure ? (
-						<ProcedureSelectorComponent
-							procedureChoices={window.procedureChoices}
-							procedure={this.state.procedure}
-							setProcedure={this.setProcedure} />
-					) : (
-						<ProcedureViewerComponent
-							procedure={this.state.procedure}
-							getProcedureWriter={this.getProcedureWriter}
-						/>
-					)}
+					{!this.state.procedure ?
+						this.renderNoProcedure() :
+						(
+							<ProcedureViewerComponent
+								procedure={this.state.procedure}
+								getProcedureWriter={this.getProcedureWriter}
+							/>
+						)
+					}
 				</div>
 			</div>
 		);
