@@ -29,7 +29,7 @@ module.exports = class ElectronProgram extends Program {
 
 		// needed to retrieve local files from electron browser
 		const pathParts = this.imagesPath
-			.replace(/\\/g, '/') // convert \ to /. No effect on *nix, makes Windows consistent
+			.replace(/\\+/g, '/') // convert \ or \\ to / to make Windows consistent with *nix
 			.split('/');
 
 		// Take the first part off the front. On Windows this will be the drive, e.g. "C:". On *nix

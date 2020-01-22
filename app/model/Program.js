@@ -157,7 +157,7 @@ module.exports = class Program {
 		});
 	}
 
-	setPathsFromProject(projectPath) {
+	setPathsFromProject(projectPath = false) {
 
 		// property on this object --> directory name
 		const paths = {
