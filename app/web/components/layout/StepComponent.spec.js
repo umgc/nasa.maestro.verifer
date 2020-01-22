@@ -2,6 +2,7 @@
 /* eslint-env node, mocha */
 /* eslint-disable-next-line no-unused-vars */
 /* global shallow render mount */
+/* eslint-disable require-jsdoc */
 
 'use strict';
 

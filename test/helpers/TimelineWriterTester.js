@@ -9,6 +9,14 @@ const assert = require('chai').assert;
 
 const Procedure = require('../../app/model/Procedure');
 
+/**
+ * Get a Procedure object from a file path
+ *
+ * @todo this should potentially be a static function in the Procedure class
+ *
+ * @param {string} filepath  File path to procedure file
+ * @return {Procedure}
+ */
 function createProcedure(filepath) {
 	const procedure = new Procedure();
 	const err = procedure.addProcedureDefinitionFromFile(filepath);

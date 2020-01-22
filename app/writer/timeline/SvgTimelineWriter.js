@@ -5,6 +5,12 @@ const svg2img = require('svg2img');
 const objectHelper = require('../../helpers/objectHelper');
 const TimelineWriter = require('./TimelineWriter');
 
+/**
+ * Add rectangle to SVG object
+ * @param {SVG} canvas   SVG object
+ * @param {Object} opts  Object with width, height, x, and y props required. stroke and fillColor
+ *                       optional.
+ */
 function addBox(canvas, opts = {}) {
 	objectHelper.requireProps(opts, ['width', 'height', 'x', 'y']);
 	objectHelper.defaults(opts, {
@@ -19,6 +25,12 @@ function addBox(canvas, opts = {}) {
 		.fill(opts.fillColor);
 }
 
+/**
+ * Add text to SVG object
+ * @param {SVG} canvas       SVG object
+ * @param {Object} opts      Object with all optional properties
+ * @param {Function} textFn
+ */
 function addText(canvas, opts, textFn) {
 	objectHelper.defaults(opts, {
 		text: '<placeholder text>',
@@ -51,6 +63,7 @@ function addText(canvas, opts, textFn) {
 
 /**
  * Get x-coordinate of the left edge of a column in pixels
+ *
  * @param {TimelineWriter} writer  Instance of TimelineWriter
  * @param {number} columnIndex     Index of the column
  * @return {number}             Pixels of the left edge of the column
@@ -59,6 +72,14 @@ function getColumnLeft(writer, columnIndex) {
 	return writer.sidebarWidth + columnIndex * writer.colWidth;
 }
 
+/**
+ * Add Activity SVG timeline
+ *
+ * @param {SvgTimelineWriter} writer
+ * @param {number} columnIndex        Which column in the timeline to insert Activity into
+ * @param {Task} task
+ * @param {string} actor
+ */
 function addActivity(writer, columnIndex, task, actor) {
 
 	const canvas = writer.canvas;
@@ -102,6 +123,13 @@ function addActivity(writer, columnIndex, task, actor) {
 
 }
 
+/**
+ * Add header to SVG
+ *
+ * @param {SvgTimelineWriter} writer
+ * @param {number} columnIndex
+ * @param {string} headerText
+ */
 function addColumnHeader(writer, columnIndex, headerText) {
 
 	const canvas = writer.canvas;
@@ -134,6 +162,11 @@ function addColumnHeader(writer, columnIndex, headerText) {
 
 }
 
+/**
+ * Add markings to side of timeline based upon how long the timeline is.
+ *
+ * @param {SvgTimelineWriter} writer
+ */
 function addTimelineMarkings(writer) {
 
 	const canvas = writer.canvas;

@@ -2,6 +2,14 @@
 
 const TaskRole = require('../../app/model/TaskRole');
 
+/**
+ * Returns an object with one key: the value supplied in `roleName`. The value associated with that
+ * key is a TaskRole object constructed with fictitious task and role requirements.
+ *
+ * @param {string} roleName
+ * @param {string} actorName
+ * @return {Object}           Returns object like { someRoleText: TaskRole }
+ */
 function getSingle(roleName = 'crewX', actorName = 'EV7') {
 	const roleDef = {
 		name: roleName,
@@ -23,6 +31,12 @@ function getSingle(roleName = 'crewX', actorName = 'EV7') {
 	return out;
 }
 
+/**
+ * Perform getSingle() multiple times for each key-value pair in `roleToActorMap`
+ *
+ * @param {Object} roleToActorMap  Like: { roleA: actorA, roleB: actorB }
+ * @return {Object}                Like: { roleA: new TaskRole(...), roleB: new TaskRole(...) }
+ */
 function getMultiple(roleToActorMap) {
 	const taskRoles = {};
 	for (const role in roleToActorMap) {
