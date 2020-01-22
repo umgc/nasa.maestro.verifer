@@ -13,6 +13,13 @@ const Duration = require('./Duration');
 const TimeSync = require('./TimeSync');
 const consoleHelper = require('../helpers/consoleHelper');
 
+/**
+ * Get path to task file relative to procedure file, or throw error.
+ *
+ * @param {string} procedureFilePath  Path to procedure file
+ * @param {string} taskFileName       Name of task file at ../tasks/${taskFileName} relative to proc
+ * @return {string}
+ */
 function translatePath(procedureFilePath, taskFileName) {
 	// Look in tasks directory, sister to procedures directory
 	// Someday look in a directory provided by dependency manager, issue #21

@@ -5,6 +5,12 @@ const YAML = require('js-yaml');
 const Program = require('./Program');
 const Procedure = require('./Procedure');
 
+/**
+ * Helper function to streamline using Fetch API
+ *
+ * @param {string} uri  URI to pass to fetch API
+ * @return {Promise}    Promise passing fetch's reponse.text()
+ */
 function fetchFileText(uri) {
 	return fetch(encodeURI(uri))
 		.then((response) => {

@@ -10,6 +10,10 @@ const typeHelper = require('../helpers/typeHelper');
 
 const validTimeTypes = ['startTime', 'endTime', 'duration'];
 
+/**
+ * Set .updateStartTimesRequired on procedures TimeSync object, noting that times need re-syncing
+ * @param {Task} task
+ */
 function timeSyncRequired(task) {
 	task.procedure.timeSync.updateStartTimesRequired = true;
 }

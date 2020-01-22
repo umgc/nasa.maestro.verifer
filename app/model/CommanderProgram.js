@@ -13,6 +13,12 @@ const EvaHtmlProcedureWriter = require('../writer/procedure/EvaHtmlProcedureWrit
 
 const Server = require('../web/Server');
 
+/**
+ * Get the path to a Maestro project from input, or use current working directory
+ * @param {string|boolean} projectPath  String representation of path to a Maestro project, or
+ *                                      false if no project path.
+ * @return {string}
+ */
 function handleProjectPath(projectPath) {
 	if (projectPath) {
 		return path.resolve(projectPath);
@@ -20,12 +26,19 @@ function handleProjectPath(projectPath) {
 	return process.cwd();
 }
 
+/**
+ * Check if a path exists, and optionally create it
+ * @param {string} path              Path to check for existence
+ * @param {boolean} createIfMissing  Create path if true, don't if false
+ * @return {boolean}
+ */
 function pathMustExist(path, createIfMissing = false) {
 	try {
 		fs.statSync(path);
 	} catch (e) {
 		if (createIfMissing) {
-			fs.mkdirSync(path); // catch here, too?
+			fs.mkdirSync(path);
+			// FIXME: catch here, then return or not based upon whether mkdirSync is successful
 		} else {
 			console.error(`Path ${path} does not exist`);
 			process.exit();

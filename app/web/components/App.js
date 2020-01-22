@@ -15,6 +15,13 @@ const changes = {
 	diffs: []
 };
 
+/**
+ * Compare procedure against previous version of procedure. Record state for comparison with future
+ * changes and console.log() a diff from the previous change.
+ *
+ * @param {Procedure} latestProcedure  Procedure object with latest updates, used to generate latest
+ *                                     YAML string to compare against previous change.
+ */
 function recordAndReportChange(latestProcedure) {
 	const newYaml = YAML.dump(latestProcedure.getDefinition());
 
@@ -47,6 +54,12 @@ function recordAndReportChange(latestProcedure) {
 
 }
 
+/**
+ * Save changes for a particular Activity
+ *
+ * @param {Procedure} procedure   Procedure with latest changes to be saved back to files
+ * @param {number} activityIndex  Activity file to save
+ */
 function saveChange(procedure, activityIndex) {
 	const activity = procedure.tasks[activityIndex];
 

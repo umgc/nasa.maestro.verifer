@@ -3,6 +3,12 @@
 const arrayHelper = require('../helpers/arrayHelper.js');
 const typeHelper = require('../helpers/typeHelper');
 
+/**
+ * Overwrites the .actorToColumn object on a ColumnsHandler instance, giving easy access to
+ * actor-->column-key relationships
+ * @param {ColumnsHandler} columnsHandler  ColumnsHandler instance on which to remap the
+ *                                         .actorToColumn property
+ */
 function remapActorToColumn(columnsHandler) {
 	columnsHandler.actorToColumn = {};
 	for (const col of columnsHandler.columns) {
@@ -12,6 +18,12 @@ function remapActorToColumn(columnsHandler) {
 	}
 }
 
+/**
+ * Overwrites the .columnToDisplay object on a ColumnsHandler instance, giving easy access to
+ * column-key-->column-display relationships
+ * @param {ColumnsHandler} columnsHandler  ColumnsHandler instance on which to remap the
+ *                                         .columnToDisplay property
+ */
 function remapColumnKeyToDisplay(columnsHandler) {
 	columnsHandler.columnToDisplay = {};
 
@@ -24,6 +36,10 @@ function remapColumnKeyToDisplay(columnsHandler) {
 	}
 }
 
+/**
+ * Re-map all mappings on a ColumnsHandler instance
+ * @param {ColumnsHandler} columnsHandler  ColumnsHandler instance on which to perform remappings
+ */
 function doRemapFunctions(columnsHandler) {
 	remapActorToColumn(columnsHandler);
 	remapColumnKeyToDisplay(columnsHandler);

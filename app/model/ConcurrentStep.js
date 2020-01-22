@@ -2,19 +2,23 @@
 
 const Step = require('./Step');
 
+/**
+ * Converts roles like "crewA" to actors like "EV1".
+ *
+ * Get either the real actor ID, or if it doesn't exist, return the actorIdGuess supplied.
+ * if taskRoles[actorIdGuess] found, then it means actorIdGuess isn't a real actor and must be
+ * replaced with whomever the procedure is passing in as an actor for the role.
+ *
+ * @param {Object} taskRoles     Object of TaskRole objects. See constructor for ConcurrentStep
+ * @param {string} actorIdGuess  May be a proper actor ID like "EV1" or it may be a placeholder
+ *                               "role" like "crewA". Procedures will then have to pass in
+ *                               crewA === EV1 into the task, and it is the job of the
+ *                               Task/ConcurrentStep/Step to attribute those steps to EV1 instead
+ *                               of "crewA". Additionally steps may include text like
+ *                               {{role:crewA}}. This is replaced within Step.
+ * @return {string}
+ */
 function getRealActorId(taskRoles, actorIdGuess) {
-
-	// "actorIdGuess" may be a proper actor ID like "EV1" or it may be a
-	// placeholder "role" like "crewA". Procedures will then have to
-	// pass in crewA === EV1 into the task, and it is the job of the
-	// Task/ConcurrentStep/Step to
-	// attribute those steps to EV1 instead of "crewA". Additionally
-	// steps may include text like {{role:crewA}}. This is replaced
-	// within Step.
-	//
-	// if taskRoles[actorIdGuess] found, then it means actorIdGuess isn't a
-	// real actor and must be replaced with whomever the procedure
-	// is passing in as an actor for the role.
 	if (taskRoles[actorIdGuess]) {
 		return taskRoles[actorIdGuess].actor;
 	} else {
@@ -22,6 +26,22 @@ function getRealActorId(taskRoles, actorIdGuess) {
 	}
 }
 
+/**
+ * Return main ID for an actorIdGuess and the list of IDs of all IDs
+ * @param {string} actorIdGuess  be a proper actor ID like "EV1" or it may be a placeholder
+ *                               "role" like "crewA". See details in getRealActorId()
+ * @param  {Object} taskRoles    Object of TaskRole objects. See constructor for ConcurrentStep
+ * @return {Object}              Examples:
+ *                                 actorIdGuess = crewA --> { id: 'EV1', idOrIds: 'EV1' }
+ *                                 actorIdGuess = EV1+EV2 --> {
+ *                                   id: 'EV1 + EV2',
+ *                                   idOrIds: ['EV1 + EV2', 'EV1, 'EV2']
+ *                                 }
+ *                                 actorIdGuess = crewA + crewB --> {
+ *                                   id: 'EV1 + EV2',
+ *                                   idOrIds: ['EV1 + EV2', 'EV1, 'EV2']
+ *                                 }
+ */
 function getActorInfo(actorIdGuess, taskRoles) {
 
 	let idOrIds,
