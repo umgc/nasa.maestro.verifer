@@ -57,6 +57,56 @@ function recordAndReportChange(latestProcedure) {
 }
 
 /**
+ * Save yamlString to Activity file
+ *
+ * @param {ElectronProgram} program
+ * @param {Task} activity
+ * @param {string} yamlString
+ */
+function saveChangeElectron(program, activity, yamlString) {
+	fs.writeFile(
+		path.join(program.tasksPath, activity.taskReqs.file),
+		yamlString,
+		{},
+		(err) => {
+			if (err) {
+				throw err;
+			}
+		}
+	);
+
+}
+
+/**
+ * Save yamlString to Activity file
+ *
+ * @param {WebProgram} program
+ * @param {Task} activity
+ * @param {string} yamlString
+ */
+function saveChangeWeb(program, activity, yamlString) {
+	fetch(
+		`edit/tasks/${activity.taskReqs.file}`,
+		{
+			method: 'POST', // or 'PUT'
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				yaml: yamlString
+			})
+		}
+	)
+		.then((response) => response.json())
+		.then((data) => {
+			console.log('Success:', data);
+		})
+		.catch((error) => {
+			console.error('Error:', error);
+		});
+}
+
+/**
  * Save changes for a particular Activity
  *
  * @param {WebProgram|ElectronProgram} program
@@ -69,36 +119,9 @@ function saveChange(program, procedure, activityIndex) {
 	const yamlString = YAML.dump(activity.getTaskDefinition());
 
 	if (window.isElectron) {
-		fs.writeFile(
-			path.join(program.tasksPath, activity.taskReqs.file),
-			yamlString,
-			{},
-			(err) => {
-				if (err) {
-					throw err;
-				}
-			}
-		);
+		saveChangeElectron(program, activity, yamlString);
 	} else {
-		fetch(
-			`edit/tasks/${activity.taskReqs.file}`,
-			{
-				method: 'POST', // or 'PUT'
-				headers: {
-					'Content-Type': 'application/json'
-				},
-				body: JSON.stringify({
-					yaml: yamlString
-				})
-			}
-		)
-			.then((response) => response.json())
-			.then((data) => {
-				console.log('Success:', data);
-			})
-			.catch((error) => {
-				console.error('Error:', error);
-			});
+		saveChangeWeb(program, activity, yamlString);
 	}
 }
 

@@ -14,7 +14,7 @@ td {
 	vertical-align: top;
 }
 
-table.gridtable {
+.gridtable {
 	/* font-family: verdana, arial, sans-serif; */
 	/* font-size: 16px; */
 	border-collapse: collapse;
@@ -25,7 +25,7 @@ table.gridtable {
 	page-break-after: always;
 }
 
-table.gridtable th {
+.gridtable th {
 	background-color: #ffffff;
 	border-color: #666666;
 	border-style: solid;
@@ -34,7 +34,7 @@ table.gridtable th {
 	text-align: center;
 }
 
-table.gridtable td {
+.gridtable td {
 	background-color: #ffffff;
 	border-bottom: 1px solid #AAAAAA;
 	border-left: 2px solid #666666;
@@ -53,7 +53,7 @@ ul {
 }
 
 ol {
-	margin: 0px;
+	margin: 0;
 	margin-left: 10px;
 	padding: 5px;
 	padding-left: 10px;
@@ -61,44 +61,44 @@ ol {
 
 li {
 	line-height: 150%;
-	margin: 3px 0px;
-	padding: 0px;
+	margin: 3px 0;
+	padding: 0;
 }
 
 li p {
-	margin: 2px 0px;
-	padding: 0px;
+	margin: 2px 0;
+	padding: 0;
 }
 
-div.ncw {
+.ncw {
 	border: solid black 1px;
-	margin: 5px 0px;
-	padding: 0px;
+	margin: 5px 0;
+	padding: 0;
 }
 
-div.ncw div {
+.ncw div {
 	border: solid black 1px;
-	margin: 0px;
+	margin: 0;
 }
 
-div.ncw-head {
+.ncw-head {
 	font-weight: bold;
 	padding: 10px;
 	text-align: center;
 	text-transform: uppercase;
 }
 
-div.ncw-warning div.ncw-head {
+.ncw-warning .ncw-head {
 	background-color: red;
 	color: white;
 }
 
-div.ncw-caution div.ncw-head {
+.ncw-caution .ncw-head {
 	background-color: yellow;
 	color: black;
 }
 
-div.ncw-body {
+.ncw-body {
 	padding: 5px;
 }
 
@@ -138,7 +138,7 @@ img {
 	visibility: visible;
 }
 
-div.footer {
+.footer {
 	text-align: center;
 }
 
@@ -193,9 +193,9 @@ div.footer {
 
 .column-header {
 	height: 18px;
-	text-align: center;
 	font-size: 16px;
 	font-weight: bold;
+	text-align: center;
 }
 
 .timeline-markings {

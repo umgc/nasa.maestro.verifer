@@ -13,12 +13,12 @@
     "test:colors": "env BABEL_ENV=test npm run test -- --colors",
     "test:coverage": "env BABEL_ENV=test nyc --all --reporter=text --reporter=lcov npm run test",
     "test:watch": "env BABEL_ENV=test npm run test -- --watch",
-    "build": "env BABEL_ENV=build ./node_modules/.bin/webpack",
-    "build:watch": "env BABEL_ENV=build ./node_modules/.bin/webpack --watch",
-    "build:prod": "env BABEL_ENV=build ./node_modules/.bin/webpack -p",
-    "build:electron": "env BABEL_ENV=build ./node_modules/.bin/webpack --config webpack.electron.config.js",
-    "build:electron:watch": "env BABEL_ENV=build ./node_modules/.bin/webpack --watch --config webpack.electron.config.js",
-    "build:electron:prod": "env BABEL_ENV=build ./node_modules/.bin/webpack -p --config webpack.electron.config.js"
+    "build": "env BABEL_ENV=build ./node_modules/.bin/webpack --config webpack/config-web.js",
+    "build:watch": "env BABEL_ENV=build ./node_modules/.bin/webpack --watch --config webpack/config-web.js",
+    "build:prod": "env BABEL_ENV=build ./node_modules/.bin/webpack -p --config webpack/config-web.js",
+    "build:electron": "env BABEL_ENV=build ./node_modules/.bin/webpack --config ./webpack/config-electron.js",
+    "build:electron:watch": "env BABEL_ENV=build ./node_modules/.bin/webpack --watch --config webpack/config-electron.js",
+    "build:electron:prod": "env BABEL_ENV=build ./node_modules/.bin/webpack -p --config webpack/config-electron.js"
   },
   "babel": {
     "env": {

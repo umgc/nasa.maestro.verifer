@@ -5,8 +5,8 @@
 
 const React = require('react');
 const ReactDOM = require('react-dom');
-const App = require('./app/web/components/App');
-const stepModules = require('./app/writer/step-mods/stepModules');
+const App = require('../app/web/components/App');
+const stepModules = require('../app/writer/step-mods/stepModules');
 
 // window.maestro = {};
 // maestro.app = new maestro.WebProgram();
@@ -28,7 +28,7 @@ for (const mod of stepModules) {
 	console.log(`attempting step module react function for ${mod.class}`);
 	try {
 		maestro.reactStepModuleFunctions[`${mod.class}React`] = require(
-			`./app/writer/step-mods/${mod.class}React`
+			`../app/writer/step-mods/${mod.class}React`
 		);
 		console.log('added');
 	} catch (e) {
