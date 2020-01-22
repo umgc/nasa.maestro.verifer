@@ -7,6 +7,9 @@ const getMenuTemplate = require('./getMenuTemplate');
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
 
+/**
+ * Function to be run on app.on('ready')
+ */
 function createWindow() {
 	// Create the browser window.
 	mainWindow = new BrowserWindow({
