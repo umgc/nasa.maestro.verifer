@@ -17,29 +17,29 @@ td {
 table.gridtable {
 	/* font-family: verdana, arial, sans-serif; */
 	/* font-size: 16px; */
-	color: #333333;
-	border-width: 2px;
-	border-color: #666666;
 	border-collapse: collapse;
+	border-color: #666666;
+	border-width: 2px;
+	color: #333333;
 	margin-bottom: 10px;
 	page-break-after: always;
 }
 
 table.gridtable th {
+	background-color: #ffffff;
+	border-color: #666666;
+	border-style: solid;
 	border-width: 2px;
 	padding: 8px;
-	border-style: solid;
-	border-color: #666666;
-	background-color: #ffffff;
 	text-align: center;
 }
 
 table.gridtable td {
+	background-color: #ffffff;
+	border-bottom: 1px solid #AAAAAA;
 	border-left: 2px solid #666666;
 	border-right: 2px solid #666666;
-	border-bottom: 1px solid #AAAAAA;
 	padding: 8px;
-	background-color: #ffffff;
 }
 
 tbody > tr:last-of-type {
@@ -60,9 +60,9 @@ ol {
 }
 
 li {
+	line-height: 150%;
 	margin: 3px 0px;
 	padding: 0px;
-	line-height: 150%;
 }
 
 li p {
@@ -72,8 +72,8 @@ li p {
 
 div.ncw {
 	border: solid black 1px;
-	padding: 0px;
 	margin: 5px 0px;
+	padding: 0px;
 }
 
 div.ncw div {
@@ -105,12 +105,10 @@ div.ncw-body {
 .sizeable{
 	border: 1px solid;
 	display: inline-block;
-	resize: both;
-	overflow: hidden;
-
 	max-height: 100%;
 	max-width: 100%;
-
+	overflow: hidden;
+	resize: both;
 }
 
 img {
@@ -118,25 +116,22 @@ img {
 }
 
 .tooltip {
-	position: relative;
-	display: inline-block;
 	border-bottom: 1px dotted black;
+	display: inline-block;
+	position: relative;
 }
 
 .tooltip .tooltiptext {
+	background-color: black;
+	border-radius: 6px;
+	color: #fff;
+	padding: 5px 0;
+	position: absolute; /* Position the tooltip */
+	text-align: center;
 	visibility: hidden;
 	width: 120px;
-	background-color: black;
-	color: #fff;
-	text-align: center;
-	border-radius: 6px;
-	padding: 5px 0;
-
-/* Position the tooltip */
-	position: absolute;
-	z-index: 1;
-	/*top: -5px;
-	left: 105%; */
+	z-index: 1; /* Position the tooltip */
+	/*top: -5px; left: 105%; */
 }
 
 .tooltip:hover .tooltiptext {
@@ -148,9 +143,9 @@ div.footer {
 }
 
 .timeline {
+	display: flex;
 	margin: 0 auto;
 	max-width: 960px;
-	display: flex;
 }
 
 .column-pet {
@@ -162,10 +157,10 @@ div.footer {
 }
 
 .tick {
+	border-top: 1px solid #000;
 	display: inline-block;
 	height: 12px;
 	width: 12px;
-	border-top: 1px solid #000;
 }
 
 .half-hour-increment {
@@ -175,8 +170,8 @@ div.footer {
 }
 
 .activity-blocks {
-	border-right: 1px solid #000;
 	border-bottom: 1px solid #000;
+	border-right: 1px solid #000;
 }
 
 /* only draw the left border in the first EV column */
@@ -186,9 +181,9 @@ div.footer {
 
 .task-block {
 	border: 1px solid #000;
+	margin-bottom: -1px;
 	margin-left: -1px;
 	margin-right: -1px;
-	margin-bottom: -1px;
 }
 
 .task-block > * {
@@ -199,14 +194,14 @@ div.footer {
 .column-header {
 	height: 18px;
 	text-align: center;
-	font-weight: bold;
 	font-size: 16px;
+	font-weight: bold;
 }
 
 .timeline-markings {
-	width: 70px;
 	font-family: Arial;
 	font-size: 12px;
+	width: 70px;
 }
 
 .task-title {
