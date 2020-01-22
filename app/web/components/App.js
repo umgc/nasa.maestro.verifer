@@ -1,4 +1,3 @@
-/* global maestro */
 const fs = require('fs');
 const path = require('path');
 const React = require('react');
@@ -142,7 +141,7 @@ class App extends React.Component {
 
 		this.setState({
 			procedure: stateHandler.state.procedure,
-			procedureWriter: new ReactProcedureWriter(maestro.app, procObject)
+			procedureWriter: new ReactProcedureWriter(window.maestro.app, procObject)
 		});
 
 		stateHandler.modifyStep = (actIndex, divIndex, colKey, stepIndex, rawDefinition) => {

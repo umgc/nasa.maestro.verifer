@@ -2,8 +2,6 @@
 
 const path = require('path');
 
-// const YAML = require('js-yaml');
-
 const Program = require('./Program');
 const Procedure = require('./Procedure');
 
@@ -28,10 +26,28 @@ module.exports = class ElectronProgram extends Program {
 	}
 
 	getHtmlImagePath(filename) {
-		// needed to retrieve them in browser
-		const ip = `file://${this.imagesPath.replace(/\\/g, '/')}`;
-		return `${ip}/${filename}`
-			.replace(/#/g, '%23'); // no # in URL (FIXME, need to figure out all possiblities)
+
+		// needed to retrieve local files from electron browser
+		const pathParts = this.imagesPath
+			.replace(/\\/g, '/') // convert \ to /. No effect on *nix, makes Windows consistent
+			.split('/');
+
+		// Take the first part off the front. On Windows this will be the drive, e.g. "C:". On *nix
+		// it will be an empty string prior the first slash of an absolute path (""/my/abs/path)
+		const first = pathParts.shift();
+
+		pathParts.push(filename); // add file name to array to be url encoded
+
+		// urlencode the segments individually
+		const urlEncoded = pathParts.map((part) => {
+			return encodeURIComponent(part);
+		});
+
+		// put the empty string or "C:" back on the front
+		urlEncoded.unshift(first);
+
+		return `file://${urlEncoded.join('/')}`;
+
 	}
 
 };

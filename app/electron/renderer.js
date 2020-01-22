@@ -1,5 +1,3 @@
-/* global maestro */
-
 'use strict';
 
 const { ipcRenderer } = require('electron');
@@ -9,7 +7,7 @@ const ElectronProgram = require('../model/ElectronProgram');
 ipcRenderer.on('procedureSelected', function(event, filepath) {
 	console.log(event);
 	console.log(filepath);
-	maestro.app.loadProcedure(filepath); // FIXME attempt to remove global ref
+	window.maestro.app.loadProcedure(filepath);
 });
 
 if (!window.maestro) {
