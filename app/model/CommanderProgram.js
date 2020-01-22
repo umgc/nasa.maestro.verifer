@@ -178,11 +178,7 @@ module.exports = class CommanderProgram extends Program {
 	 */
 	validateProgramArguments() {
 
-		this.procedurePath = path.join(this.projectPath, 'procedures');
-		this.tasksPath = path.join(this.projectPath, 'tasks');
-		this.imagesPath = path.join(this.projectPath, 'images');
-		this.outputPath = path.join(this.projectPath, 'build');
-		this.gitPath = path.join(this.projectPath, '.git');
+		this.setPathsFromProject(this.project);
 
 		pathMustExist(this.procedurePath);
 		pathMustExist(this.tasksPath);

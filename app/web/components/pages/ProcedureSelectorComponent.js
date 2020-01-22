@@ -1,4 +1,3 @@
-/* global maestro */
 const React = require('react');
 const PropTypes = require('prop-types');
 
@@ -10,9 +9,9 @@ const btnStyle = {
 class ProcedureSelectorComponent extends React.Component {
 
 	onClick = (proc) => {
-		maestro.app.loadProcedure(proc)
+		window.maestro.app.loadProcedure(proc)
 			.then(() => {
-				this.props.setProcedure(maestro.app.procedure);
+				this.props.setProcedure(window.maestro.app.procedure);
 			});
 	};
 

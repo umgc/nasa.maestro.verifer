@@ -11,7 +11,7 @@ const TextTransform = require('../text-transform/TextTransform');
 const maestroKey = require('../../web/components/helpers/maestroKey');
 const uuidv4 = require('uuid/v4');
 
-const TaskWriter = require('./HtmlTaskWriter');
+const TaskWriter = require('./TaskWriter');
 const EvaDivisionWriter = require('./EvaDivisionWriter');
 const filters = require('../../helpers/filters');
 
@@ -121,22 +121,26 @@ module.exports = class ReactTaskWriter extends TaskWriter {
 	addImages(images) {
 
 		const imageHtmlArray = [];
-		const imagesPath = this.procedureWriter.program.imagesPath;
+
+		const program = this.procedureWriter.program;
 		for (const imageMeta of images) {
 
-			const imageSrcPath = path.join(imagesPath, imageMeta.path);
+			const imageSrcPath = path.join(this.procedureWriter.program.imagesPath, imageMeta.path);
+
+			// if electron, need to get images with file://path/to/image
+			const htmlImagePath = program.isElectron ?
+				program.getHtmlImagePath(imageMeta.path) : path.join('images', imageMeta.path);
+
 			const imageSize = this.scaleImage(
 				getImageFileDimensions(imageSrcPath),
 				imageMeta
 			);
 
-			const imgPath = path.join('images', imageMeta.path);
-
 			const image = (
-				<a href={imgPath} key={uuidv4()}>
+				<a href={htmlImagePath} key={uuidv4()}>
 					<img
 						className="img-fluid"
-						src={imgPath}
+						src={htmlImagePath}
 						width={imageSize.width}
 						height={imageSize.height}
 						alt="image"

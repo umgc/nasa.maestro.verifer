@@ -1,4 +1,5 @@
-/* global maestro */
+const fs = require('fs');
+const path = require('path');
 const React = require('react');
 const jsdiff = require('diff');
 const YAML = require('js-yaml');
@@ -55,21 +56,34 @@ function recordAndReportChange(latestProcedure) {
 }
 
 /**
- * Save changes for a particular Activity
+ * Save yamlString to Activity file
  *
- * @param {Procedure} procedure   Procedure with latest changes to be saved back to files
- * @param {number} activityIndex  Activity file to save
+ * @param {ElectronProgram} program
+ * @param {Task} activity
+ * @param {string} yamlString
  */
-function saveChange(procedure, activityIndex) {
-	const activity = procedure.tasks[activityIndex];
+function saveChangeElectron(program, activity, yamlString) {
+	fs.writeFile(
+		path.join(program.tasksPath, activity.taskReqs.file),
+		yamlString,
+		{},
+		(err) => {
+			if (err) {
+				throw err;
+			}
+		}
+	);
 
-	// const xhr = new XMLHttpRequest();
-	// xhr.open('POST', `edit/tasks/${activity.taskReqs.file}`, true);
-	// xhr.setRequestHeader('Content-Type', 'application/json');
-	// xhr.send(JSON.stringify({
-	// yaml: YAML.dump(activity.getTaskDefinition())
-	// }));
+}
 
+/**
+ * Save yamlString to Activity file
+ *
+ * @param {WebProgram} program
+ * @param {Task} activity
+ * @param {string} yamlString
+ */
+function saveChangeWeb(program, activity, yamlString) {
 	fetch(
 		`edit/tasks/${activity.taskReqs.file}`,
 		{
@@ -78,7 +92,7 @@ function saveChange(procedure, activityIndex) {
 				'Content-Type': 'application/json'
 			},
 			body: JSON.stringify({
-				yaml: YAML.dump(activity.getTaskDefinition())
+				yaml: yamlString
 			})
 		}
 	)
@@ -89,10 +103,34 @@ function saveChange(procedure, activityIndex) {
 		.catch((error) => {
 			console.error('Error:', error);
 		});
+}
 
+/**
+ * Save changes for a particular Activity
+ *
+ * @param {WebProgram|ElectronProgram} program
+ * @param {Procedure} procedure                 Procedure with latest changes to be saved back to
+ *                                              files
+ * @param {number} activityIndex                Activity file to save
+ */
+function saveChange(program, procedure, activityIndex) {
+	const activity = procedure.tasks[activityIndex];
+	const yamlString = YAML.dump(activity.getTaskDefinition());
+
+	if (window.isElectron) {
+		saveChangeElectron(program, activity, yamlString);
+	} else {
+		saveChangeWeb(program, activity, yamlString);
+	}
 }
 
 class App extends React.Component {
+
+	constructor() {
+		super();
+		window.appComponent = this;
+	}
+
 	state = {
 		procedure: null
 	};
@@ -103,7 +141,7 @@ class App extends React.Component {
 
 		this.setState({
 			procedure: stateHandler.state.procedure,
-			procedureWriter: new ReactProcedureWriter(maestro.app, procObject)
+			procedureWriter: new ReactProcedureWriter(window.maestro.app, procObject)
 		});
 
 		stateHandler.modifyStep = (actIndex, divIndex, colKey, stepIndex, rawDefinition) => {
@@ -120,7 +158,7 @@ class App extends React.Component {
 
 			recordAndReportChange(newProc);
 
-			saveChange(newProc, actIndex);
+			saveChange(this.program, newProc, actIndex);
 
 			this.setState({
 				procedure: newProc
@@ -128,7 +166,6 @@ class App extends React.Component {
 
 		};
 
-		maestro.react = { app: this }; // for testing/playing with react FIXME remove later
 		console.log(`Procedure set to ${procObject.name}`);
 	};
 
@@ -136,22 +173,37 @@ class App extends React.Component {
 		return this.state.procedureWriter;
 	}
 
+	setProgram(program) {
+		this.program = program;
+	}
+
+	renderNoProcedure() {
+		if (window.isElectron) {
+			return (<p>Please select a procedure file from the file:open menu</p>);
+		} else {
+			return (
+				<ProcedureSelectorComponent
+					procedureChoices={window.procedureChoices}
+					procedure={this.state.procedure}
+					setProcedure={this.setProcedure} />
+			);
+		}
+	}
+
 	render() {
 		return (
 			<div className='app'>
 				<div className='container'>
 					<HeaderComponent />
-					{!this.state.procedure ? (
-						<ProcedureSelectorComponent
-							procedureChoices={window.procedureChoices}
-							procedure={this.state.procedure}
-							setProcedure={this.setProcedure} />
-					) : (
-						<ProcedureViewerComponent
-							procedure={this.state.procedure}
-							getProcedureWriter={this.getProcedureWriter}
-						/>
-					)}
+					{!this.state.procedure ?
+						this.renderNoProcedure() :
+						(
+							<ProcedureViewerComponent
+								procedure={this.state.procedure}
+								getProcedureWriter={this.getProcedureWriter}
+							/>
+						)
+					}
 				</div>
 			</div>
 		);

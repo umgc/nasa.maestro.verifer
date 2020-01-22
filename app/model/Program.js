@@ -1,6 +1,7 @@
 'use strict';
 
 const fs = require('fs');
+const path = require('path');
 const childProcess = require('child_process');
 
 const packageJson = require('../../package.json');
@@ -154,6 +155,32 @@ module.exports = class Program {
 		return fs.readdirSync(this.procedurePath).filter((filename) => {
 			return filename.endsWith('.yml');
 		});
+	}
+
+	setPathsFromProject(projectPath = false) {
+
+		// property on this object --> directory name
+		const paths = {
+			procedurePath: 'procedures',
+			tasksPath: 'tasks',
+			imagesPath: 'images',
+			outputPath: 'build',
+			gitPath: '.git'
+		};
+
+		if (projectPath) {
+			this.projectPath = projectPath;
+			for (const prop in paths) {
+				const dir = paths[prop];
+				this[prop] = path.join(projectPath, dir);
+			}
+		} else {
+			for (const prop in paths) {
+				const dir = paths[prop];
+				this[prop] = dir;
+			}
+		}
+
 	}
 
 };
