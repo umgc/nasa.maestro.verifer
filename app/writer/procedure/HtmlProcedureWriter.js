@@ -31,7 +31,8 @@ module.exports = class HtmlProcedureWriter extends ProcedureWriter {
 		return nunjucks.render('document.html', {
 			title: this.program.fullName,
 			content: this.content,
-			footer: this.genFooter()
+			footer: this.genFooter(),
+			css: fs.readFileSync(path.join(__dirname, '../../assets/css/base-eva.css')).toString()
 		});
 	}
 

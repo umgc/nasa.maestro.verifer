@@ -18,7 +18,8 @@ function createWindow() {
 		webPreferences: {
 			preload: path.join(__dirname, 'preload.js'),
 			nodeIntegration: true
-		}
+		},
+		icon: path.join(__dirname, '../assets/images/favicon.ico')
 	});
 
 	mainWindow.maximize();
