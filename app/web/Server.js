@@ -26,6 +26,7 @@ module.exports = class Server {
 
 			// Serve application resources
 			{ webPath: 'maestro', localBase: __dirname, localRelative: '../../build' },
+			{ webPath: 'maestro-images', localBase: __dirname, localRelative: '../images' },
 			{
 				webPath: 'maestro-views',
 				localBase: __dirname,
