@@ -4,18 +4,17 @@ const YAML = require('js-yaml');
 
 const stateHandler = require('../../state/index');
 
+const StepViewerComponent = require('./StepViewerComponent');
+
 const liStyle = {
 	position: 'relative'
-};
-const editButtonsContainerStyle = {
-	position: 'absolute',
-	right: '5px',
-	top: '3px'
 };
 const textareaStyle = {
 	height: '80px',
 	width: '100%'
 };
+
+// NOTE: See base-eva.css for :hover styles, etc
 
 class StepComponent extends React.Component {
 
@@ -57,44 +56,28 @@ class StepComponent extends React.Component {
 	}
 
 	render() {
-		return this.state.editMode ? this.renderEditor() : this.renderViewer();
+		return this.state.editMode ?
+			this.renderEditor() :
+			(
+				<StepViewerComponent
+					stepState={this.props.stepState}
+					columnKeys={this.props.columnKeys}
+					taskWriter={this.props.taskWriter}
+
+					activityIndex={this.props.activityIndex}
+					divisionIndex={this.props.divisionIndex}
+					primaryColumnKey={this.props.primaryColumnKey}
+					stepIndex={this.props.stepIndex}
+
+					handleEditButtonClick={this.handleEditButtonClick}
+					handleDeleteButtonClick={this.handleDeleteButtonClick}
+				/>
+			);
 	}
 
-	renderViewer() {
-		const step = this.props.stepState;
-		step.columnKeys = this.props.columnKeys;
+	// was renderViewer
 
-		const options = { level: 0 };
-
-		return (
-			<li
-				style={liStyle}
-				className={`li-level-${options.level} step-component`}
-			>
-				{this.renderButton()}
-				{this.props.taskWriter.insertStep(step)}
-			</li>
-		);
-	}
-
-	renderButton() {
-		return (
-			<div style={editButtonsContainerStyle} className='modify-step-button-container'>
-				<button
-					onClick={this.handleEditButtonClick}
-					className='edit-button'
-				>
-					edit
-				</button>
-				<button
-					onClick={this.handleDeleteButtonClick}
-					className='delete-button'
-				>
-					delete
-				</button>
-			</div>
-		);
-	}
+	// was renderButton
 
 	renderEditor() {
 
