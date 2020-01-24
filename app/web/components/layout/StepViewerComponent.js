@@ -1,9 +1,9 @@
 const React = require('react');
-const { useDrag, useDrop } = require('react-dnd');
+const { useDrag } = require('react-dnd');
 
 const ItemTypes = require('../../../model/ItemTypes');
 const PropTypes = require('prop-types');
-const stateHandler = require('../../state/index');
+const StepDropLocationComponent = require('./StepDropLocationComponent');
 
 const liStyle = {
 	position: 'relative'
@@ -19,9 +19,10 @@ const editButtonsContainerStyle = {
 /**
  * @param {Function} editFn    Function to be run when clicking edit button
  * @param {Function} deleteFn  Function to be run when clicking delete button
+ * @param {Function} insertStepAfter
  * @return {Object}            React component
  */
-function renderButtons(editFn, deleteFn) {
+function renderButtons(editFn, deleteFn, insertStepAfter) {
 	return (
 		<div style={editButtonsContainerStyle} className='modify-step-button-container'>
 			<button
@@ -36,6 +37,12 @@ function renderButtons(editFn, deleteFn) {
 			>
 				delete
 			</button>
+			<button
+				onClick={insertStepAfter}
+				className='insert-step-after-button'
+			>
+				insert step after
+			</button>
 		</div>
 	);
 }
@@ -45,10 +52,11 @@ const StepViewerComponent = ({
 
 	activityIndex, divisionIndex, primaryColumnKey, stepIndex,
 
-	handleEditButtonClick, handleDeleteButtonClick
+	handleEditButtonClick, handleDeleteButtonClick, handleMoveStep, handleInsertStepAfter
 }) => {
 
-	stepState.columnKeys = columnKeys;
+	// why does this need to be set here? Is this why actors inappropriately shown in react? FIXME.
+	stepState.props.columnKeys = columnKeys;
 
 	const options = { level: 0 };
 
@@ -56,13 +64,12 @@ const StepViewerComponent = ({
 		return { activityIndex, divisionIndex, primaryColumnKey, stepIndex };
 	};
 
-	const stepPathsMatch = (path1, path2) => {
+	const seriesPathsMatch = (path1, path2) => {
 		const match = (prop) => (path1[prop] === path2[prop]);
 		return (
 			match('activityIndex') &&
 			match('divisionIndex') &&
-			match('primaryColumnKey') &&
-			match('stepIndex')
+			match('primaryColumnKey')
 		);
 	};
 
@@ -80,7 +87,7 @@ const StepViewerComponent = ({
 			if (monitor.didDrop()) {
 				const droppedAt = monitor.getDropResult();
 				const draggedFrom = getStepPath();
-				stateHandler.handleMoveStep(draggedFrom, droppedAt);
+				handleMoveStep(draggedFrom, droppedAt);
 			}
 		},
 		collect: (monitor) => ({
@@ -88,27 +95,21 @@ const StepViewerComponent = ({
 		})
 	});
 
-	const [{ isOver, canDrop }, drop] = useDrop({
-		accept: ItemTypes.STEP,
-		canDrop: (item, monitor) => {
-			const dragItem = monitor.getItem(); // .getItem() modified in useDrag.begin() above
-			const thisDropItem = getStepPath();
-			return !stepPathsMatch(dragItem, thisDropItem);
-		},
+	const canDropBeforeStep = (item, monitor) => {
+		const dragItem = monitor.getItem(); // .getItem() modified in useDrag.begin() above
+		const thisDropItem = getStepPath();
+		return !seriesPathsMatch(dragItem, thisDropItem) ||
+			(
+				dragItem.stepIndex !== thisDropItem.stepIndex &&
+				dragItem.stepIndex !== thisDropItem.stepIndex - 1
+			);
+	};
 
-		// returns step path for use in useDrag.end()
-		drop: () => {
-			return getStepPath();
-		},
-		collect: (monitor) => ({
-			isOver: !!monitor.isOver(),
-			canDrop: !!monitor.canDrop()
-		})
-	});
-
-	const backgroundColor = canDrop ?
-		(isOver ? 'green' : 'green') : // was #dddddd
-		(isOver ? 'red' : 'transparent');
+	const dropOccurredBeforeStep = () => {
+		const dropAt = getStepPath();
+		dropAt.stepIndex--; // getStepPath gets the index of the step. Drop one index earlier.
+		return dropAt;
+	};
 
 	return (
 		<li
@@ -119,19 +120,13 @@ const StepViewerComponent = ({
 			className={`li-level-${options.level} step-component`}
 			ref={drag}
 		>
-			{renderButtons(handleEditButtonClick, handleDeleteButtonClick)}
-			<div
-				ref={drop}
-				style={{
-					position: 'absolute',
-					height: '20px',
-					width: '100%',
-					bottom: '-10px',
-					backgroundColor,
-					opacity: isOver ? 0.6 : 0.2
-				}}
-			/>
+			{renderButtons(handleEditButtonClick, handleDeleteButtonClick, handleInsertStepAfter)}
 			{taskWriter.insertStep(stepState)}
+			<StepDropLocationComponent
+				canDropFn={canDropBeforeStep}
+				dropFn={dropOccurredBeforeStep}
+				position='top'
+			/>
 		</li>
 	);
 };
@@ -147,7 +142,9 @@ StepViewerComponent.propTypes = {
 	stepIndex: PropTypes.number.isRequired,
 
 	handleEditButtonClick: PropTypes.func.isRequired,
-	handleDeleteButtonClick: PropTypes.func.isRequired
+	handleDeleteButtonClick: PropTypes.func.isRequired,
+	handleInsertStepAfter: PropTypes.func.isRequired,
+	handleMoveStep: PropTypes.func.isRequired
 };
 
 module.exports = StepViewerComponent;

@@ -19,7 +19,8 @@ const textareaStyle = {
 class StepComponent extends React.Component {
 
 	state = {
-		editMode: false
+		editMode: false,
+		stepState: false
 	}
 
 	constructor(props) {
@@ -29,6 +30,15 @@ class StepComponent extends React.Component {
 		// this.state.localStepState = this.props.stepState;
 
 		this.editorInput = React.createRef();
+
+		// when Step.reload() is called, run function to update this component state
+		this.unsubscribeReloadFn = this.props.stepState.subscribeReload((newState) => {
+			this.setState({ stepState: newState });
+		});
+	}
+
+	componentWillUnmount() {
+		this.unsubscribeReloadFn();
 	}
 
 	handleEditButtonClick = (e) => {
@@ -43,12 +53,23 @@ class StepComponent extends React.Component {
 		e.preventDefault();
 		e.stopPropagation();
 
-		stateHandler.deleteStep(
-			this.props.activityIndex,
-			this.props.divisionIndex,
-			this.props.primaryColumnKey,
-			this.props.stepIndex
-		);
+		this.props.deleteStepFromSeries(this.props.stepIndex);
+
+		stateHandler.saveChange(stateHandler.state.program,
+			stateHandler.state.procedure, this.props.activityIndex);
+
+	}
+
+	handleInsertStepAfter = (e) => {
+		console.log('insert step after button click');
+		e.preventDefault();
+		e.stopPropagation();
+
+		this.props.insertStepIntoSeries(this.props.stepIndex + 1, );
+
+		stateHandler.saveChange(stateHandler.state.program,
+			stateHandler.state.procedure, this.props.activityIndex);
+
 	}
 
 	getKey() {
@@ -56,7 +77,11 @@ class StepComponent extends React.Component {
 	}
 
 	render() {
-		return this.state.editMode ?
+		console.log('rendering StepComponent');
+
+		const emptyDefinition = Object.keys(this.props.stepState.getDefinition()).length === 0;
+
+		return this.state.editMode || emptyDefinition ?
 			this.renderEditor() :
 			(
 				<StepViewerComponent
@@ -71,20 +96,23 @@ class StepComponent extends React.Component {
 
 					handleEditButtonClick={this.handleEditButtonClick}
 					handleDeleteButtonClick={this.handleDeleteButtonClick}
+					handleInsertStepAfter={this.handleInsertStepAfter}
+					handleMoveStep={this.props.handleMoveStep}
+
 				/>
 			);
 	}
-
-	// was renderViewer
-
-	// was renderButton
 
 	renderEditor() {
 
 		const options = { level: 0 };
 
 		// was: this.state.localStepState.text
-		const initial = YAML.safeDump(this.props.stepState.raw);
+		let initial = YAML.safeDump(this.props.stepState.getDefinition());
+
+		if (initial.trim() === '{}') {
+			initial = 'text: <insert text>';
+		}
 
 		// had: onChange={this.handleEditTextChange}
 		return (
@@ -113,17 +141,12 @@ class StepComponent extends React.Component {
 		e.preventDefault();
 		e.stopPropagation();
 
-		const newRaw = YAML.safeLoad(this.editorInput.current.value);
-		// const newState = cloneDeep(this.props.stepState);
-		// newState.raw = newRaw;
+		const newDefinition = YAML.safeLoad(this.editorInput.current.value);
 
-		stateHandler.modifyStep(
-			this.props.activityIndex,
-			this.props.divisionIndex,
-			this.props.primaryColumnKey,
-			this.props.stepIndex,
-			newRaw
-		);
+		// update the state with new definition
+		this.props.stepState.reload(newDefinition);
+		stateHandler.saveChange(stateHandler.state.program,
+			stateHandler.state.procedure, this.props.activityIndex);
 
 		this.setState({
 			editMode: false
@@ -154,8 +177,11 @@ StepComponent.propTypes = {
 	activityIndex: PropTypes.number.isRequired,
 	divisionIndex: PropTypes.number.isRequired,
 	primaryColumnKey: PropTypes.string.isRequired,
-	stepIndex: PropTypes.number.isRequired
+	stepIndex: PropTypes.number.isRequired,
 
+	deleteStepFromSeries: PropTypes.func.isRequired,
+	handleMoveStep: PropTypes.func.isRequired,
+	insertStepIntoSeries: PropTypes.func.isRequired
 };
 
 module.exports = StepComponent;

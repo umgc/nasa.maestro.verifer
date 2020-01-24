@@ -1,6 +1,7 @@
 'use strict';
 
 const Step = require('./Step');
+const Series = require('./Series');
 
 /**
  * Converts roles like "crewA" to actors like "EV1".
@@ -134,13 +135,13 @@ module.exports = class ConcurrentStep {
 
 	getDefinition() {
 		const def = {};
-		const numActors = Object.keys(this.subscenes).length;
 		for (const actor in this.subscenes) {
-			def[actor] = [];
-			for (const step of this.subscenes[actor]) {
-				def[actor].push(step.getDefinition());
+			const seriesDef = this.subscenes[actor].getDefinition();
+			if (Array.isArray(seriesDef) && seriesDef.length > 0) {
+				def[actor] = seriesDef;
 			}
 		}
+		const numActors = Object.keys(def).length;
 		if (numActors > 1) {
 			return { simo: def };
 		}
@@ -154,18 +155,18 @@ module.exports = class ConcurrentStep {
 			concurrentStepYaml.simo[actorIdGuess] :
 			concurrentStepYaml[actorIdGuess];
 
-		// Initiate the array of steps for the actor
-		const actorSteps = [];
-
 		const actorInfo = getActorInfo(actorIdGuess, this.taskRoles);
 
+		// Initiate the array of steps for the actor
+		const series = new Series(actorInfo.idOrIds, this.taskRoles);
+
 		if (typeof actorStepsDefinition === 'string') {
-			actorSteps.push(this.makeStep(actorIdGuess, actorStepsDefinition));
+			series.appendStep(this.makeStep(actorIdGuess, actorStepsDefinition));
 
 		} else if (Array.isArray(actorStepsDefinition)) {
 
 			for (var stepDefinition of actorStepsDefinition) {
-				actorSteps.push(this.makeStep(actorIdGuess, stepDefinition));
+				series.appendStep(this.makeStep(actorIdGuess, stepDefinition));
 			}
 
 		// Don't know how to process this
@@ -176,9 +177,26 @@ module.exports = class ConcurrentStep {
 		}
 
 		// Set the actor and steps in the object
-		this.subscenes[actorInfo.id] = actorSteps;
+		this.subscenes[actorInfo.id] = series;
 
 	}
+
+	hasSeries(seriesId) {
+		return this.subscenes[seriesId] &&
+			typeof this.subscenes[seriesId] === 'object' &&
+			this.subscenes[seriesId] instanceof Series;
+	}
+
+	/**
+	 *
+	 * @param {string} seriesKey - The key in the Division.subscenes object pointing to the Series
+	 */
+	addSeries(seriesKey) {
+		const actorInfo = getActorInfo(seriesKey, this.taskRoles);
+		this.subscenes[seriesKey] = new Series(actorInfo.idOrIds, this.taskRoles);
+	}
+
+	// FIXME add removeSeries() {}
 
 	/**
 	 * Make a Step based upon the context of this concurrentStep
