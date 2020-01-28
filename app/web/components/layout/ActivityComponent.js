@@ -2,21 +2,63 @@ const React = require('react');
 const PropTypes = require('prop-types');
 
 const DivisionComponent = require('./DivisionComponent');
+const DivisionControlsComponent = require('./DivisionControlsComponent');
+
+const stateHandler = require('../../state/index');
 
 const filters = require('../../../helpers/filters');
 const maestroKey = require('../helpers/maestroKey');
 
 class ActivityComponent extends React.Component {
 
+	state = {
+		activityState: false
+	}
+
+	constructor(props) {
+		super(props);
+		console.log('Constructing ActivityComponent');
+
+		this.unsubscribeFns = {
+			deleteDivision: null,
+			insertDivision: null
+		};
+
+	}
+
+	// Fixme this probably can stay in constructor...
+	componentDidMount() {
+		const activity = stateHandler.state.procedure.getTaskByUuid(this.props.activityUuid);
+
+		for (const activityModelMethod in this.unsubscribeFns) {
+			this.unsubscribeFns[activityModelMethod] = activity.subscribe(
+				activityModelMethod, // insertDivision, deleteDivision, etc
+				(newState) => { // perform this func when the Activity method is run
+					console.log(`Running subscribed method for Task.${activityModelMethod}`);
+					console.log(newState);
+					this.setState({ activityState: newState });
+				}
+			);
+		}
+
+	}
+
+	componentWillUnmount() {
+		for (const activityModelMethod in this.unsubscribeFns) {
+			this.unsubscribeFns[activityModelMethod](); // run each unsubscribe function
+		}
+	}
+
 	// FIXME: largely copied from a procedure writer class, setTaskTableHeader()
 	getTableHeaderCells() {
+		const activity = stateHandler.state.procedure.getTaskByUuid(this.props.activityUuid);
 
-		const columnKeys = this.props.activity.getColumns();
+		const columnKeys = activity.getColumns();
 		const columnNames = [];
 
 		for (const colKey of columnKeys) {
 			columnNames.push(
-				this.props.procedure.ColumnsHandler.getDisplayTextFromColumnKey(colKey)
+				stateHandler.state.procedure.ColumnsHandler.getDisplayTextFromColumnKey(colKey)
 			);
 		}
 
@@ -28,17 +70,20 @@ class ActivityComponent extends React.Component {
 	}
 
 	render() {
+		const activity = stateHandler.state.procedure.getTaskByUuid(this.props.activityUuid);
 
+		console.log(`rendering activity ${this.props.activityUuid}`);
+		const procWriter = stateHandler.state.procedureWriter;
 		return (
 			<div className='activityWrapper'>
 				<h2
-					id={filters.uniqueHtmlId(this.props.activity.title)}
+					id={filters.uniqueHtmlId(activity.title)}
 					data-level="procedure"
-					data-task={this.props.activity.title}
+					data-task={activity.title}
 				>
-					{this.props.procedure.name} - {' '}
-					{this.props.activity.title} {' '}
-					({this.props.getProcedureWriter().getTaskDurationDisplay(this.props.activity)})
+					{stateHandler.state.procedure.name} - {' '}
+					{activity.title} {' '}
+					({procWriter.getTaskDurationDisplay(activity)})
 				</h2>
 				<table className="gridtable">
 					<thead>
@@ -47,17 +92,30 @@ class ActivityComponent extends React.Component {
 						</tr>
 					</thead>
 					<tbody>
-						{this.props.activity.concurrentSteps.map((division, index) => {
+						{activity.concurrentSteps.map((division, index) => {
 							return (
-								<DivisionComponent
-									key={maestroKey.getKey(this.props.activityIndex, index)}
-									procedure={this.props.procedure}
-									activity={this.props.activity}
-									activityIndex={this.props.activityIndex}
-									division={division}
-									divisionIndex={index}
-									getProcedureWriter={this.props.getProcedureWriter}
-								/>
+								<React.Fragment
+									key={maestroKey.getKey(this.props.activityUuid, index) + '-wrapper'}
+								>
+									<DivisionControlsComponent
+										// activityIndex={this.props.activityIndex}
+										activityUuid={this.props.activityUuid}
+										// divisionIndex={index}
+										divisionUuid={division.uuid}
+										// deleteDivision={this.deleteDivision}
+										// insertDivision={this.insertDivision}
+									/>
+									<DivisionComponent
+										key={maestroKey.getKey(this.props.activityUuid, index)}
+										// procedure={stateHandler.state.procedure}
+										// activity={activity}
+										// activityIndex={this.props.activityIndex}
+										activityUuid={this.props.activityUuid}
+										// division={division}
+										// divisionIndex={index}
+										divisionUuid={division.uuid}
+									/>
+								</React.Fragment>
 							);
 						})}
 					</tbody>
@@ -69,10 +127,11 @@ class ActivityComponent extends React.Component {
 }
 
 ActivityComponent.propTypes = {
-	procedure: PropTypes.object.isRequired,
-	activity: PropTypes.object.isRequired,
-	getProcedureWriter: PropTypes.func.isRequired,
-	activityIndex: PropTypes.number.isRequired
+	// procedure: PropTypes.object.isRequired,
+	// activity: PropTypes.object.isRequired,
+	// getProcedureWriter: PropTypes.func.isRequired,
+	// activityIndex: PropTypes.number.isRequired
+	activityUuid: PropTypes.string.isRequired
 };
 
 module.exports = ActivityComponent;

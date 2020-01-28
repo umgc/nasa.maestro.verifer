@@ -54,7 +54,7 @@ module.exports = class ReactTaskWriter extends TaskWriter {
 	}
 
 	// FIXME: duplication from HtmlTaskWriter or something like that
-	writeDivision(division, activityIndex, divisionIndex) {
+	writeDivision(division, activityUuid, divisionUuid) {
 		const divWriter = new EvaDivisionWriter();
 
 		const columns = divWriter.prepareDivision(
@@ -90,8 +90,8 @@ module.exports = class ReactTaskWriter extends TaskWriter {
 					const startStep = this.preInsertSteps(); // FIXME this doesn't seem right
 
 					const key = maestroKey.getKey(
-						activityIndex,
-						divisionIndex,
+						activityUuid,
+						divisionUuid,
 						columns[colId].stateColumnKey
 					);
 
@@ -103,8 +103,10 @@ module.exports = class ReactTaskWriter extends TaskWriter {
 							primaryColumnKey={columns[colId].stateColumnKey}
 							columnKeys={columns[colId].columnKeys}
 							seriesState={columns[colId].series}
-							activityIndex={activityIndex}
-							divisionIndex={divisionIndex}
+							// activityIndex={activityIndex}
+							activityUuid={activityUuid}
+							// divisionIndex={divisionIndex}
+							divisionUuid={divisionUuid}
 							taskWriter={this}
 						/>
 					);

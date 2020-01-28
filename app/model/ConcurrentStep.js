@@ -1,5 +1,7 @@
 'use strict';
 
+const uuidv4 = require('uuid/v4');
+
 const Step = require('./Step');
 const Series = require('./Series');
 
@@ -110,6 +112,8 @@ module.exports = class ConcurrentStep {
 		this.subscenes = {};
 		this.taskRoles = taskRoles; // make this available for re-rendering steps later
 
+		this.uuid = uuidv4();
+
 		// First, check if this is a simo
 		if (concurrentStepYaml.simo) {
 
@@ -142,7 +146,9 @@ module.exports = class ConcurrentStep {
 			}
 		}
 		const numActors = Object.keys(def).length;
-		if (numActors > 1) {
+		if (numActors === 0) {
+			return false;
+		} else if (numActors > 1) {
 			return { simo: def };
 		}
 		return def;

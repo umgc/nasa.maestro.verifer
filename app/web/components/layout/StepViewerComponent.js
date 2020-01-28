@@ -4,6 +4,7 @@ const { useDrag } = require('react-dnd');
 const ItemTypes = require('../../../model/ItemTypes');
 const PropTypes = require('prop-types');
 const StepDropLocationComponent = require('./StepDropLocationComponent');
+// const stateHandler = require('../../state/index');
 
 const liStyle = {
 	position: 'relative'
@@ -19,10 +20,10 @@ const editButtonsContainerStyle = {
 /**
  * @param {Function} editFn    Function to be run when clicking edit button
  * @param {Function} deleteFn  Function to be run when clicking delete button
- * @param {Function} insertStepAfter
+ * @param {Function} insertStepBefore
  * @return {Object}            React component
  */
-function renderButtons(editFn, deleteFn, insertStepAfter) {
+function renderButtons(editFn, deleteFn, insertStepBefore) {
 	return (
 		<div style={editButtonsContainerStyle} className='modify-step-button-container'>
 			<button
@@ -38,10 +39,10 @@ function renderButtons(editFn, deleteFn, insertStepAfter) {
 				delete
 			</button>
 			<button
-				onClick={insertStepAfter}
-				className='insert-step-after-button'
+				onClick={insertStepBefore}
+				className='insert-step-before-button'
 			>
-				insert step after
+				insert step before
 			</button>
 		</div>
 	);
@@ -50,9 +51,9 @@ function renderButtons(editFn, deleteFn, insertStepAfter) {
 const StepViewerComponent = ({
 	stepState, columnKeys, taskWriter,
 
-	activityIndex, divisionIndex, primaryColumnKey, stepIndex,
+	activityUuid, divisionUuid, primaryColumnKey, stepIndex,
 
-	handleEditButtonClick, handleDeleteButtonClick, handleMoveStep, handleInsertStepAfter
+	handleEditButtonClick, handleDeleteButtonClick, handleMoveStep, handleInsertStepBefore
 }) => {
 
 	// why does this need to be set here? Is this why actors inappropriately shown in react? FIXME.
@@ -61,14 +62,14 @@ const StepViewerComponent = ({
 	const options = { level: 0 };
 
 	const getStepPath = () => {
-		return { activityIndex, divisionIndex, primaryColumnKey, stepIndex };
+		return { activityUuid, divisionUuid, primaryColumnKey, stepIndex };
 	};
 
 	const seriesPathsMatch = (path1, path2) => {
 		const match = (prop) => (path1[prop] === path2[prop]);
 		return (
 			match('activityIndex') &&
-			match('divisionIndex') &&
+			match('divisionUuid') &&
 			match('primaryColumnKey')
 		);
 	};
@@ -120,7 +121,7 @@ const StepViewerComponent = ({
 			className={`li-level-${options.level} step-component`}
 			ref={drag}
 		>
-			{renderButtons(handleEditButtonClick, handleDeleteButtonClick, handleInsertStepAfter)}
+			{renderButtons(handleEditButtonClick, handleDeleteButtonClick, handleInsertStepBefore)}
 			{taskWriter.insertStep(stepState)}
 			<StepDropLocationComponent
 				canDropFn={canDropBeforeStep}
@@ -136,14 +137,16 @@ StepViewerComponent.propTypes = {
 	columnKeys: PropTypes.array.isRequired,
 	taskWriter: PropTypes.object.isRequired,
 
-	activityIndex: PropTypes.number.isRequired,
-	divisionIndex: PropTypes.number.isRequired,
+	// activityIndex: PropTypes.number.isRequired,
+	activityUuid: PropTypes.string.isRequired,
+	// divisionIndex: PropTypes.number.isRequired,
+	divisionUuid: PropTypes.string.isRequired,
 	primaryColumnKey: PropTypes.string.isRequired,
 	stepIndex: PropTypes.number.isRequired,
 
 	handleEditButtonClick: PropTypes.func.isRequired,
 	handleDeleteButtonClick: PropTypes.func.isRequired,
-	handleInsertStepAfter: PropTypes.func.isRequired,
+	handleInsertStepBefore: PropTypes.func.isRequired,
 	handleMoveStep: PropTypes.func.isRequired
 };
 

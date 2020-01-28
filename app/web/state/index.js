@@ -58,7 +58,8 @@ function recordAndReportChange(latestProcedure) {
 
 	changesDiffs.push(diffText);
 
-	console.log(diffText, ...css);
+	// FIXME reenable this!
+	// console.log(diffText, ...css);
 	setState({ lastProcDefinitionYaml: newYaml });
 
 }
@@ -122,16 +123,16 @@ function saveChangeWeb(program, activity, yamlString) {
  * @param {number} activityIndex                Activity file to save
  */
 function saveChange(program, procedure, activityIndex) {
-	const activity = procedure.tasks[activityIndex];
+	const activity = state.procedure.tasks[activityIndex];
 	const yamlString = YAML.dump(activity.getTaskDefinition());
 
 	if (window.isElectron) {
-		saveChangeElectron(program, activity, yamlString);
+		saveChangeElectron(state.program, activity, yamlString);
 	} else {
-		saveChangeWeb(program, activity, yamlString);
+		saveChangeWeb(state.program, activity, yamlString);
 	}
 
-	recordAndReportChange(procedure);
+	recordAndReportChange(state.procedure);
 }
 
 module.exports = {
