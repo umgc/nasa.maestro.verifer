@@ -3,30 +3,62 @@ const PropTypes = require('prop-types');
 const { DndProvider } = require('react-dnd');
 const Backend = require('react-dnd-html5-backend').default;
 
+const ASMenuComponent = require('../layout/ActivitySelector/ASMenuComponent');
 const stateHandler = require('../../state/index');
 
-// const ActivitySelectorMenu = require('./../layout/ActivitySelectorMenu');
 const ActivityComponent = require('../layout/ActivityComponent');
+const SummaryTimelineComponent = require('../layout/SummaryTimelineComponent');
+
 class ProcedureViewerComponent extends React.Component {
+
+	constructor(props) {
+		super(props);
+
+		this.state = {
+			currentActivityUuid: stateHandler.state.procedure.tasks[0].uuid,
+			showTimeline: true
+		};
+	}
+
+	updateCurrentActivity = (activityUuid) => {
+		console.log(`switching to activity ${activityUuid}`);
+		this.setState({ currentActivityUuid: activityUuid });
+	}
+
+	showTimeline = (show) => {
+		console.log(show ? 'showing timeline' : 'hiding timeline');
+		this.setState({ showTimeline: show });
+	}
+
 	render() {
 
-		// <ActivitySelectorMenu activities={this.props.procedure.tasks} />
+		console.log('render ProcedureViewerComponent');
 
 		return (
-			<React.Fragment>
-				<DndProvider backend={Backend}>
-					{stateHandler.state.procedure.tasks.map((task) => {
-						return (
-							<ActivityComponent
-								key={task.uuid}
-								// activity={task}
-								activityUuid={task.uuid}
-								// procedure={stateHandler.state.procedure}
-							/>
-						);
-					})}
-				</DndProvider>
-			</React.Fragment>
+			<DndProvider backend={Backend}>
+				{ this.state.currentActivityUuid && !this.state.showTimeline ?
+					<React.Fragment>
+						<ASMenuComponent
+							currentActivityUuid={this.state.currentActivityUuid}
+							updateCurrentActivity={this.updateCurrentActivity}
+							showTimeline={this.showTimeline}
+						/>
+						<ActivityComponent
+							key={this.state.currentActivityUuid}
+							activityUuid={this.state.currentActivityUuid}
+						/>
+						<ASMenuComponent
+							currentActivityUuid={this.state.currentActivityUuid}
+							updateCurrentActivity={this.updateCurrentActivity}
+							showTimeline={this.showTimeline}
+						/>
+					</React.Fragment> :
+					<SummaryTimelineComponent
+						showTimeline={this.showTimeline}
+						updateCurrentActivity={this.updateCurrentActivity}
+					/>
+				}
+			</DndProvider>
 		);
 
 	}

@@ -1,5 +1,6 @@
 'use strict';
 
 module.exports = {
-	STEP: 'step'
+	STEP: 'step',
+	TIMELINE_ACTIVITY: 'timeline_activity'
 };

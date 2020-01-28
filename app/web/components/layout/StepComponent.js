@@ -61,8 +61,7 @@ class StepComponent extends React.Component {
 		const activityIndex = stateHandler.state.procedure
 			.TasksHandler.getTaskIndexByUuid(this.props.activityUuid);
 
-		stateHandler.saveChange(stateHandler.state.program,
-			stateHandler.state.procedure, activityIndex);
+		stateHandler.saveChange(activityIndex);
 	}
 
 	handleInsertStepBefore = (e) => {
@@ -75,8 +74,7 @@ class StepComponent extends React.Component {
 		const activityIndex = stateHandler.state.procedure
 			.TasksHandler.getTaskIndexByUuid(this.props.activityUuid);
 
-		stateHandler.saveChange(stateHandler.state.program,
-			stateHandler.state.procedure, activityIndex);
+		stateHandler.saveChange(activityIndex);
 
 	}
 
@@ -160,8 +158,7 @@ class StepComponent extends React.Component {
 		const activityIndex = stateHandler.state.procedure
 			.TasksHandler.getTaskIndexByUuid(this.props.activityUuid);
 
-		stateHandler.saveChange(stateHandler.state.program,
-			stateHandler.state.procedure, activityIndex);
+		stateHandler.saveChange(activityIndex);
 
 		this.setState({
 			editMode: false

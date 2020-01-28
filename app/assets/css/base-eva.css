@@ -257,5 +257,20 @@ img {
 	display: block;
 }
 
+.modify-timeline-activity-controls {
+	display: none;
+}
 
+.task-block:hover .modify-timeline-activity-controls {
+	display: block;
+}
 
+.striped-background {
+	background: repeating-linear-gradient(
+		45deg,
+		#e6e6e6,
+		#e6e6e6 10px,
+		#c9c9c9 10px,
+		#c9c9c9 20px
+	);
+}

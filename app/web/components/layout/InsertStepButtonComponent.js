@@ -26,8 +26,7 @@ class InsertStepButtonComponent extends React.Component {
 			series.insertStep(this.props.stepIndex);
 		}
 
-		stateHandler.saveChange(stateHandler.state.program,
-			stateHandler.state.procedure, activityIndex);
+		stateHandler.saveChange(activityIndex);
 
 	}
 

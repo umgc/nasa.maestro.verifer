@@ -9,7 +9,7 @@ class DivisionComponent extends React.PureComponent {
 	constructor(props) {
 		super(props);
 		const activity = stateHandler.state.procedure.getTaskByUuid(this.props.activityUuid);
-		console.log('constructing DivisionComponent');
+		// console.log('constructing DivisionComponent');
 
 		this.taskWriter = new ReactTaskWriter(
 			activity,
@@ -18,7 +18,7 @@ class DivisionComponent extends React.PureComponent {
 	}
 
 	render() {
-		console.log(`rendering division ${this.props.divisionUuid}`);
+		// console.log(`rendering division ${this.props.divisionUuid}`);
 
 		const activity = stateHandler.state.procedure.getTaskByUuid(this.props.activityUuid);
 		const divisionIndex = activity.getDivisionIndexByUuid(this.props.divisionUuid);

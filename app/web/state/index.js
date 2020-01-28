@@ -5,6 +5,9 @@ const path = require('path');
 const YAML = require('js-yaml');
 const jsdiff = require('diff');
 
+const Procedure = require('../../model/Procedure');
+const Task = require('../../model/Task');
+
 const state = {};
 
 // FIXME should this be in state too?
@@ -26,13 +29,10 @@ function setState(changes) {
  * Compare procedure against previous version of procedure. Record state for comparison with future
  * changes and console.log() a diff from the previous change.
  *
- * @param {Procedure} latestProcedure  Procedure object with latest updates, used to generate latest
- *                                     YAML string to compare against previous change.
- *
  * FIXME: does this belong in stateHandler?
  */
-function recordAndReportChange(latestProcedure) {
-	const newYaml = YAML.dump(latestProcedure.getDefinition());
+function recordAndReportChange() {
+	const newYaml = YAML.dump(state.procedure.getDefinition());
 
 	const diff = jsdiff.diffLines(
 		state.lastProcDefinitionYaml,
@@ -65,15 +65,33 @@ function recordAndReportChange(latestProcedure) {
 }
 
 /**
+ *
+ */
+function getPathParts(taskOrProcedure) {
+	if (taskOrProcedure instanceof Procedure) {
+		return {
+			basepath: state.program.procedurePath,
+			filename: state.procedure.procedureFile
+		};
+	} else if (taskOrProcedure instanceof Task) {
+		return {
+			basepath: state.program.tasksPath,
+			filename: taskOrProcedure.taskReqs.file
+		};
+	}
+	throw new Error('taskOrProcedure must be Task or Procedure');
+}
+
+/**
  * Save yamlString to Activity file
  *
- * @param {ElectronProgram} program
- * @param {Task} activity
+ * @param {Task|Procedure} taskOrProcedure  Task or Procedure object
  * @param {string} yamlString
  */
-function saveChangeElectron(program, activity, yamlString) {
+function saveChangeElectron(taskOrProcedure, yamlString) {
+	const p = getPathParts(taskOrProcedure);
 	fs.writeFile(
-		path.join(program.tasksPath, activity.taskReqs.file),
+		path.join(p.basepath, p.filename),
 		yamlString,
 		{},
 		(err) => {
@@ -88,13 +106,17 @@ function saveChangeElectron(program, activity, yamlString) {
 /**
  * Save yamlString to Activity file
  *
- * @param {WebProgram} program
- * @param {Task} activity
+ * @param {Task|Procedure} taskOrProcedure
  * @param {string} yamlString
  */
-function saveChangeWeb(program, activity, yamlString) {
+function saveChangeWeb(taskOrProcedure, yamlString) {
+	const p = getPathParts(taskOrProcedure);
+	// console.log('------------------------->', p);
+	// console.log(' --------- program --->', state.program);
+	// console.log(taskOrProcedure);
+	// return; // FIXME remove this stuff
 	fetch(
-		`edit/tasks/${activity.taskReqs.file}`,
+		`edit/${p.basepath}/${p.filename}`,
 		{
 			method: 'POST', // or 'PUT'
 			headers: {
@@ -117,27 +139,40 @@ function saveChangeWeb(program, activity, yamlString) {
 /**
  * Save changes for a particular Activity
  *
- * @param {WebProgram|ElectronProgram} program
- * @param {Procedure} procedure                 Procedure with latest changes to be saved back
- *                                              to files
- * @param {number} activityIndex                Activity file to save
+ * @param {number} activityIndex                Index Activity to save to file
  */
-function saveChange(program, procedure, activityIndex) {
+function saveChange(activityIndex) {
 	const activity = state.procedure.tasks[activityIndex];
 	const yamlString = YAML.dump(activity.getTaskDefinition());
 
 	if (window.isElectron) {
-		saveChangeElectron(state.program, activity, yamlString);
+		saveChangeElectron(activity, yamlString);
 	} else {
-		saveChangeWeb(state.program, activity, yamlString);
+		saveChangeWeb(activity, yamlString);
 	}
 
-	recordAndReportChange(state.procedure);
+	recordAndReportChange();
+}
+
+/**
+ *
+ */
+function saveProcedureChange() {
+	const yamlString = YAML.dump(state.procedure.getOnlyProcedureDefinition());
+
+	if (window.isElectron) {
+		saveChangeElectron(state.procedure, yamlString);
+	} else {
+		saveChangeWeb(state.procedure, yamlString);
+	}
+
+	recordAndReportChange();
 }
 
 module.exports = {
 	state: state,
 	setState: setState,
 	saveChange: saveChange,
+	saveProcedureChange: saveProcedureChange,
 	recordAndReportChange: recordAndReportChange
 };

@@ -18,8 +18,8 @@ class App extends React.Component {
 	}
 
 	state = {
-		procedureName: null
-	};
+		procedureFile: null
+	}
 
 	setProcedure = (procObject) => {
 
@@ -38,7 +38,6 @@ class App extends React.Component {
 
 		this.setState({
 			procedureFile: stateHandler.state.procedure.filename
-			// procedureWriter: new ReactProcedureWriter(window.maestro.app, procObject)
 		});
 
 		console.log(`Procedure set to ${procObject.name}`);
@@ -66,8 +65,8 @@ class App extends React.Component {
 	}
 
 	render() {
-		console.log('render App');
-		console.log(this.state.procedureFile);
+		console.log(`Rendering App for ${this.state.procedureFile}`);
+		console.log(stateHandler.state);
 		return (
 			<div className='app'>
 				<HeaderComponent />

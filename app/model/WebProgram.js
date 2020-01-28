@@ -20,15 +20,19 @@ function fetchFileText(uri) {
 
 module.exports = class WebProgram extends Program {
 
-	constructor() {
+	constructor(reactAppComponent) {
 		super();
 		this.setPathsFromProject(false);
 		this.gitPath = '[NO GIT PATH IN BROWSER]';
+		this.isElectron = false;
+		this.reactAppComponent = reactAppComponent; // bind react App component to this
+		this.reactAppComponent.setProgram(this); // bind this to react App component
 	}
 
 	loadProcedure(procedureFilename) {
 
 		this.procedure = new Procedure();
+		this.procedure.procedureFile = procedureFilename;
 
 		return new Promise((resolveOuter, rejectOuter) => {
 			fetchFileText(`procedures/${procedureFilename}`)

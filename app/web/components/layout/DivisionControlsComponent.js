@@ -27,9 +27,7 @@ class DivisionControlsComponent extends React.PureComponent {
 
 		activity.deleteDivision(divisionIndex);
 
-		// FIXME: in stateHandler, make saveChange not need the first two inputs
-		stateHandler.saveChange(stateHandler.state.program,
-			stateHandler.state.procedure, activityIndex);
+		stateHandler.saveChange(activityIndex);
 	}
 
 	handleInsertButtonClick = (e) => {
@@ -47,9 +45,7 @@ class DivisionControlsComponent extends React.PureComponent {
 		const activity = stateHandler.state.procedure.tasks[activityIndex];
 		activity.insertDivision(divisionIndex);
 
-		// FIXME: in stateHandler, make saveChange not need the first two inputs
-		stateHandler.saveChange(stateHandler.state.program,
-			stateHandler.state.procedure, activityIndex);
+		stateHandler.saveChange(activityIndex);
 	}
 
 	// Fixme maybe this functionality should be broken out into another component?
@@ -65,9 +61,7 @@ class DivisionControlsComponent extends React.PureComponent {
 		const activity = stateHandler.state.procedure.tasks[activityIndex];
 		activity.appendDivision();
 
-		// FIXME: in stateHandler, make saveChange not need the first two inputs
-		stateHandler.saveChange(stateHandler.state.program,
-			stateHandler.state.procedure, activityIndex);
+		stateHandler.saveChange(activityIndex);
 	}
 
 	render() {
@@ -104,10 +98,13 @@ class DivisionControlsComponent extends React.PureComponent {
 		};
 
 		return (
-			<tr style={trTdStyle}>
+			<tr style={trTdStyle} className='division-controls-tr'>
 				<td colSpan="3" style={trTdStyle}>
 					<div style={wrapperStyle}>
-						<div style={contentDiv} className='division-controls'>
+						<div
+							style={contentDiv}
+							className='division-controls'
+						>
 							<div className='modify-division-hoverbox'></div>
 							<div style={controlsStyle} className='modify-division-container'>
 								{ this.props.divisionUuid !== 'last' ?

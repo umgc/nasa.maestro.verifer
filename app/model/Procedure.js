@@ -49,17 +49,19 @@ module.exports = class Procedure {
 		this.ColumnsHandler = new ColumnsHandler();
 	}
 
-	getDefinition() {
-
-		const procedure = {
+	getOnlyProcedureDefinition() {
+		return {
 			// eslint-disable-next-line camelcase
 			procedure_name: this.name,
 			columns: this.ColumnsHandler.getDefinition(),
 			tasks: this.TasksHandler.getRequirementsDefinitions()
 		};
+	}
+
+	getDefinition() {
 
 		return {
-			procedureDefinition: procedure,
+			procedureDefinition: this.getOnlyProcedureDefinition(),
 			taskDefinitions: this.TasksHandler.getTaskDefinitions()
 		};
 	}
@@ -210,7 +212,8 @@ module.exports = class Procedure {
 
 	setName(value) {
 		this.name = value;
-		this.filename = filenamify(value.replace(/\s+/g, '_'));
+		this.filename = filenamify(value.replace(/\s+/g, '_')); // FIXME this doesn't have .yml ?!?!
+		// FIXME also how does this jive with this.procedureFile
 	}
 
 	/**
@@ -343,7 +346,7 @@ module.exports = class Procedure {
 		const roleLatestAct = {};
 
 		// Loop over all tasks and all roles within those tasks
-		for (const currentTask of this.tasks) {
+		for (const currentTask of this.TasksHandler.tasks) {
 			for (const role in currentTask.actorRolesDict) {
 
 				// If the role has a defined latest activity
@@ -378,7 +381,7 @@ module.exports = class Procedure {
 			}
 		}
 
-		this.timeSync = new TimeSync(this.tasks, false);
+		this.timeSync = new TimeSync(this.TasksHandler.tasks, false);
 		this.timeSync.sync();
 		this.taskEndpoints = this.timeSync.endpoints();
 
@@ -396,10 +399,14 @@ module.exports = class Procedure {
 		}
 	}
 
-	getTaskByUuid(uuid) {
+	getTaskByUuid(uuid, allowMissing = false) {
 		const index = this.TasksHandler.getTaskIndexByUuid(uuid);
 		if (index === -1 || index > this.tasks.length - 1) {
-			throw new Error(`Task with uuid ${uuid} not found`);
+			if (allowMissing) {
+				return null;
+			} else {
+				throw new Error(`Task with uuid ${uuid} not found`);
+			}
 		}
 		return this.tasks[index];
 	}

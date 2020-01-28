@@ -28,7 +28,7 @@ class SeriesComponent extends React.Component {
 		super(props);
 
 		// console.log('constructing series component', this.props);
-		console.log('constructing series component');
+		// console.log('constructing series component');
 
 		// FIXME get this from Series, or better yet from someplace centralized. So either:
 		//   a) this.unsubscribeFns = Series.getUnsubscribeFns()
@@ -101,8 +101,7 @@ class SeriesComponent extends React.Component {
 		const activityIndex = stateHandler.state.procedure
 			.TasksHandler.getTaskIndexByUuid(this.props.activityUuid);
 
-		stateHandler.saveChange(stateHandler.state.program,
-			stateHandler.state.procedure, activityIndex);
+		stateHandler.saveChange(activityIndex);
 
 	}
 
@@ -126,7 +125,7 @@ class SeriesComponent extends React.Component {
 	render() {
 		// const startStep = this.props.taskWriter.preInsertSteps();
 
-		console.log(`rendering series with colKeys = ${this.props.columnKeys}`);
+		// console.log(`rendering series with colKeys = ${this.props.columnKeys}`);
 
 		return (
 			<td key={uuidv4()} colSpan={this.props.colspan} className='series-td'>

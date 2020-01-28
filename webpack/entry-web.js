@@ -44,10 +44,10 @@ window.maestro = {
 };
 
 // require('./app/web/ui/timeline');
+const app = <App />;
+ReactDOM.render(app, document.getElementById('root'));
 
 window.maestro.app = new window.maestro.WebProgram(window.appComponent);
-
-ReactDOM.render(<App />, document.getElementById('root'));
 
 console.log(`     __  ______    _____________________  ____
     /  |/  /   |  / ____/ ___/_  __/ __ \\/ __ \\

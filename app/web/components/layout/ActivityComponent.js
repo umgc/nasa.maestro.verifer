@@ -17,7 +17,7 @@ class ActivityComponent extends React.Component {
 
 	constructor(props) {
 		super(props);
-		console.log('Constructing ActivityComponent');
+		// console.log('Constructing ActivityComponent');
 
 		this.unsubscribeFns = {
 			deleteDivision: null,
