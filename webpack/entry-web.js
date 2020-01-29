@@ -31,6 +31,7 @@ window.maestro = {
 
 	// helpers
 	typeHelper: require('../app/helpers/typeHelper'),
+	jsonHelper: require('../app/helpers/jsonHelper'),
 
 	// writers
 	EvaHtmlProcedureWriter: require('../app/writer/procedure/EvaHtmlProcedureWriter'),

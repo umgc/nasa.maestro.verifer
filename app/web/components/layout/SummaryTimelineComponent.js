@@ -17,29 +17,59 @@ class SummaryTimelineComponent extends React.Component {
 			activityOrder: stateHandler.state.procedure.TasksHandler.getTaskUuids()
 		};
 
-		this.unsubscribeFns = {
-			deleteTask: null,
-			insertTask: null,
-			moveTask: null
-		};
+		this.unsubscribeFns = [];
+
+		// subscribe to TasksHandler functions
+		this.tasksHandlerSetStateSubscriptions = [
+			'deleteTask',
+			'insertTask',
+			'moveTask'
+		];
+
+		// subscribe to TasksHandler functions that will impact the timeline but are not tied to
+		// local state. Each of these are really _Task_ functions, not _TasksHandler_, but
+		// TasksHandler handles the subscription so UI doesn't have to subscribe to _every_ task.
+		this.tasksHandlerRerenderSubscriptions = [
+			'timeUpdates',
+			'updateTaskRequirements',
+			'setTitle',
+			'updateRolesDefinitions'
+		];
 
 	}
 
 	componentDidMount() {
-		for (const modelMethod in this.unsubscribeFns) {
-			this.unsubscribeFns[modelMethod] = stateHandler.state.procedure.TasksHandler.subscribe(
-				modelMethod,
-				(newState) => {
-					this.setState({ activityOrder: newState.getTaskUuids() });
-				}
+		for (const modelMethod of this.tasksHandlerSetStateSubscriptions) {
+			this.unsubscribeFns.push(
+				stateHandler.state.procedure.TasksHandler.subscribe(
+					modelMethod,
+					(newState) => {
+						this.setState({ activityOrder: newState.getTaskUuids() });
+					}
+				)
 			);
 		}
+
+		for (const modelMethod of this.tasksHandlerRerenderSubscriptions) {
+			this.unsubscribeFns.push(
+				stateHandler.state.procedure.TasksHandler.subscribe(
+					modelMethod,
+					(task) => {
+						console.log(`forcing timeline render due to ${modelMethod} event on ${task.title}`);
+						// this.forceUpdate(); // FIXME is this best way? No state is tracking this.
+						this.setState(this.state);
+					}
+				)
+			);
+		}
+
 	}
 
 	componentWillUnmount() {
-		for (const modelMethod in this.unsubscribeFns) {
-			this.unsubscribeFns[modelMethod](); // run each unsubscribe function
+		for (const unsubscribe of this.unsubscribeFns) {
+			unsubscribe(); // run each unsubscribe function
 		}
+		stateHandler.setEditorNode(null);
 	}
 
 	render() {
@@ -56,8 +86,8 @@ class SummaryTimelineComponent extends React.Component {
 		return (
 			<div>
 				<div style={headerStyle}>
-					<h2>{stateHandler.state.procedure.name}</h2>
-					<h3>Summary Timeline</h3>
+					<h2>{stateHandler.state.procedure.name} - Summary Timeline</h2>
+					<h4>PET {stateHandler.state.procedure.getActualDuration().format('H:M')}</h4>
 				</div>
 				<div className='timeline' style={timelineStyle}>
 					{this.genTimelineMarkings(timelineMarkings, true)}

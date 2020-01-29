@@ -104,6 +104,26 @@ function saveChangeElectron(taskOrProcedure, yamlString) {
 }
 
 /**
+ *
+ * @param {*} path
+ */
+function exists(path) {
+	fetch(
+		path,
+		{
+			method: 'POST' // or 'PUT'
+		}
+	)
+		.then((response) => response.json())
+		.then((data) => {
+			console.log('Success:', data);
+		})
+		.catch((error) => {
+			console.error('Error:', error);
+		});
+}
+
+/**
  * Save yamlString to Activity file
  *
  * @param {Task|Procedure} taskOrProcedure
@@ -111,10 +131,6 @@ function saveChangeElectron(taskOrProcedure, yamlString) {
  */
 function saveChangeWeb(taskOrProcedure, yamlString) {
 	const p = getPathParts(taskOrProcedure);
-	// console.log('------------------------->', p);
-	// console.log(' --------- program --->', state.program);
-	// console.log(taskOrProcedure);
-	// return; // FIXME remove this stuff
 	fetch(
 		`edit/${p.basepath}/${p.filename}`,
 		{
@@ -174,5 +190,6 @@ module.exports = {
 	setState: setState,
 	saveChange: saveChange,
 	saveProcedureChange: saveProcedureChange,
-	recordAndReportChange: recordAndReportChange
+	recordAndReportChange: recordAndReportChange,
+	exists: exists
 };

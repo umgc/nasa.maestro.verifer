@@ -19,8 +19,7 @@ const SummaryTimelineComponent = ({
 		height: `${height}px`,
 		backgroundColor: fillColor,
 		fontSize: `${textSize}px`,
-		position: 'relative',
-		padding: '1px 3px'
+		position: 'relative'
 	};
 	if (marginTop) {
 		blockStyle.marginTop = `${marginTop}px`;
@@ -60,14 +59,8 @@ const SummaryTimelineComponent = ({
 
 	const handleEditMetaClick = (event) => {
 		console.log(`clicked "edit metadata" for timeline activity ${event.target.dataset.uuid}`);
-	};
-
-	const handleDeleteClick = (event) => {
-		console.log(`clicked "delete" for timeline activity ${event.target.dataset.uuid}`);
-		const taskUuid = stateHandler.state.procedure.TasksHandler
-			.getTaskIndexByUuid(event.target.dataset.uuid);
-		stateHandler.state.procedure.TasksHandler.deleteTask(taskUuid);
-		stateHandler.saveProcedureChange();
+		const task = stateHandler.state.procedure.getTaskByUuid(event.target.dataset.uuid);
+		stateHandler.setEditorNode(task);
 	};
 
 	const canDropBeforeBlock = (item, monitor) => {
@@ -109,11 +102,28 @@ const SummaryTimelineComponent = ({
 		})
 	});
 
-	console.log('minutesGap', minutesGap);
 	const timeWasteWarning = minutesGap > 0 ?
 		<span style={{ color: 'red', fontWeight: 'bold', marginLeft: '10px' }}>
 			{minutesGap} minutes wasted before this activity!
 		</span> : null;
+
+	const handleOnMouseOver = (event) => {
+		const className = `block-${event.target.dataset.uuid}`;
+		// console.log('over: ' + className);
+		const blocks = document.getElementsByClassName(className);
+		for (const block of blocks) {
+			block.classList.add('timeline-hover');
+		}
+	};
+
+	const handleOnMouseOut = (event) => {
+		const className = `block-${event.target.dataset.uuid}`;
+		// console.log('out: ' + className);
+		const blocks = document.getElementsByClassName(className);
+		for (const block of blocks) {
+			block.classList.remove('timeline-hover');
+		}
+	};
 
 	return (
 		<div
@@ -126,20 +136,29 @@ const SummaryTimelineComponent = ({
 			}}
 			ref={drag}
 		>
-			<span>{title}</span>
+			<div
+				data-uuid={uuid}
+				className={`block-${uuid} task-block-content`}
+				style={{
+					width: '100%',
+					height: '100%',
+					padding: '1px 3px'
+				}}
+				onMouseOver={handleOnMouseOver}
+				onMouseOut={handleOnMouseOut}
+			>
+				<span>{title}</span>
 				&nbsp;
-			<span>({duration})</span>
-			{timeWasteWarning}
-			<div style={controlsStyle} className='modify-timeline-activity-controls'>
-				<button onClick={handleViewStepsClick} data-uuid={uuid}>
+				<span>({duration})</span>
+				{timeWasteWarning}
+				<div style={controlsStyle} className='modify-timeline-activity-controls'>
+					<button onClick={handleViewStepsClick} data-uuid={uuid}>
 						view steps
-				</button>
-				<button onClick={handleEditMetaClick} data-uuid={uuid}>
+					</button>
+					<button onClick={handleEditMetaClick} data-uuid={uuid}>
 						edit metadata
-				</button>
-				<button onClick={handleDeleteClick} data-uuid={uuid}>
-						delete
-				</button>
+					</button>
+				</div>
 			</div>
 			<SummaryTimelineBlockDropLocationComponent
 				canDropFn={canDropBeforeBlock}

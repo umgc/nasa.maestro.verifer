@@ -28,7 +28,14 @@ module.exports = class TasksHandler {
 		this.subscriberFns = {
 			deleteTask: [],
 			insertTask: [],
-			moveTask: []
+			moveTask: [],
+
+			// these are actions really made against individual tasks, but subscription happens here
+			timeUpdates: [],
+			updateTaskRequirements: [], // this data is stored in the procedure file, but task model
+			// NOT YET IMPLEMENTED updateTaskDefinition: [],
+			setTitle: [],
+			updateRolesDefinitions: []
 		};
 
 		procTaskDefs.forEach((procTaskDef, index) => {
@@ -140,13 +147,8 @@ module.exports = class TasksHandler {
 		subscriptionHelper.run(this.subscriberFns.moveTask, this);
 	}
 
-	syntaxerror - that will lead us here
 	// TOMORROW
-	//    create Task.canonicalRoles ==> task.rolesArr.map((taskRole) => taskRole.name)  +  procedure.getAstreriskColumnKey()
-	//    generate .steps below from canonicalRoles, filling in text like "One small step"
-	//    verify works okay with maestro.state.state.procedure.TasksHandler.insertTask(0);
-	//
-	// Make modal form box component
+	// Make ~modal~ right sidebar form box component
 	//
 	// Then make form with:
 	//    .title --> filenamify to .file  - verify not a used filename (either in model or on disk)
@@ -171,12 +173,33 @@ module.exports = class TasksHandler {
 		file = file || 'Temp_Name';
 		rolesCast = rolesCast || { crewA: 'EV1', crewB: 'EV2' };
 		color = color || '#FFDEAD';
+
 		const task = new Task({ file, roles: rolesCast, color }, this.procedure);
+
 		title = title || 'Temp Name';
-		rolesNeeded = rolesNeeded || [{ name: 'crewA', duration: { hours: 1 } }];
-		steps = steps || [{ simo: { IV: [], EV1: [], EV2: [] } }];
+		rolesNeeded = rolesNeeded || Object.keys(rolesCast).map((role) => {
+			return { name: role, duration: { minutes: 30 } };
+		});
+		steps = steps || [];
+
 		task.addTaskDefinition({ title, roles: rolesNeeded, steps });
+
+		task.appendDivision(task.getEmptyDivisionDefinition(true, 'One small step'));
 		return task;
+	}
+
+	notifyTaskSubscription(subscriptionName, task) {
+		console.log(`TasksHandler running notifier for ${subscriptionName} on ${task.title}`);
+		subscriptionHelper.run(this.subscriberFns[subscriptionName], task);
+	}
+
+	makeStepsDef(task) {
+		const stepsDef = [{ simo: {} }];
+		const canonRoles = task.getCanonicalRoles();
+		for (const role of canonRoles) {
+			stepsDef[0].simo[role] = [{ text: 'One small step' }];
+		}
+		return stepsDef;
 	}
 
 	getTaskUuids() {

@@ -54,7 +54,7 @@ module.exports = class Series {
 	 * @param {Step} step  Step model to push to this Series
 	 */
 	appendStep(step = false) {
-		console.log('Series.appendStep');
+		// console.log('Series.appendStep');
 		if (!step) {
 			step = this.makeStep();
 		}
@@ -63,13 +63,13 @@ module.exports = class Series {
 	}
 
 	deleteStep(stepIndex) {
-		console.log('Series.deleteStep');
+		// console.log('Series.deleteStep');
 		this.steps.splice(stepIndex, 1);
 		subscriptionHelper.run(this.subscriberFns.deleteStep, this);
 	}
 
 	insertStep(insertIndex, step = false) {
-		console.log('Series.insertStep');
+		// console.log('Series.insertStep');
 		if (!step) {
 			step = this.makeStep();
 		}
@@ -78,7 +78,7 @@ module.exports = class Series {
 	}
 
 	transferStep(removalIndex, destinationSeries, insertIndex) {
-		console.log('Series.transferStep');
+		// console.log('Series.transferStep');
 		const [stepToTransfer] = this.steps.splice(removalIndex, 1);
 
 		// transferring step within this Series

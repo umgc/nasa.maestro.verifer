@@ -131,17 +131,14 @@ module.exports = class Task {
 		};
 
 		this.title = '';
-
 		this.uuid = uuidv4(); // used by Procedure/TasksHandler to find this Task
 
 		this.divisionUuidToObj = {}; // used by Task to find Divisions
 
-		// Why "requirements"? See TaskRequirements
-		this.taskReqs = new TaskRequirements(taskRequirementsDef, this);
-
+		this.procedure = procedure;
 		this.concurrentSteps = [];
 
-		this.procedure = procedure;
+		this.updateTaskRequirements(taskRequirementsDef);
 	}
 
 	getDefinition() {
@@ -175,6 +172,34 @@ module.exports = class Task {
 			steps: concurrentStepsDefs
 		};
 		// throw new Error('NOT YET DEFINED');
+	}
+
+	setTitle(title) {
+		if (this.title === title) {
+			console.log(`skipping Task.setTitle(); Identical titles: ${title}`);
+			return;
+		}
+		console.log(`Running Task.setTitle(); Was ${this.title}. Is ${title}`);
+		this.title = title;
+
+		// allows UI to subscribe to all task events through TasksHandler
+		this.procedure.TasksHandler.notifyTaskSubscription('setTitle', this);
+	}
+
+	updateTaskRequirements(taskRequirementsDef) {
+		// Why "requirements"? See TaskRequirements
+		if (!this.taskReqs) {
+			this.taskReqs = new TaskRequirements(taskRequirementsDef, this);
+		} else {
+			this.taskReqs.updateDefinition(taskRequirementsDef);
+		}
+
+		// when procedure is initially loading, reference to TasksHandler not available yet. Should
+		// not need to subscribe to changes at that point (knock on wood).
+		if (this.procedure.TasksHandler) {
+			// allows UI to subscribe to all task events through TasksHandler
+			this.procedure.TasksHandler.notifyTaskSubscription('updateTaskRequirements', this);
+		}
 	}
 
 	// FIXME this is copied* directly from Step. Create "ReloadableModel" and make them extend it?
@@ -211,6 +236,11 @@ module.exports = class Task {
 		console.log('Activity.appendDivision');
 		if (!division) {
 			division = new ConcurrentStep(this.getEmptyDivisionDefinition(), this.rolesDict);
+		} else if (typeof division === 'object' && !(division instanceof ConcurrentStep)) {
+			// assume it's a division definition
+			division = new ConcurrentStep(division, this.rolesDict);
+		} else {
+			throw new Error('division must be ConcurrentStep, division definition, or falsy');
 		}
 		this.concurrentSteps.push(division);
 		this.divisionUuidToObj[division.uuid] = division;
@@ -219,12 +249,21 @@ module.exports = class Task {
 
 	/**
 	 * Get the most basic form of a definition of a division for this activity
+	 *
+	 * @param {boolean} canonical - Whether to get canonical roles or those currently in use. FIXME
+	 *                              there's no real reason to get anything but canonical, I think,
+	 *                              except that it throws errors in editor UI at the moment.
+	 * @param {string|boolean} dummyStepText - If string, make a step with that text for each role.
+	 * @return {Object}            Like { simo: { crewA: [], crewB: [], IV: [] }}
 	 */
-	getEmptyDivisionDefinition() {
+	getEmptyDivisionDefinition(canonical = false, dummyStepText = false) {
 		const def = { simo: {} };
-		const colKeys = this.getColumns();
+		const colKeys = canonical ? this.getCanonicalRoles() : this.getColumns();
 		for (const key of colKeys) {
 			def.simo[key] = []; // create an empty array of steps for this actor
+			if (dummyStepText) {
+				def.simo[key].push(dummyStepText);
+			}
 		}
 		return def;
 	}
@@ -240,28 +279,10 @@ module.exports = class Task {
 		typeHelper.errorIfIsnt(taskDef.title, 'string');
 		typeHelper.errorIfIsnt(taskDef.steps, 'array');
 
-		this.title = taskDef.title;
+		this.setTitle(taskDef.title);
 
 		if (taskDef.roles) {
-			this.rolesDict = {};
-			this.rolesArr = [];
-			this.actorRolesDict = {};
-			for (const role of taskDef.roles) {
-				if (!role.name) {
-					consoleHelper.error([
-						'Roles require a name, none found in role definition',
-						role
-					], 'Task role definition error');
-				}
-				this.rolesDict[role.name] = new TaskRole(role, this.taskReqs);
-				this.rolesArr.push(this.rolesDict[role.name]);
-
-				// task defines roles, procedure applies actors to roles in TaskRole object. Get
-				// "actor" for this task from that.
-				const actor = this.rolesDict[role.name].actor;
-
-				this.actorRolesDict[actor] = this.rolesDict[role.name]; // for convenience
-			}
+			this.updateRolesDefinitions(taskDef.roles);
 		}
 
 		// Get the steps.  ConcurrentSteps class will handle the simo vs actor stuff in the yaml.
@@ -271,6 +292,48 @@ module.exports = class Task {
 			this.concurrentSteps.push(division);
 		}
 
+	}
+
+	updateRolesDefinitions(rolesDef, runTimeSync = false) {
+
+		// if (!this.rolesDict) {
+		this.rolesDict = {};
+		// }
+		// if (!this.rolesArr) {
+		this.rolesArr = [];
+		// }
+		// if (!this.actorRolesDict) {
+		this.actorRolesDict = {};
+		// }
+
+		// FIXME remove anything in this.actorRolesDict, etc, that isn't in new definition
+
+		for (const role of rolesDef) {
+			console.log('role', role);
+			if (!role.name) {
+				consoleHelper.error([
+					'Roles require a name, none found in role definition',
+					role
+				], 'Task role definition error');
+			}
+			this.rolesDict[role.name] = new TaskRole(role, this.taskReqs);
+			this.rolesArr.push(this.rolesDict[role.name]);
+
+			// task defines roles, procedure applies actors to roles in TaskRole object. Get
+			// "actor" for this task from that.
+			const actor = this.rolesDict[role.name].actor;
+
+			this.actorRolesDict[actor] = this.rolesDict[role.name]; // for convenience
+		}
+
+		if (runTimeSync) {
+			this.procedure.setupTimeSync();
+		}
+
+		// allows UI to subscribe to all task events through TasksHandler
+		if (this.procedure.TasksHandler) {
+			this.procedure.TasksHandler.notifyTaskSubscription('updateRolesDefinitions', this);
+		}
 	}
 
 	/**
@@ -362,6 +425,11 @@ module.exports = class Task {
 	 */
 	setStartTimeForRole(actor, time) {
 		doTimeUpdate(this, actor, 'startTime', time, 'endTime');
+
+		this.procedure.setupTimeSync(); // overkill? Do this less often?
+
+		// allows UI to subscribe to all task events through TasksHandler
+		this.procedure.TasksHandler.notifyTaskSubscription('timeUpdates', this);
 		return this;
 	}
 
@@ -375,6 +443,11 @@ module.exports = class Task {
 	 */
 	setEndTimeForRole(actor, time) {
 		doTimeUpdate(this, actor, 'endTime', time, 'startTime');
+
+		this.procedure.setupTimeSync(); // overkill? Do this less often?
+
+		// allows UI to subscribe to all task events through TasksHandler
+		this.procedure.TasksHandler.notifyTaskSubscription('timeUpdates', this);
 		return this;
 	}
 
@@ -388,6 +461,11 @@ module.exports = class Task {
 	 */
 	setDurationForRole(actor, time) {
 		doTimeUpdate(this, actor, 'duration', time, 'endTime');
+
+		this.procedure.setupTimeSync(); // overkill? Do this less often?
+
+		// allows UI to subscribe to all task events through TasksHandler
+		this.procedure.TasksHandler.notifyTaskSubscription('timeUpdates', this);
 		return this;
 	}
 
@@ -406,6 +484,26 @@ module.exports = class Task {
 			throw new Error(`Division with uuid ${uuid} not found`);
 		}
 		return this.concurrentSteps[index];
+	}
+
+	// create Task.canonicalRoles ==> task.rolesArr.map((taskRole) => taskRole.name)
+	//                                 +  procedure.getAstreriskColumnKey()
+
+	/**
+	 * Get roles defined in this task (e.g. this.rolesArr, etc) _plus_ the procedure's column key
+	 * for the column with a wildcard actor ('*') if it exists.
+	 *
+	 * @return {Array}  Like ['crewA', 'crewB', 'IV']
+	 */
+	getCanonicalRoles() {
+		// get array like ['crewA', 'crewB']
+		const canonical = this.rolesArr.map((taskRole) => taskRole.name);
+		try {
+			canonical.push(this.procedure.ColumnsHandler.getActorColumnKey('*'));
+		} catch (e) {
+			console.log('No wildcard column');
+		}
+		return canonical;
 	}
 
 };

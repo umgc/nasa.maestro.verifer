@@ -6,6 +6,7 @@ const YAML = require('js-yaml');
 const stateHandler = require('../state/index');
 // const PropTypes = require('prop-types'); FIXME CLEANPUP
 const HeaderComponent = require('./layout/HeaderComponent');
+const SidebarComponent = require('./layout/SidebarComponent');
 const ProcedureViewerComponent = require('./pages/ProcedureViewerComponent');
 const ProcedureSelectorComponent = require('./pages/ProcedureSelectorComponent');
 const ReactProcedureWriter = require('../../writer/procedure/ReactProcedureWriter');
@@ -65,22 +66,27 @@ class App extends React.Component {
 	}
 
 	render() {
-		console.log(`Rendering App for ${this.state.procedureFile}`);
-		console.log(stateHandler.state);
 		return (
-			<div className='app'>
-				<HeaderComponent />
-				<div className='procedure-container' style={{ margin: '0 20px' }}>
-					{typeof this.state.procedureFile === 'string' ?
-						(
-							<ProcedureViewerComponent
-								procedureFile={this.state.procedureFile}
-							/>
-						) :
-						this.renderNoProcedure()
-					}
+			<React.Fragment>
+				<header id='main-header'>
+					<h1>Maestro</h1>
+				</header>
+				<div id='sidebar-and-content-wrapper'>
+					<div id="sidebar">
+						<SidebarComponent />
+					</div>
+					<div id='content'>
+						{typeof this.state.procedureFile === 'string' ?
+							(
+								<ProcedureViewerComponent
+									procedureFile={this.state.procedureFile}
+								/>
+							) :
+							this.renderNoProcedure()
+						}
+					</div>
 				</div>
-			</div>
+			</React.Fragment>
 		);
 	}
 }

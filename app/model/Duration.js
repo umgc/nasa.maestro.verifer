@@ -33,6 +33,10 @@ module.exports = class Duration {
 
 		const errors = [];
 		for (const t of ['hours', 'minutes', 'seconds']) {
+			if (typeof duration[t] === 'string') {
+				duration[t] = parseInt(duration[t]);
+			}
+
 			if (duration[t] && !Number.isInteger(duration[t])) {
 				errors.push(`duration ${t} must be an integer`);
 			}
