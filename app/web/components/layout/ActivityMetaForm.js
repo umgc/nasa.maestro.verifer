@@ -21,6 +21,7 @@ const Duration = require('../../../model/Duration');
 // };
 
 const ActivityMetaForm = ({ task }) => {
+
 	const taskDef = task.getDefinition();
 	const initial = {
 		title: taskDef.task.title,
@@ -71,6 +72,28 @@ const ActivityMetaForm = ({ task }) => {
 		stateHandler.saveProcedureChange();
 		stateHandler.setEditorNode(null);
 	};
+
+	React.useEffect(() => {
+
+		/**
+		 *
+		 */
+		function cleanup() {
+			const currentSelected = document.getElementsByClassName('timeline-selected');
+			for (const block of currentSelected) {
+				block.classList.remove('timeline-selected');
+			}
+		}
+
+		cleanup();
+
+		const blocks = document.getElementsByClassName(`block-${task.uuid}`);
+		for (const block of blocks) {
+			block.classList.add('timeline-selected');
+		}
+
+		return cleanup;
+	});
 
 	return (
 		<div>

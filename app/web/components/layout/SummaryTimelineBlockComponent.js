@@ -135,6 +135,7 @@ const SummaryTimelineComponent = ({
 				opacity: isDragging ? 0.5 : 1
 			}}
 			ref={drag}
+			onClick={handleEditMetaClick}
 		>
 			<div
 				data-uuid={uuid}
@@ -153,10 +154,7 @@ const SummaryTimelineComponent = ({
 				{timeWasteWarning}
 				<div style={controlsStyle} className='modify-timeline-activity-controls'>
 					<button onClick={handleViewStepsClick} data-uuid={uuid}>
-						view steps
-					</button>
-					<button onClick={handleEditMetaClick} data-uuid={uuid}>
-						edit metadata
+						go to steps
 					</button>
 				</div>
 			</div>

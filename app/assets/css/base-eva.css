@@ -282,10 +282,10 @@ img {
 .striped-background {
 	background: repeating-linear-gradient(
 		45deg,
-		#e6e6e6,
-		#e6e6e6 10px,
-		#c9c9c9 10px,
-		#c9c9c9 20px
+		#e6e6e666,
+		#e6e6e666 10px,
+		#c9c9c966 10px,
+		#c9c9c966 20px
 	);
 }
 
@@ -384,10 +384,10 @@ img {
 
 .timeline-selected {
 	background: repeating-linear-gradient(
-		45deg,
-		#0d11fa,
-		#0d11fa 10px,
-		#c9c9c9 10px,
-		#c9c9c9 20px
+		-45deg,
+		#05410036,
+		#05410036 5px,
+		#c9c9c936 5px,
+		#c9c9c936 10px
 	);
 }
