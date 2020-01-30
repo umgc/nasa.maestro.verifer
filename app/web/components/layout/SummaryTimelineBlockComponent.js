@@ -52,12 +52,14 @@ const SummaryTimelineComponent = ({
 	};
 
 	const handleViewStepsClick = (event) => {
+		event.stopPropagation();
 		console.log(`clicked "view steps" for timeline activity ${event.target.dataset.uuid}`);
 		updateCurrentActivity(event.target.dataset.uuid);
 		showTimeline(false);
 	};
 
 	const handleEditMetaClick = (event) => {
+		event.stopPropagation();
 		console.log(`clicked "edit metadata" for timeline activity ${event.target.dataset.uuid}`);
 		const task = stateHandler.state.procedure.getTaskByUuid(event.target.dataset.uuid);
 		stateHandler.setEditorNode(task);
@@ -125,6 +127,18 @@ const SummaryTimelineComponent = ({
 		}
 	};
 
+	const handleInsertActivityClick = (event) => {
+		event.stopPropagation();
+		const th = stateHandler.state.procedure.TasksHandler;
+		const insertIndex = th.getTaskIndexByUuid(event.target.dataset.uuid) + 1;
+		th.insertTask(insertIndex);
+		const task = th.tasks[insertIndex];
+		stateHandler.saveChange(insertIndex);
+		stateHandler.saveProcedureChange();
+
+		stateHandler.setEditorNode(task);
+	};
+
 	return (
 		<div
 			key={uuid}
@@ -153,6 +167,9 @@ const SummaryTimelineComponent = ({
 				<span>({duration})</span>
 				{timeWasteWarning}
 				<div style={controlsStyle} className='modify-timeline-activity-controls'>
+					<button onClick={handleInsertActivityClick} data-uuid={uuid}>
+						insert activity below
+					</button>
 					<button onClick={handleViewStepsClick} data-uuid={uuid}>
 						go to steps
 					</button>

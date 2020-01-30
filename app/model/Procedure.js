@@ -40,13 +40,13 @@ function translatePath(procedureFilePath, taskFileName) {
 
 module.exports = class Procedure {
 
-	constructor() {
+	constructor(options = {}) {
 		this.name = '';
 		this.filename = '';
 		this.actors = [];
 
 		// this.columns = []; // <-- switch to model below instead
-		this.ColumnsHandler = new ColumnsHandler();
+		this.ColumnsHandler = new ColumnsHandler(false, options);
 	}
 
 	getOnlyProcedureDefinition() {

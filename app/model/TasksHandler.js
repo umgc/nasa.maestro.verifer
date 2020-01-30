@@ -31,11 +31,15 @@ module.exports = class TasksHandler {
 			moveTask: [],
 
 			// these are actions really made against individual tasks, but subscription happens here
-			timeUpdates: [],
-			updateTaskRequirements: [], // this data is stored in the procedure file, but task model
-			// NOT YET IMPLEMENTED updateTaskDefinition: [],
-			setTitle: [],
-			updateRolesDefinitions: []
+			timeUpdates: [], // FIXME should this be handled by setState() ?
+			setState: [],
+
+			// Still do this?
+			updateTaskRequirements: [] // this data is stored in procedure file, but task model
+
+			// FIXME removed to instead use setState for all subscribable functions
+			// // NOT YET IMPLEMENTED updateTaskDefinition: [],
+			// setTitle: [],
 		};
 
 		procTaskDefs.forEach((procTaskDef, index) => {
@@ -88,6 +92,7 @@ module.exports = class TasksHandler {
 		return tasksByFile[taskFile];
 	}
 
+	// FIXME pick one place for these types of functions: procedure or TasksHandler
 	getTaskIndexByUuid(uuid) {
 		for (let i = 0; i < this.tasks.length; i++) {
 			if (this.tasks[i].uuid === uuid) {
@@ -147,36 +152,37 @@ module.exports = class TasksHandler {
 		subscriptionHelper.run(this.subscriberFns.moveTask, this);
 	}
 
-	// TOMORROW
-	// Make ~modal~ right sidebar form box component
-	//
-	// Then make form with:
-	//    .title --> filenamify to .file  - verify not a used filename (either in model or on disk)
-	//    .color  (just a text box for now)
-	//    .rolesNeeded [{ roleName, description, duration }]
-	//    .rolesCast {roleName1: actor1, roleName2: actor2 }
-	//       Flatten ^ into:
-	//           title: textbox
-	//           color: textbox
-	//           roles: (multiple instance thing)
-	//              role name: textbox with validation of good role name, words like "crewA" or "ssrmsCrew"
-	//              description: textbox (optional)
-	//              duration: hour / minute textboxes   ALSO OFFSET
-	//              filled by actor: textbox, words like "EV1", "EV2" <-- enforce comes from columns
-	//
-	//    Make ^ edit existing
-	//    Then make it work for insert new (using command line to insert)
-	//    Then make insert-new buttons somewhere
-	//
-	//
 	makeTask({ file, rolesCast, color } = {}, { title, rolesNeeded, steps } = {}) {
-		file = file || 'Temp_Name';
+		// file = file || title || 'Temp_Name';
+		title = title || 'Temp Name';
+
+		const allTaskFiles = Object.keys(tasksByFile);
+
+		const t = this.tasks[0]; // any random task. Hopefully there aren't zero. FIXME
+
+		if (!file && allTaskFiles.indexOf(file) !== -1) {
+			throw new Error('Trying to do TasksHandler.makeTask() with a task file name already in use');
+		} else if (!file) {
+			let suffix = 2;
+			let titlecheck = title + ' ' + suffix;
+			let filecheck = t.formatTitleToFilename(titlecheck);
+			while (allTaskFiles.indexOf(filecheck) !== -1) {
+				suffix++;
+				titlecheck = title + ' ' + suffix;
+				filecheck = t.formatTitleToFilename(titlecheck);
+				if (suffix > 1000) {
+					throw new Error('WTF');
+				}
+			}
+			title = titlecheck;
+			file = filecheck;
+		}
+
 		rolesCast = rolesCast || { crewA: 'EV1', crewB: 'EV2' };
 		color = color || '#FFDEAD';
 
 		const task = new Task({ file, roles: rolesCast, color }, this.procedure);
 
-		title = title || 'Temp Name';
 		rolesNeeded = rolesNeeded || Object.keys(rolesCast).map((role) => {
 			return { name: role, duration: { minutes: 30 } };
 		});

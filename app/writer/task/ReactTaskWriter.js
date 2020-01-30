@@ -26,7 +26,9 @@ module.exports = class ReactTaskWriter extends TaskWriter {
 	constructor(task, procedureWriter) {
 		super(task, procedureWriter);
 
-		this.taskColumns = task.getColumns();
+		task.columnsArray = null; // unset this so task.getColumns doesn't short circuit below
+		this.taskColumns = task.getColumns(true, true);
+		console.log('--------------------->', this.taskColumns);
 		this.textTransform = new TextTransform('react');
 
 		this.numCols = this.taskColumns.length;
@@ -65,6 +67,8 @@ module.exports = class ReactTaskWriter extends TaskWriter {
 			if (!columns[c]) {
 				// FIXME need a better way to handle this
 				const columnKey = this.task.getColumns()[c];
+
+				console.log('TCL: ReactTaskWriter -> writeDivision -> columnKey', columnKey);
 				division.addSeries(columnKey);
 
 				columns[c] = {

@@ -31,9 +31,7 @@ class SummaryTimelineComponent extends React.Component {
 		// TasksHandler handles the subscription so UI doesn't have to subscribe to _every_ task.
 		this.tasksHandlerRerenderSubscriptions = [
 			'timeUpdates',
-			'updateTaskRequirements',
-			'setTitle',
-			'updateRolesDefinitions'
+			'setState'
 		];
 
 	}
@@ -44,6 +42,8 @@ class SummaryTimelineComponent extends React.Component {
 				stateHandler.state.procedure.TasksHandler.subscribe(
 					modelMethod,
 					(newState) => {
+						console.log(`Running subscribed method for TasksHandler.${modelMethod}`);
+						console.log(newState); // FIXME remove
 						this.setState({ activityOrder: newState.getTaskUuids() });
 					}
 				)
@@ -195,51 +195,6 @@ class SummaryTimelineComponent extends React.Component {
 	}
 
 	/*
-	getReactBlock({ height, fillColor, textSize, marginTop, title, duration, uuid }) {
-		const blockStyle = {
-			height: `${height}px`,
-			backgroundColor: fillColor,
-			fontSize: `${textSize}px`,
-			position: 'relative'
-		};
-		if (marginTop) {
-			blockStyle.marginTop = `${marginTop}px`;
-		}
-
-		const controlsStyle = {
-			position: 'absolute',
-			backgroundColor: '#eee',
-			right: '2px',
-			top: '2px'
-		};
-		return (
-			<div
-				key={uuid}
-				data-uuid={uuid}
-				className="task-block"
-				style={blockStyle}
-			>
-				<span className='task-title'>{title}</span>
-				&nbsp;
-				<span className='task-duration'>({duration})</span>
-				<div style={controlsStyle} className='modify-timeline-activity-controls'>
-					<button onClick={this.handleViewStepsClick} data-uuid={uuid}>
-						view steps
-					</button>
-					<button onClick={this.handleEditMetaClick} data-uuid={uuid}>
-						edit metadata
-					</button>
-					<button onClick={this.handleMoveUpClick} data-uuid={uuid}>
-						move up
-					</button>
-					<button onClick={this.handleMoveDownClick} data-uuid={uuid}>
-						move down
-					</button>
-				</div>
-			</div>
-		);
-	}*/
-
 	handleViewStepsClick = (event) => {
 		console.log(`clicked "view steps" for timeline activity ${event.target.dataset.uuid}`);
 		this.props.updateCurrentActivity(event.target.dataset.uuid);
@@ -249,7 +204,7 @@ class SummaryTimelineComponent extends React.Component {
 	handleEditMetaClick = (event) => {
 		console.log(`clicked "edit metadata" for timeline activity ${event.target.dataset.uuid}`);
 
-	}
+	}*/
 
 	handleMoveUpClick = (event) => {
 		console.log(`clicked "move up" for timeline activity ${event.target.dataset.uuid}`);

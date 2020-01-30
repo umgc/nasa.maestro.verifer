@@ -46,12 +46,23 @@ module.exports = class TaskRequirements {
 	}
 
 	setFile(file) {
+		const changed = this.file !== file;
+
 		this.file = file;
 
 		// FIXME: Pick one. Both are used currently. Maybe only set it on this object, not on Task
 		this.task.file = file;
 		this.task.filename = file;
+
+		return changed;
 	}
+
+	// FIXME remove
+	// setFileFromTitle(newTitle) {
+	// 	const filename = this.task.formatTitleToFilename(newTitle);
+	// 	this.setFile(filename);
+	// 	this.task.setTitle(newTitle);
+	// }
 
 	cloneRoles(source) {
 		const cloned = {};

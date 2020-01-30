@@ -349,7 +349,7 @@ img {
 #sidebar {
 	background: #EEEEEE;
 	/* width: 30%; */
-	width: 400px;
+	width: 500px;
 	float: right;
 	height: 100%;
 	box-shadow: -2px 0 rgba(0,0,0,0.2);
@@ -390,4 +390,45 @@ img {
 		#c9c9c936 5px,
 		#c9c9c936 10px
 	);
+}
+
+.sidebar-form {
+	margin: 10px auto;
+    border: 1px solid #ccc;
+    padding: 20px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+    border-radius: 3px;
+    position: relative;
+}
+
+.sidebar-form input {
+}
+
+.field-row {
+	display: flex;
+	flex-flow: row nowrap;
+	line-height: 2em;
+	margin: 5px;
+	position: relative;
+}
+
+.field-row label {
+	color: #333;
+	width: 110px;
+	min-width: 60px;
+	font-size: 1em;
+	line-height: 32px;
+}
+
+.field-row input, .field-row textarea, .field-row select {
+	flex: 1;
+	padding: 3px 5px;
+	font-size: 1em;
+	margin-left: 15px;
+	border: 1px solid #ccc;
+	border-radius: 3px;
+}
+
+input.error {
+	border: solid red 2px;
 }

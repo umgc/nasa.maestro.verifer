@@ -1,6 +1,7 @@
 'use strict';
 
 const uuidv4 = require('uuid/v4');
+const filenamify = require('filenamify');
 
 const Duration = require('./Duration');
 const ConcurrentStep = require('./ConcurrentStep');
@@ -174,16 +175,60 @@ module.exports = class Task {
 		// throw new Error('NOT YET DEFINED');
 	}
 
+	setState(newState) {
+		let taskFileChanges = 0;
+		let procedureFileChanges = 0; // FIXME do someting with this
+		if (newState.title) {
+			taskFileChanges += this.setTitle(newState.title) ? 1 : 0;
+		}
+		if (newState.roles) {
+			taskFileChanges += this.setRoles(newState.roles) ? 1 : 0;
+		}
+		if (newState.steps) {
+			taskFileChanges += this.setDivisions(newState.steps) ? 1 : 0;
+		}
+		if (newState.file) {
+			const change = this.taskReqs.setFile(newState.file);
+			taskFileChanges += change;
+			procedureFileChanges += change;
+		}
+
+		// if changes were made, notify
+		console.log('should be running it');
+		console.log('tasks handler', this.procedure.TasksHandler);
+		console.log('taskfilechanges', taskFileChanges);
+		if (this.procedure.TasksHandler && taskFileChanges > 0) {
+			console.log('            --------- Actually running Task.setState() notifications');
+			this.procedure.TasksHandler.notifyTaskSubscription('setState', this);
+		}
+
+		// FIXME handle procedureFileChanges
+
+	}
+
 	setTitle(title) {
 		if (this.title === title) {
 			console.log(`skipping Task.setTitle(); Identical titles: ${title}`);
-			return;
+			return false;
 		}
 		console.log(`Running Task.setTitle(); Was ${this.title}. Is ${title}`);
 		this.title = title;
 
 		// allows UI to subscribe to all task events through TasksHandler
-		this.procedure.TasksHandler.notifyTaskSubscription('setTitle', this);
+		// FIXME REMOVE THIS SUBSCRIPTION
+		// this.procedure.TasksHandler.notifyTaskSubscription('setTitle', this);
+
+		return true;
+	}
+
+	// FIXME use this or throw it away
+	setDivisions(divisions) {
+		throw new Error('not yet implemented');
+	}
+
+	formatTitleToFilename(titleToFormat) {
+		return filenamify(titleToFormat.replace(/\s+/g, '_') + '.yml');
+		// this.TaskReqs.setFile(filename);
 	}
 
 	updateTaskRequirements(taskRequirementsDef) {
@@ -282,7 +327,7 @@ module.exports = class Task {
 		this.setTitle(taskDef.title);
 
 		if (taskDef.roles) {
-			this.updateRolesDefinitions(taskDef.roles);
+			this.setRoles(taskDef.roles, false);
 		}
 
 		// Get the steps.  ConcurrentSteps class will handle the simo vs actor stuff in the yaml.
@@ -294,7 +339,7 @@ module.exports = class Task {
 
 	}
 
-	updateRolesDefinitions(rolesDef, runTimeSync = false) {
+	setRoles(rolesDef, runTimeSync = true) { // was updateRolesDefinitions
 
 		// if (!this.rolesDict) {
 		this.rolesDict = {};
@@ -327,13 +372,18 @@ module.exports = class Task {
 		}
 
 		if (runTimeSync) {
+			console.log('running time sync after Task.setRoles()');
 			this.procedure.setupTimeSync();
 		}
 
+		// FIXME removed. use this.setState() instead
 		// allows UI to subscribe to all task events through TasksHandler
-		if (this.procedure.TasksHandler) {
-			this.procedure.TasksHandler.notifyTaskSubscription('updateRolesDefinitions', this);
-		}
+		// if (this.procedure.TasksHandler) {
+		// this.procedure.TasksHandler.notifyTaskSubscription('updateRolesDefinitions', this);
+		// }
+
+		// FIXME this should return false if no changes were made.
+		return true;
 	}
 
 	/**
@@ -346,9 +396,12 @@ module.exports = class Task {
 	 */
 	getColumns() {
 
+		console.log('running Task.getColumns');
 		if (this.columnsArray) {
+			console.log('---------------> short circuiting Task.getColumns');
 			return this.columnsArray;
 		}
+		console.log('---------------> ACTUALLY RUNNING TASK.GETCOLUMNS');
 
 		const divisions = this.concurrentSteps;
 		const taskColumns = [];
@@ -357,6 +410,7 @@ module.exports = class Task {
 			colKey,
 			actorKey;
 
+		console.log('one');
 		// Loop over the array of divisions, and within that loop over each object of
 		// actorKey:[array,of,steps].
 		//
@@ -376,6 +430,33 @@ module.exports = class Task {
 				}
 			}
 		}
+		console.log('two');
+
+		// make sure column available for each defined role+actor, even if that actor doesn't have
+		// any steps yet.
+		if (this.procedure.ColumnsHandler.alwaysShowRoleColumns) {
+			console.log('---- forcing all role columns');
+			for (const taskRole of this.rolesArr) {
+				const colKey = this.procedure.ColumnsHandler.getActorColumnKey(taskRole.actor);
+				taskColumnsHash[colKey] = true;
+				console.log('adding colKey --->', colKey);
+			}
+		}
+		console.log('three', {
+			always: this.procedure.ColumnsHandler.alwaysShowWildcardColumn,
+			intend: this.procedure.ColumnsHandler.intendAlwaysShowWildcardColumn
+		});
+
+		if (this.procedure.ColumnsHandler.alwaysShowWildcardColumn) {
+			try {
+				const wildcardColumnKey = this.procedure.ColumnsHandler.getActorColumnKey('*');
+				console.log('adding wildcard column -->', wildcardColumnKey);
+				taskColumnsHash[wildcardColumnKey] = true;
+			} catch (e) {
+				console.error(e);
+			}
+		}
+		console.log('four');
 
 		// create taskColumns in order specified by procedure
 		for (colKey of this.procedure.ColumnsHandler.getColumnKeys()) {
@@ -383,6 +464,7 @@ module.exports = class Task {
 				taskColumns.push(colKey);
 			}
 		}
+		console.log('five');
 
 		this.columnsArray = taskColumns;
 		return taskColumns;

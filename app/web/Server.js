@@ -90,9 +90,9 @@ module.exports = class Server {
 		fs.writeFile(filepath, req.body.yaml, (err) => {
 			if (err) {
 				console.log(err);
-				res.send({ success: false, msg: 'error writing file' });
+				res.send({ success: false, msg: `error writing file ${filepath}` });
 			} else {
-				res.send({ success: true, msg: 'file written' });
+				res.send({ success: true, msg: `file ${filepath} written` });
 			}
 		});
 	}

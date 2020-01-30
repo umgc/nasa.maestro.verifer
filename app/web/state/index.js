@@ -124,6 +124,46 @@ function exists(path) {
 }
 
 /**
+ *
+ */
+function moveFileElectron(taskOrProcedure, newFilename, completeFn) {
+	const p = getPathParts(taskOrProcedure);
+
+}
+/**
+ *
+ */
+function moveFileWeb(taskOrProcedure, newFilename, completeFn) {
+	const p = getPathParts(taskOrProcedure);
+	fetch(
+		`move/${p.basepath}/${p.filename}/${newFilename}`,
+		{
+			method: 'POST' // or 'PUT'
+		}
+	)
+		.then((response) => response.json())
+		.then((data) => {
+			console.log('Success:', data);
+			completeFn(data);
+		})
+		.catch((error) => {
+			console.error('Error:', error);
+			completeFn(error);
+		});
+}
+
+/**
+ *
+ */
+function moveFile(taskOrProcedure, newFilename, completeFn = function() {}) {
+	if (window.isElectron) {
+		moveFileElectron(taskOrProcedure, newFilename, completeFn);
+	} else {
+		moveFileWeb(taskOrProcedure, newFilename, completeFn);
+	}
+}
+
+/**
  * Save yamlString to Activity file
  *
  * @param {Task|Procedure} taskOrProcedure
@@ -191,5 +231,6 @@ module.exports = {
 	saveChange: saveChange,
 	saveProcedureChange: saveProcedureChange,
 	recordAndReportChange: recordAndReportChange,
-	exists: exists
+	exists: exists,
+	moveFile: moveFile
 };

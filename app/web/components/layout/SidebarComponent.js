@@ -19,6 +19,7 @@ class SidebarComponent extends React.Component {
 	constructor(props) {
 		super(props);
 		stateHandler.setEditorNode = (editorNode) => {
+			console.log('setEditorNode() -->', editorNode);
 			this.setState({ editorNode: editorNode });
 		};
 	}

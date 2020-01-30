@@ -31,7 +31,10 @@ module.exports = class WebProgram extends Program {
 
 	loadProcedure(procedureFilename) {
 
-		this.procedure = new Procedure();
+		this.procedure = new Procedure({
+			alwaysShowRoleColumns: true,
+			alwaysShowWildcardColumn: true
+		});
 		this.procedure.procedureFile = procedureFilename;
 
 		return new Promise((resolveOuter, rejectOuter) => {
