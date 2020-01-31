@@ -80,8 +80,9 @@ const validateForm = (values) => {
 	return errors;
 };
 
-const ActivityMetaForm = ({ task }) => {
+const DivisionMetaForm = ({ division, editorOptions }) => {
 
+	/*
 	const taskDef = task.getDefinition();
 	const initial = {
 		title: taskDef.task.title,
@@ -153,136 +154,74 @@ const ActivityMetaForm = ({ task }) => {
 		}
 
 	};
+	*/
 
-	const handleDeleteClick = (event) => {
-		console.log(`clicked "delete" for timeline activity ${event.target.dataset.uuid}`);
-		const taskIndex = stateHandler.state.procedure.TasksHandler
-			.getTaskIndexByUuid(task.uuid);
-		stateHandler.state.procedure.TasksHandler.deleteTask(taskIndex);
-		stateHandler.saveProcedureChange();
+	const handleCloseEditorClick = () => {
 		stateHandler.unsetEditorNode();
 	};
 
-	React.useEffect(() => {
+	const handleDeleteClick = () => {
+		console.log(`clicked "delete division" for ${division.uuid}`);
+		const activityIndex = stateHandler.state.procedure.TasksHandler
+			.getTaskIndexByUuid(editorOptions.activityUuid);
+		const activity = stateHandler.state.procedure.tasks[activityIndex];
 
-		/**
-		 *
-		 */
-		function cleanup() {
-			const currentSelected = document.getElementsByClassName('timeline-selected');
-			for (const block of currentSelected) {
-				block.classList.remove('timeline-selected');
-			}
+		const divisionIndex = activity.getDivisionIndexByUuid(division.uuid);
+		activity.deleteDivision(divisionIndex);
+
+		stateHandler.saveChange(activityIndex);
+		stateHandler.unsetEditorNode();
+	};
+
+	// FIXME either use this to highlight the current division being edited, or delete this.
+	// React.useEffect(() => {
+	// /**
+	//  *
+	// */
+	// function cleanup() {
+	// const currentSelected = document.getElementsByClassName('timeline-selected');
+	// for (const block of currentSelected) {
+	// block.classList.remove('timeline-selected');
+	// }
+	// }
+	// cleanup();
+	// const blocks = document.getElementsByClassName(`block-${task.uuid}`);
+	// for (const block of blocks) {
+	// block.classList.add('timeline-selected');
+	// }
+	// return cleanup;
+	// });
+
+	const mergeCheckboxes = () => {
+		const actors = Object.keys(division.subscenes);
+		const columnsFromTask = task.getColumns();
+		return <div>
+			<h5>Merge columns</h5>
+			{actors.map((actor) => {
+
+			})}
+		</div>
+
+		for (const actor in division.subscenes) {
+
 		}
-
-		cleanup();
-
-		const blocks = document.getElementsByClassName(`block-${task.uuid}`);
-		for (const block of blocks) {
-			block.classList.add('timeline-selected');
-		}
-
-		return cleanup;
-	});
+	};
 
 	return (
 		<div>
-			<h3>Edit Activity <button onClick={handleDeleteClick}>delete activity</button></h3>
-			<Form
-				onSubmit={onSubmit}
-				mutators={{
-					...arrayMutators
-				}}
-				initialValues={initial}
-				validate={validateForm}
-				render={({
-					handleSubmit,
-					form: {
-						mutators: { push }
-					}, // injected from final-form-arrays above
-					pristine,
-					form,
-					submitting
-					// values
-				}) => {
-					return (
-						<form onSubmit={handleSubmit} className='sidebar-form'>
-							{textInputField('title', 'Title', [required, minLength(4)])}
-							{textInputField('color', 'Color', [required, isRGBstring])}
-							<h4>
-							Roles
-								<button
-									type="button"
-									onClick={() => push('roles', undefined)}
-								>
-									Add Role
-								</button>
-							</h4>
-							<FieldArray name="roles">
-								{({ fields }) =>
-									fields.map((name, index) => (
-										<div style={{ backgroundColor: 'white', margin: '5px', padding: '5px' }} key={name}>
-											<div><label>Role #{index + 1}</label></div>
-											{textInputField(`${name}.name`, 'Role', [required, minLength(2)])}
-											{selectInputField(
-												`${name}.playedBy`,
-												stateHandler.state.procedure.ColumnsHandler.getActors().map((actor) => {
-													return <option key={actor} value={actor}>{actor}</option>;
-												}),
-												'Actor in role',
-												[required]
-											)}
-											{durationInput(
-												`${name}.duration.hours`,
-												`${name}.duration.minutes`,
-												'Duration'
-											)}
-											{durationInput(
-												`${name}.duration.offset.hours`,
-												`${name}.duration.offset.minutes`,
-												'Offset time'
-											)}
-											{textInputField(
-												`${name}.description`,
-												'Description'
-											)}
-											<div style={{ textAlign: 'right' }}>
-												<span
-													onClick={() => fields.remove(index)}
-													style={{ cursor: 'pointer' }}
-												>
-													❌ Remove role
-												</span>
-											</div>
-										</div>
-									))
-								}
-							</FieldArray>
+			<h3>Edit Sync Block
+				<button onClick={handleCloseEditorClick}>close editor</button>
+				<button onClick={handleDeleteClick}>delete</button>
+			</h3>
 
-							<div className="buttons">
-								<button type="submit" disabled={submitting || pristine}>
-								Save
-								</button>
-								<button
-									type="button"
-									onClick={form.reset}
-									disabled={submitting || pristine}
-								>
-								Reset
-								</button>
-							</div>
-							{/* <h4>Raw data</h4>
-							<pre>{JSON.stringify(values, 0, 2)}</pre> */}
-						</form>
-					);
-				}}
-			/>
 		</div>
 	);
+
 };
 
-ActivityMetaForm.propTypes = {
-	task: PropTypes.object.isRequired
+DivisionMetaForm.propTypes = {
+	division: PropTypes.object.isRequired,
+	editorOptions: PropTypes.object.isRequired
 };
 
-module.exports = ActivityMetaForm;
+module.exports = DivisionMetaForm;

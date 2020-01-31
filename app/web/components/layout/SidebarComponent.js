@@ -9,6 +9,7 @@ const Step = require('../../../model/Procedure');
 const stateHandler = require('../../state/index');
 
 const ActivityMetaForm = require('./ActivityMetaForm');
+const DivisionMetaForm = require('./DivisionMetaForm');
 
 class SidebarComponent extends React.Component {
 
@@ -18,9 +19,13 @@ class SidebarComponent extends React.Component {
 
 	constructor(props) {
 		super(props);
-		stateHandler.setEditorNode = (editorNode) => {
+		stateHandler.setEditorNode = (editorNode, options = {}) => {
 			console.log('setEditorNode() -->', editorNode);
-			this.setState({ editorNode: editorNode });
+			this.setState({ editorNode: editorNode, editorNodeOptions: options });
+		};
+		stateHandler.unsetEditorNode = () => {
+			console.log('unsetEditorNode()');
+			this.setState({ editorNode: null, editorNodeOptions: {} });
 		};
 	}
 
@@ -38,12 +43,17 @@ class SidebarComponent extends React.Component {
 	}
 
 	renderTaskNode() {
-		return <ActivityMetaForm task={this.state.editorNode} />;
-
+		return <ActivityMetaForm
+			task={this.state.editorNode}
+			editorOptions={this.state.editorNodeOptions}
+		/>;
 	}
 
 	renderConcurrentStepNode() {
-		return <div>Sidebar Division editor not yet available</div>;
+		return <DivisionMetaForm
+			division={this.state.editorNode}
+			editorOptions={this.state.editorNodeOptions}
+		/>;
 	}
 
 	renderSeriesNode() {

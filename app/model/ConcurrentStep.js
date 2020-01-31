@@ -202,7 +202,10 @@ module.exports = class ConcurrentStep {
 		this.subscenes[seriesKey] = new Series(actorInfo.idOrIds, this.taskRoles);
 	}
 
-	// FIXME add removeSeries() {}
+	// FIXME add this, or maybe handle with setState()
+	// removeSeries(seriesKey) {
+	// delete this.subscenes[seriesKey];
+	// }
 
 	/**
 	 * Make a Step based upon the context of this concurrentStep

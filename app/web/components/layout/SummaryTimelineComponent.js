@@ -69,7 +69,7 @@ class SummaryTimelineComponent extends React.Component {
 		for (const unsubscribe of this.unsubscribeFns) {
 			unsubscribe(); // run each unsubscribe function
 		}
-		stateHandler.setEditorNode(null);
+		stateHandler.unsetEditorNode();
 	}
 
 	render() {

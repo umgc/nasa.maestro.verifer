@@ -388,20 +388,19 @@ module.exports = class Task {
 
 	/**
 	 * Detect and return what columns are present on a task. A given task may
-	 * have 1 or more columns. Only return those present in a task.
+	 * have 1 or more columns. Only return those present in a task, unless ColumnsHandler says
+	 * otherwise
 	 *
 	 * Clarify: This should probably be getColumnKeys()
 	 *
+	 * @param {boolean} forceReload  Force regen of this.columnsArray
 	 * @return {Array}             Array of column names in this task
 	 */
-	getColumns() {
+	getColumns(forceReload = false) {
 
-		console.log('running Task.getColumns');
-		if (this.columnsArray) {
-			console.log('---------------> short circuiting Task.getColumns');
+		if (this.columnsArray && !forceReload) {
 			return this.columnsArray;
 		}
-		console.log('---------------> ACTUALLY RUNNING TASK.GETCOLUMNS');
 
 		const divisions = this.concurrentSteps;
 		const taskColumns = [];
@@ -410,7 +409,6 @@ module.exports = class Task {
 			colKey,
 			actorKey;
 
-		console.log('one');
 		// Loop over the array of divisions, and within that loop over each object of
 		// actorKey:[array,of,steps].
 		//
@@ -430,33 +428,25 @@ module.exports = class Task {
 				}
 			}
 		}
-		console.log('two');
 
 		// make sure column available for each defined role+actor, even if that actor doesn't have
 		// any steps yet.
 		if (this.procedure.ColumnsHandler.alwaysShowRoleColumns) {
-			console.log('---- forcing all role columns');
 			for (const taskRole of this.rolesArr) {
 				const colKey = this.procedure.ColumnsHandler.getActorColumnKey(taskRole.actor);
 				taskColumnsHash[colKey] = true;
 				console.log('adding colKey --->', colKey);
 			}
 		}
-		console.log('three', {
-			always: this.procedure.ColumnsHandler.alwaysShowWildcardColumn,
-			intend: this.procedure.ColumnsHandler.intendAlwaysShowWildcardColumn
-		});
 
 		if (this.procedure.ColumnsHandler.alwaysShowWildcardColumn) {
 			try {
 				const wildcardColumnKey = this.procedure.ColumnsHandler.getActorColumnKey('*');
-				console.log('adding wildcard column -->', wildcardColumnKey);
 				taskColumnsHash[wildcardColumnKey] = true;
 			} catch (e) {
 				console.error(e);
 			}
 		}
-		console.log('four');
 
 		// create taskColumns in order specified by procedure
 		for (colKey of this.procedure.ColumnsHandler.getColumnKeys()) {
@@ -464,7 +454,6 @@ module.exports = class Task {
 				taskColumns.push(colKey);
 			}
 		}
-		console.log('five');
 
 		this.columnsArray = taskColumns;
 		return taskColumns;
@@ -560,9 +549,12 @@ module.exports = class Task {
 		return -1;
 	}
 
-	getDivisionByUuid(uuid) {
+	getDivisionByUuid(uuid, allowMissing = false) {
 		const index = this.getDivisionIndexByUuid(uuid);
 		if (index === -1 || index > this.concurrentSteps.length - 1) {
+			if (allowMissing) {
+				return false;
+			}
 			throw new Error(`Division with uuid ${uuid} not found`);
 		}
 		return this.concurrentSteps[index];

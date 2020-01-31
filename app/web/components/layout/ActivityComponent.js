@@ -54,7 +54,7 @@ class ActivityComponent extends React.Component {
 	getTableHeaderCells() {
 		const activity = stateHandler.state.procedure.getTaskByUuid(this.props.activityUuid);
 
-		const columnKeys = activity.getColumns();
+		const columnKeys = activity.getColumns(true);
 		const columnNames = [];
 
 		for (const colKey of columnKeys) {

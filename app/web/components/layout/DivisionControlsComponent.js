@@ -30,6 +30,22 @@ class DivisionControlsComponent extends React.PureComponent {
 		stateHandler.saveChange(activityIndex);
 	}
 
+	/* FIXME: remove if this capability staying in sidebar
+	handleEditButtonClick = (e) => {
+		console.log('edit-division button click');
+		e.preventDefault();
+		e.stopPropagation();
+
+		const activityIndex = stateHandler.state.procedure
+			.TasksHandler.getTaskIndexByUuid(this.props.activityUuid);
+
+		const division = stateHandler.state.procedure.tasks[activityIndex]
+			.getDivisionByUuid(this.props.divisionUuid);
+
+		stateHandler.setEditorNode(division, { activityUuid: this.props.activityUuid });
+	}
+	*/
+
 	handleInsertButtonClick = (e) => {
 		console.log('insert-division button click');
 		e.preventDefault();
@@ -62,6 +78,18 @@ class DivisionControlsComponent extends React.PureComponent {
 		activity.appendDivision();
 
 		stateHandler.saveChange(activityIndex);
+	}
+
+	componentWillUnmount() {
+		const activityIndex = stateHandler.state.procedure
+			.TasksHandler.getTaskIndexByUuid(this.props.activityUuid);
+
+		const division = stateHandler.state.procedure.tasks[activityIndex]
+			.getDivisionByUuid(this.props.divisionUuid, true);
+
+		if (stateHandler.state.editorNode === division) {
+			stateHandler.unsetEditorNode();
+		}
 	}
 
 	render() {
@@ -110,17 +138,23 @@ class DivisionControlsComponent extends React.PureComponent {
 								{ this.props.divisionUuid !== 'last' ?
 									(
 										<React.Fragment>
-											<button
+											{/* <button
 												onClick={this.handleDeleteButtonClick}
 												className='delete-button'
 											>
 												delete sync block
-											</button>
+											</button> */}
 											<button
 												onClick={this.handleInsertButtonClick}
 												className='insert-division-button'
 											>
 												insert sync block
+											</button>
+											<button
+												onClick={this.handleEditButtonClick}
+												className='edit-division-button'
+											>
+												edit sync block
 											</button>
 										</React.Fragment>
 									) :
