@@ -179,7 +179,7 @@ module.exports = class ReactTaskWriter extends TaskWriter {
 		});
 
 		return (
-			<div key={uuidv4()} className="ncw ncw-{{blockType}}">
+			<div key={uuidv4()} className={`ncw ncw-${blockType}`}>
 				<div className="ncw-head">
 					{blockType.toUpperCase()}
 				</div>
