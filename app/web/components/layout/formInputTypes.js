@@ -1,5 +1,6 @@
 const React = require('react');
 const { Field } = require('react-final-form');
+const uuidv4 = require('uuid/v4');
 
 const required = (value) => (value ? undefined : 'Required');
 const mustBeNumber = (value) => (isNaN(value) ? 'Must be a number' : undefined);
@@ -47,6 +48,35 @@ const textInputField = (name, label = false, validators = [], style = {}) => {
 	</Field>;
 };
 
+const checkboxInputField = (
+	name, value = true, label = false, validators = [], style = {}
+) => {
+
+	return <Field
+		name={name}
+		validate={composeValidators(...validators)}
+		value={value}
+		type='checkbox'
+	>
+		{({ input, meta }) => (
+			<React.Fragment>
+				<div className='field-row'>
+					{ label ? <label>{label}</label> : null }
+					<input
+						{...input}
+						// value={value}
+						className={meta.error && meta.touched ? 'error' : null }
+						type="checkbox"
+						style={style}
+						// defaultChecked={checked}
+					/>
+				</div>
+				{showValidationErrors(meta)}
+			</React.Fragment>
+		)}
+	</Field>;
+};
+
 const selectInputField = (name, children, label = false, validators = []) => {
 	return <Field
 		name={name}
@@ -82,6 +112,7 @@ module.exports = {
 	durationInput,
 	selectInputField,
 	textInputField,
+	checkboxInputField,
 	showValidationErrors,
 	validators: {
 		required,

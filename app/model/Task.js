@@ -208,10 +208,10 @@ module.exports = class Task {
 
 	setTitle(title) {
 		if (this.title === title) {
-			console.log(`skipping Task.setTitle(); Identical titles: ${title}`);
+			// console.log(`skipping Task.setTitle(); Identical titles: ${title}`);
 			return false;
 		}
-		console.log(`Running Task.setTitle(); Was ${this.title}. Is ${title}`);
+		// console.log(`Running Task.setTitle(); Was ${this.title}. Is ${title}`);
 		this.title = title;
 
 		// allows UI to subscribe to all task events through TasksHandler
@@ -354,7 +354,7 @@ module.exports = class Task {
 		// FIXME remove anything in this.actorRolesDict, etc, that isn't in new definition
 
 		for (const role of rolesDef) {
-			console.log('role', role);
+			// console.log('role', role);
 			if (!role.name) {
 				consoleHelper.error([
 					'Roles require a name, none found in role definition',
@@ -435,7 +435,6 @@ module.exports = class Task {
 			for (const taskRole of this.rolesArr) {
 				const colKey = this.procedure.ColumnsHandler.getActorColumnKey(taskRole.actor);
 				taskColumnsHash[colKey] = true;
-				console.log('adding colKey --->', colKey);
 			}
 		}
 

@@ -96,7 +96,7 @@ class ActivityComponent extends React.Component {
 						{activity.concurrentSteps.map((division, index) => {
 							return (
 								<React.Fragment
-									key={maestroKey.getKey(this.props.activityUuid, index) + '-wrapper'}
+									key={division.uuid + '-wrapper'}
 								>
 									{/* <DivisionControlsComponent
 										activityUuid={this.props.activityUuid}
@@ -104,7 +104,7 @@ class ActivityComponent extends React.Component {
 										canDelete={true}
 									/> */}
 									<DivisionComponent
-										key={maestroKey.getKey(this.props.activityUuid, index)}
+										key={division.uuid + '-component'}
 										activityUuid={this.props.activityUuid}
 										divisionUuid={division.uuid}
 									/>

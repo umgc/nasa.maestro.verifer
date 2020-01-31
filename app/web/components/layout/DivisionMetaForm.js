@@ -4,157 +4,86 @@ const PropTypes = require('prop-types');
 const { Form } = require('react-final-form');
 const arrayMutators = require('final-form-arrays').default;
 const { FieldArray } = require('react-final-form-arrays');
+const uuidv4 = require('uuid/v4');
 
 const stateHandler = require('../../state/index');
 
-const { validators, textInputField, durationInput, selectInputField } = require('./formInputTypes');
+const {
+	validators, textInputField, checkboxInputField, durationInput, selectInputField
+} = require('./formInputTypes');
+
 const { isZeroish, minLength, isRGBstring, required } = validators;
-
-// validate={insertFunction}
-const validateForm = (values) => {
-	const errors = {};
-
-	const roleIndexes = {};
-	const actorIndexes = {};
-	values.roles.forEach((role, index) => {
-
-		if (!role) {
-			if (!errors.roles) {
-				errors.roles = [];
-			}
-			errors.roles[index] = {};
-			return;
-		}
-
-		// Setup for unique role validation below
-		if (!roleIndexes[role.name]) {
-			roleIndexes[role.name] = [];
-		}
-		roleIndexes[role.name].push(index);
-
-		// Setup for unique actor validation below
-		if (!actorIndexes[role.playedBy]) {
-			actorIndexes[role.playedBy] = [];
-		}
-		actorIndexes[role.playedBy].push(index);
-
-		// validate duration
-		if (isZeroish(role.duration ? role.duration.hours : 0) &&
-			isZeroish(role.duration ? role.duration.minutes : 0)) {
-			if (!errors.roles) {
-				errors.roles = [];
-			}
-			errors.roles[index] = { duration: {} };
-			errors.roles[index].duration.minutes = 'Duration must be greater than 0';
-		}
-	});
-
-	for (const role in roleIndexes) {
-		if (roleIndexes[role].length > 1) {
-			if (!errors.roles) {
-				errors.roles = [];
-			}
-			for (const badIndex of roleIndexes[role]) {
-				if (!errors.roles[badIndex]) {
-					errors.roles[badIndex] = {};
-				}
-				errors.roles[badIndex].name = 'Duplicate role name found';
-			}
-		}
-	}
-
-	for (const actor in actorIndexes) {
-		if (actorIndexes[actor].length > 1) {
-			if (!errors.roles) {
-				errors.roles = [];
-			}
-			for (const badIndex of actorIndexes[actor]) {
-				if (!errors.roles[badIndex]) {
-					errors.roles[badIndex] = {};
-				}
-				errors.roles[badIndex].playedBy = 'Duplicate actor found';
-			}
-		}
-	}
-
-	return errors;
-};
 
 const DivisionMetaForm = ({ division, editorOptions }) => {
 
-	/*
-	const taskDef = task.getDefinition();
-	const initial = {
-		title: taskDef.task.title,
-		file: taskDef.requirements.file,
-		color: taskDef.requirements.color,
-		roles: taskDef.task.roles
-	};
-	for (const role of initial.roles) {
-		role.playedBy = taskDef.requirements.roles[role.name];
-	}
+	const calculateChange = (values) => {
+		const mergedOrNot = {};
 
-	const onSubmit = (values) => {
-		console.log('Activity form submit', JSON.stringify(values, 0, 2));
+		// FIRST: Get all columns from activity, except first, and set their "merged" values to
+		//        false. Skip first because it can't be merged with previous.
+		const activity = stateHandler.state.procedure
+			.getTaskByUuid(editorOptions.activityUuid);
+		const columnsFromActivity = activity.getColumns(); // FIXME do we need to pass 'true' here?
+		for (let i = 1; i < columnsFromActivity.length; i++) {
+			const colKey = columnsFromActivity[i];
+			mergedOrNot[colKey] = false;
+		}
 
-		const updateValues = function(v) {
-			values = v;
-		};
+		// SECOND: loop over values.mergedwithprevious, setting those to true
+		for (const colKey of values.mergewithprevious) {
+			mergedOrNot[colKey] = true;
+		}
 
-		const roleReqs = {};
-		for (const role of values.roles) {
-			if (!role.playedBy) {
-				console.log('no actor in role.playedBy', role);
-				console.log('should be:', task.rolesDict[role.name].actor);
+		const newSeriesKeys = [];
+		let collector = [columnsFromActivity[0]];
+		for (let i = 1; i < columnsFromActivity.length; i++) {
+			const colKey = columnsFromActivity[i];
+			const isMergedWithPrevious = mergedOrNot[colKey];
+
+			if (isMergedWithPrevious) {
+				collector.push(colKey);
+			} else {
+				newSeriesKeys.push(collector.join(' + '));
+				collector = [colKey];
 			}
-			roleReqs[role.name] = role.playedBy;
-			// task.setDurationForRole(role.playedBy, new Duration(role.duration));
-			// delete role.playedBy;
+		}
+		newSeriesKeys.push(collector.join(' + '));
+
+		const currentSeriesKeys = Object.keys(division.subscenes);
+
+		// console.log('new series keys', newSeriesKeys);
+		// console.log('current series keys', currentSeriesKeys);
+
+		const deleting = {};
+		const keeping = {};
+		const creating = {};
+		for (const key of newSeriesKeys) {
+			if (currentSeriesKeys.indexOf(key) === -1) {
+				// is in new, not in old...creating
+				creating[key] = true;
+			} else {
+				// is in new and old...keeping
+				keeping[key] = true;
+			}
 		}
 
-		const postFileChange = function() {
-			// this must precede Task.setState() due to running Task.setRoles() internally
-			// FIXME is ^ still true?
-			task.updateTaskRequirements({
-				file: values.file,
-				color: values.color,
-				roles: roleReqs
-			});
-			stateHandler.saveProcedureChange();
+		for (const key of currentSeriesKeys) {
+			if (newSeriesKeys.indexOf(key) === -1) {
+				// is in old, not in new...deleting
+				deleting[key] = true;
+			} else {
+				// is in old and new...keeping (this should be duplicate of above but...paranoia)
+				keeping[key] = true;
+			}
+		}
 
-			task.setState(values);
-
-			// FIXME setState should run this now
-			// stateHandler.state.procedure.setupTimeSync();
-
-			stateHandler.saveChange(
-				stateHandler.state.procedure.TasksHandler.getTaskIndexByUuid(task.uuid)
-			);
+		return {
+			deleting: Object.keys(deleting),
+			keeping: Object.keys(keeping),
+			creating: Object.keys(creating)
 		};
 
-		if (values.title !== task.title) {
-			const newFilename = task.formatTitleToFilename(values.title);
-			console.log('new file name ------------------', newFilename);
-
-			// FIXME doesn't really belong in stateHandler
-			stateHandler.moveFile(task, newFilename, function(response) {
-				if (response.success) {
-					console.log('File moved successfully', response);
-
-					// since file move was successful, now adjust file in state
-					values.file = newFilename;
-					updateValues(values);
-				} else {
-					console.error('Failed to move file', response);
-				}
-				postFileChange();
-			});
-		} else {
-			postFileChange();
-		}
-
 	};
-	*/
 
 	const handleCloseEditorClick = () => {
 		stateHandler.unsetEditorNode();
@@ -171,6 +100,32 @@ const DivisionMetaForm = ({ division, editorOptions }) => {
 
 		stateHandler.saveChange(activityIndex);
 		stateHandler.unsetEditorNode();
+	};
+
+	// validate={insertFunction}
+	const validateForm = (values) => {
+		const errors = {};
+
+		const change = calculateChange(values);
+		// console.log('CHANGES:', change);
+		const { deleting, keeping, creating } = change;
+
+		for (const key of deleting) {
+			if (division.subscenes[key].steps.length > 0) {
+				// console.error(`series ${key} has steps. It cannot be deleted.`);
+				errors.mergewithprevious = 'Cannot delete columns that have steps';
+			}
+			// else { console.log(`series ${key} can be deleted`); }
+		}
+
+		// for (const key of keeping) {
+		// console.log(`series ${key} is being kept. If it has steps, they should be preserved`);
+		// }
+		// for (const key of creating) {
+		// console.log(`series ${key} is being created with no content.`);
+		// }
+
+		return errors;
 	};
 
 	// FIXME either use this to highlight the current division being edited, or delete this.
@@ -192,19 +147,135 @@ const DivisionMetaForm = ({ division, editorOptions }) => {
 	// return cleanup;
 	// });
 
-	const mergeCheckboxes = () => {
-		const actors = Object.keys(division.subscenes);
-		const columnsFromTask = task.getColumns();
-		return <div>
-			<h5>Merge columns</h5>
-			{actors.map((actor) => {
-
-			})}
-		</div>
-
-		for (const actor in division.subscenes) {
-
+	const formatCheckbox = (colKey, actuallyAcheckbox) => {
+		if (actuallyAcheckbox) {
+			return <div key={colKey + '-merge-selector'}>
+				{checkboxInputField('mergewithprevious', colKey, colKey, [])}
+			</div>;
+		} else {
+			return <div
+				key={colKey + '-merge-selector'}
+				className='field-row'
+			>
+				<label>{colKey}</label>
+				<div>First column - no previous</div>
+			</div>;
 		}
+	};
+
+	const setInitial = () => {
+
+		const initial = { mergewithprevious: [] };
+
+		// first make a mapping like { IV: "IV", EV1: "EV1 + EV2", EV2: "EV1 + EV2" } if EV1 and EV2
+		// columns are merged, pointing expected canonical columns to actual columns
+		const seriesKeys = Object.keys(division.subscenes);
+		const actorToSeriesKey = {};
+		for (const key of seriesKeys) {
+			if (key.indexOf('+') === -1) {
+				actorToSeriesKey[key] = key;
+			} else {
+				key.split('+').forEach((actor) => {
+					actorToSeriesKey[actor.trim()] = key;
+				});
+			}
+		}
+
+		const activity = stateHandler.state.procedure
+			.getTaskByUuid(editorOptions.activityUuid);
+
+		const columnsFromActivity = activity.getColumns(); // FIXME do we need to pass 'true' here?
+		for (let i = 1; i < columnsFromActivity.length; i++) {
+			const colKey = columnsFromActivity[i];
+			const prevColKey = columnsFromActivity[i - 1];
+
+			if (
+			// { IV: "IV" } not { EV1: "EV1 + EV2" }
+			// colKey === actorToSeriesKey[colKey] ||
+
+				// this and prev point to the same series, so they're merged
+				actorToSeriesKey[colKey] === actorToSeriesKey[prevColKey]
+			) {
+				initial.mergewithprevious.push(colKey);
+			}
+		}
+		return initial;
+
+	};
+
+	const mergeCheckboxes = () => {
+
+		// first make a mapping like { IV: "IV", EV1: "EV1 + EV2", EV2: "EV1 + EV2" } if EV1 and EV2
+		// columns are merged, pointing expected canonical columns to actual columns
+		const seriesKeys = Object.keys(division.subscenes);
+		const actorToSeriesKey = {};
+		for (const key of seriesKeys) {
+			if (key.indexOf('+') === -1) {
+				actorToSeriesKey[key] = key;
+			} else {
+				key.split('+').forEach((actor) => {
+					actorToSeriesKey[actor.trim()] = key;
+				});
+			}
+		}
+
+		const activity = stateHandler.state.procedure
+			.getTaskByUuid(editorOptions.activityUuid);
+
+		const columnsFromActivity = activity.getColumns(); // FIXME do we need to pass 'true' here?
+		const things = [];
+		things.push(formatCheckbox(columnsFromActivity[0], false));
+		for (let i = 1; i < columnsFromActivity.length; i++) {
+			const colKey = columnsFromActivity[i];
+			const prevColKey = columnsFromActivity[i - 1];
+
+			if (
+				// { IV: "IV" } not { EV1: "EV1 + EV2" }
+				colKey === actorToSeriesKey[colKey] ||
+
+				// this and prev do _not_ point to the same series, so they're not merged
+				actorToSeriesKey[colKey] !== actorToSeriesKey[prevColKey]
+			) {
+				things.push(formatCheckbox(colKey, true));
+			} else {
+				things.push(formatCheckbox(colKey, true));
+			}
+		}
+
+		return <div>
+			<h4>Merge column with previous</h4>
+			{things}
+		</div>;
+	};
+
+	const onSubmit = (values) => {
+		// console.log('onSubmit values', values);
+
+		const change = calculateChange(values);
+		// console.log('CHANGES:', change);
+		const { deleting, keeping, creating } = change;
+
+		for (const key of deleting) {
+			if (division.subscenes[key].steps.length > 0) {
+				// This should never happen since validation should prevent it
+				throw new Error(`series ${key} has steps. It cannot be deleted.`);
+			}
+			// else { console.log(`series ${key} can be deleted`); }
+		}
+
+		const newDef = { simo: {} };
+		for (const key of keeping) {
+			// console.log(`series ${key} is being kept. If it has steps, preserve them`);
+			newDef.simo[key] = division.subscenes[key].getDefinition();
+		}
+
+		for (const key of creating) {
+			// console.log(`series ${key} is being created with no content.`);
+			newDef.simo[key] = []; // empty list of steps
+		}
+
+		division.setState(newDef);
+
 	};
 
 	return (
@@ -213,7 +284,42 @@ const DivisionMetaForm = ({ division, editorOptions }) => {
 				<button onClick={handleCloseEditorClick}>close editor</button>
 				<button onClick={handleDeleteClick}>delete</button>
 			</h3>
-
+			<Form
+				onSubmit={onSubmit}
+				mutators={{
+					...arrayMutators
+				}}
+				initialValues={setInitial()}
+				validate={validateForm}
+				render={({
+					handleSubmit,
+					form: {
+						mutators: { push }
+					}, // injected from final-form-arrays above
+					pristine,
+					form,
+					submitting
+					// values
+				}) => {
+					return (
+						<form onSubmit={handleSubmit} className='sidebar-form'>
+							{mergeCheckboxes()}
+							<div className="buttons">
+								<button type="submit" disabled={submitting || pristine}>
+								Save
+								</button>
+								<button
+									type="button"
+									onClick={form.reset}
+									disabled={submitting || pristine}
+								>
+								Reset
+								</button>
+							</div>
+						</form>
+					);
+				}}
+			/>
 		</div>
 	);
 

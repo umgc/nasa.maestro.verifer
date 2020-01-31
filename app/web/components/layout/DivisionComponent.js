@@ -4,7 +4,7 @@ const ReactTaskWriter = require('../../../writer/task/ReactTaskWriter');
 const stateHandler = require('../../state/index');
 const DivisionControlsComponent = require('./DivisionControlsComponent');
 
-class DivisionComponent extends React.PureComponent {
+class DivisionComponent extends React.Component {
 
 	constructor(props) {
 		super(props);
@@ -15,6 +15,33 @@ class DivisionComponent extends React.PureComponent {
 			activity,
 			stateHandler.state.procedureWriter
 		);
+
+		this.unsubscribeFns = {
+			setState: null
+		};
+
+		// }
+
+		// componentDidMount() {
+		const division = stateHandler.state.procedure
+			.getTaskByUuid(this.props.activityUuid)
+			.getDivisionByUuid(this.props.divisionUuid);
+
+		for (const modelMethod in this.unsubscribeFns) {
+			this.unsubscribeFns[modelMethod] = division.subscribe(
+				modelMethod,
+				(newState) => {
+					console.log('setting state for DivisionComponent');
+					this.setState({ arbitrary: Date.now() });
+				}
+			);
+		}
+	}
+
+	componentWillUnmount() {
+		for (const modelMethod in this.unsubscribeFns) {
+			this.unsubscribeFns[modelMethod](); // run each unsubscribe function
+		}
 	}
 
 	render() {

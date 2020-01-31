@@ -28,7 +28,6 @@ module.exports = class ReactTaskWriter extends TaskWriter {
 
 		task.columnsArray = null; // unset this so task.getColumns doesn't short circuit below
 		this.taskColumns = task.getColumns(true, true);
-		console.log('--------------------->', this.taskColumns);
 		this.textTransform = new TextTransform('react');
 
 		this.numCols = this.taskColumns.length;

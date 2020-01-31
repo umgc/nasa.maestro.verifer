@@ -9,6 +9,7 @@ class DivisionControlsComponent extends React.PureComponent {
 		super(props);
 	}
 
+	/* FIXME: remove if this capability staying in sidebar
 	handleDeleteButtonClick = (e) => {
 		console.log('delete-division button click');
 		e.preventDefault();
@@ -29,8 +30,8 @@ class DivisionControlsComponent extends React.PureComponent {
 
 		stateHandler.saveChange(activityIndex);
 	}
+	*/
 
-	/* FIXME: remove if this capability staying in sidebar
 	handleEditButtonClick = (e) => {
 		console.log('edit-division button click');
 		e.preventDefault();
@@ -44,7 +45,6 @@ class DivisionControlsComponent extends React.PureComponent {
 
 		stateHandler.setEditorNode(division, { activityUuid: this.props.activityUuid });
 	}
-	*/
 
 	handleInsertButtonClick = (e) => {
 		console.log('insert-division button click');

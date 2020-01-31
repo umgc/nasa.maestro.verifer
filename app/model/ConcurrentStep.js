@@ -4,6 +4,7 @@ const uuidv4 = require('uuid/v4');
 
 const Step = require('./Step');
 const Series = require('./Series');
+const subscriptionHelper = require('../helpers/subscriptionHelper');
 
 /**
  * Converts roles like "crewA" to actors like "EV1".
@@ -114,27 +115,10 @@ module.exports = class ConcurrentStep {
 
 		this.uuid = uuidv4();
 
-		// First, check if this is a simo
-		if (concurrentStepYaml.simo) {
-
-			// Iterate over they keys (which are actor roles)
-			for (const actorIdGuess in concurrentStepYaml.simo) {
-				this.handleActorSteps(concurrentStepYaml, actorIdGuess);
-			}
-
-		// Not a simo, so just an actor role
-		} else {
-
-			// Get the actor role
-			if (Object.keys(concurrentStepYaml).length !== 1) {
-				throw new Error(`Expected a single actor role, but instead got ${JSON.stringify(concurrentStepYaml)}`);
-			}
-
-			const actorIdGuess = Object.keys(concurrentStepYaml)[0];
-
-			this.handleActorSteps(concurrentStepYaml, actorIdGuess);
-		}
-
+		this.subscriberFns = {
+			setState: []
+		};
+		this.setState(concurrentStepYaml);
 	}
 
 	getDefinition() {
@@ -152,6 +136,46 @@ module.exports = class ConcurrentStep {
 			return { simo: def };
 		}
 		return def;
+	}
+
+	subscribe(subscriptionMethod, subscriberFn) {
+		const unsubscribeFn = subscriptionHelper.subscribe(
+			subscriberFn,
+			this.subscriberFns[subscriptionMethod]
+		);
+		return unsubscribeFn;
+	}
+
+	setState(definition) {
+
+		for (const actor in this.subscenes) {
+			delete this.subscenes[actor];
+		}
+
+		// First, check if this is a simo
+		if (definition.simo) {
+
+			// Iterate over they keys (which are actor roles)
+			for (const actorIdGuess in definition.simo) {
+				this.handleActorSteps(definition, actorIdGuess);
+			}
+
+		// Not a simo, so just an actor role
+		} else {
+
+			// Get the actor role
+			if (Object.keys(definition).length !== 1) {
+				throw new Error(`Expected a single actor role, but instead got ${JSON.stringify(definition)}`);
+			}
+
+			const actorIdGuess = Object.keys(definition)[0];
+
+			this.handleActorSteps(definition, actorIdGuess);
+		}
+
+		console.log(this.subscriberFns);
+
+		subscriptionHelper.run(this.subscriberFns.setState, this);
 	}
 
 	handleActorSteps(concurrentStepYaml, actorIdGuess) {
