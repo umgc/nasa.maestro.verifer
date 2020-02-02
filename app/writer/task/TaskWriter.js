@@ -213,7 +213,7 @@ module.exports = class TaskWriter extends Abstract {
 		if (elements.body.length) {
 			elements.body = this.addStepText(elements.body, {
 				level: level,
-				actors: step.props.actors,
+				actors: step.context.actors,
 				columnKeys: step.props.columnKeys
 			});
 		}

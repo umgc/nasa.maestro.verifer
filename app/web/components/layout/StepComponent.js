@@ -96,9 +96,7 @@ class StepComponent extends React.Component {
 					columnKeys={this.props.columnKeys}
 					taskWriter={this.props.taskWriter}
 
-					// activityIndex={this.props.activityIndex}
 					activityUuid={this.props.activityUuid}
-					// divisionIndex={this.props.divisionIndex}
 					divisionUuid={this.props.divisionUuid}
 					primaryColumnKey={this.props.primaryColumnKey}
 					stepIndex={this.props.stepIndex}
@@ -107,7 +105,6 @@ class StepComponent extends React.Component {
 					handleDeleteButtonClick={this.handleDeleteButtonClick}
 					handleInsertStepBefore={this.handleInsertStepBefore}
 					handleMoveStep={this.props.handleMoveStep}
-
 				/>
 			);
 	}

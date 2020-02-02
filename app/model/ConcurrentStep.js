@@ -191,12 +191,12 @@ module.exports = class ConcurrentStep {
 		const series = new Series(actorInfo.idOrIds, this.taskRoles);
 
 		if (typeof actorStepsDefinition === 'string') {
-			series.appendStep(this.makeStep(actorIdGuess, actorStepsDefinition));
+			series.appendStep(actorStepsDefinition);
 
 		} else if (Array.isArray(actorStepsDefinition)) {
 
 			for (var stepDefinition of actorStepsDefinition) {
-				series.appendStep(this.makeStep(actorIdGuess, stepDefinition));
+				series.appendStep(stepDefinition);
 			}
 
 		// Don't know how to process this
@@ -218,28 +218,12 @@ module.exports = class ConcurrentStep {
 	}
 
 	/**
-	 *
+	 * FIXME: Handle with setState?
 	 * @param {string} seriesKey - The key in the Division.subscenes object pointing to the Series
 	 */
 	addSeries(seriesKey) {
 		const actorInfo = getActorInfo(seriesKey, this.taskRoles);
 		this.subscenes[seriesKey] = new Series(actorInfo.idOrIds, this.taskRoles);
-	}
-
-	// FIXME add this, or maybe handle with setState()
-	// removeSeries(seriesKey) {
-	// delete this.subscenes[seriesKey];
-	// }
-
-	/**
-	 * Make a Step based upon the context of this concurrentStep
-	 * @param {string}         actorIdGuess
-	 * @param {Object|string}  stepDefinition
-	 * @return {Step}          Resulting step object
-	 */
-	makeStep(actorIdGuess, stepDefinition) {
-		const actorInfo = getActorInfo(actorIdGuess, this.taskRoles);
-		return new Step(stepDefinition, actorInfo.idOrIds, this.taskRoles);
 	}
 
 };

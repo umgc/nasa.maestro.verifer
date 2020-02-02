@@ -51,9 +51,6 @@ const DivisionMetaForm = ({ division, editorOptions }) => {
 
 		const currentSeriesKeys = Object.keys(division.subscenes);
 
-		// console.log('new series keys', newSeriesKeys);
-		// console.log('current series keys', currentSeriesKeys);
-
 		const deleting = {};
 		const keeping = {};
 		const creating = {};

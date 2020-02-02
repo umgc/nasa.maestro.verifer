@@ -75,11 +75,6 @@ class SeriesComponent extends React.Component {
 		this.props.seriesState.deleteStep(stepIndex);
 	}
 
-	// FIXME delete
-	// insertStepIntoSeries = (stepIndex) => {
-	// this.props.seriesState.insertStep(stepIndex, this.props.seriesState.makeStep());
-	// }
-
 	handleMoveStep = (from, to) => {
 
 		const destinationSeries = stateHandler.state.procedure

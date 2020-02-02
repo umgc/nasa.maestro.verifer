@@ -1,6 +1,7 @@
 'use strict';
 
 const cloneDeep = require('lodash/cloneDeep');
+const uuidv4 = require('uuid/v4');
 
 const subscriptionHelper = require('../helpers/subscriptionHelper');
 const arrayHelper = require('../helpers/arrayHelper');
@@ -19,52 +20,39 @@ module.exports = class Step {
 
 	/**
 	 *
-	 * @param {Object} stepYaml            Object with anything that can be within a step, like:
+	 * @param {Object} definition            Object with anything that can be within a step, like:
 	 *                                     { text: "Things!", title: "Stuff!", checkboxes: [], ... }
-	 * @param {string|Array} actorIdOrIds  Actor ID like 'EV1' or array of multiple actor IDs, with
-	 *                                     their joint identifier first: ['EV1 + EV2', 'EV1, 'EV2']
-	 * @param {Array} taskRoles
+	 * @param {Series} parent - Series to point to as parent ~~or null if no parent~~ fixme. In the
+	 *                               future substeps may point to something other than a Series as
+	 *                               their parent (either the parent Step, or something else).
 	 */
-	constructor(stepYaml, actorIdOrIds, taskRoles) {
+	constructor(definition, parent) { // actorIdOrIds, taskRoles) {
+		this.uuid = uuidv4();
+		this.context = {};
+		this.props = {}; // fixme setState wipes out this.props, which previously would have wiped out taskroles and actor stuff. verify no issues with switch to this.context. also this.props should be this.state maybe
 		this.reloadSubscriberFns = []; // these can't be wiped out...FIXME keep pondering this
-		this.doConstruct(stepYaml, actorIdOrIds, taskRoles);
+		this.setContext(parent, definition);
+		this.setState(definition);
 	}
 
-	doConstruct(stepYaml, actorIdOrIds, taskRoles) {
+	/**
+	 * @param {Series|null} parent - Series to point to as parent, or null if no parent. In the
+	 *                               future substeps may point to something other than a Series as
+	 *                               their parent (either the parent Step, or something else).
+	 * @param {Object} definition FIXME docs
+	 */
+	setContext(parent, definition) {
+		this.parent = parent;
 
-		this.props = {}; // wipes out pre-existing properties, so reload() can start over
-
-		// Initiate the vars as empty.
-		for (const prop of props.strings) {
-			this.props[prop] = '';
-		}
-
-		// FIXME: This can't be in props.strings because the YAML input is "step" not "text", and in
-		// getDefinition() it needs the proper YAML input name. Ultimately probably should change
-		// "step" to "text".
-		this.props.text = [];
-
-		for (const prop of props.arrays) {
-			this.props[prop] = [];
-		}
-
-		// handled differently by getDefinition()
-		this.props.images = [];
-		this.props.modules = [];
-		this.props.substeps = [];
-
-		this.props.raw = null; // FIXME pretty much sure not used anywhere. Remove. UniqueEWCVDS
-
-		// this needs to be re-run if a step is moved between activities
-		this.mapTaskRolesToActor(taskRoles); // sets this.props.taskRoles & this.props.taskRolesMap
+		// this needs to be re-run if a step is moved between _activities_
+		// sets this.context.taskRoles & this.context.taskRolesMap
+		this.mapTaskRolesToActor(parent.taskRoles);
 
 		// this needs to be re-run if a step is moved between actors/roles/columns
 		this.setActors(
-			actorIdOrIds,
-			stepYaml.actor // often undefined
+			parent.seriesActors,
+			definition // was definition.actor
 		);
-
-		this.populateFromYaml(stepYaml);
 	}
 
 	subscribeReload(subscriberFn) {
@@ -75,12 +63,14 @@ module.exports = class Step {
 		return unsubscribeFn;
 	}
 
+	// FIXME this should probably be broken up into separate external use of setState and setContext
 	reload(
-		newStepYaml = {},
-		newActorIdOrIds = this.props.actorIdOrIds,
-		newTaskRoles = this.props.taskRoles
+		newDefinition = {},
+		newActorIdOrIds = this.context.actorIdOrIds,
+		newTaskRoles = this.context.taskRoles
 	) {
-		this.doConstruct(newStepYaml, newActorIdOrIds, newTaskRoles);
+		this.setContext(parent, newDefinition);
+		this.setState(newDefinition, newActorIdOrIds, newTaskRoles);
 		subscriptionHelper.run(this.reloadSubscriberFns, this);
 	}
 
@@ -149,29 +139,50 @@ module.exports = class Step {
 		return [];
 	}
 
-	populateFromYaml(stepYaml) {
+	setState(definition) {
 
-		this.props.raw = stepYaml; // FIXME pretty much sure not used anywhere. Remove. UniqueEWCVDS
+		this.props = {}; // wipes out pre-existing properties, so reload() can start over
+
+		// Initiate the vars as empty.
+		for (const prop of props.strings) {
+			this.props[prop] = '';
+		}
+
+		// FIXME: This can't be in props.strings because the YAML input is "step" not "text", and in
+		// getDefinition() it needs the proper YAML input name. Ultimately probably should change
+		// "step" to "text".
+		this.props.text = [];
+
+		for (const prop of props.arrays) {
+			this.props[prop] = [];
+		}
+
+		// handled differently by getDefinition()
+		this.props.images = [];
+		this.props.modules = [];
+		this.props.substeps = [];
+
+		this.props.raw = definition; // FIXME pretty sure not used anywhere. Remove. UniqueEWCVDS
 
 		// Check if the step is a simple string
-		if (typeof stepYaml === 'string') {
-			this.props.text = [this.parseStepText(stepYaml)];
+		if (typeof definition === 'string') {
+			this.props.text = [this.parseStepText(definition)];
 			return;
 		}
 
-		this.props.duration = new Duration(stepYaml.duration);
+		this.props.duration = new Duration(definition.duration);
 
 		// Check for the title
-		if (stepYaml.title) {
-			this.props.title = this.parseTitle(stepYaml.title);
+		if (definition.title) {
+			this.props.title = this.parseTitle(definition.title);
 		}
 
 		// Check for the text
-		this.props.text = this.getTextFromDefinition(stepYaml);
+		this.props.text = this.getTextFromDefinition(definition);
 
 		// Check for images
-		if (stepYaml.images) {
-			this.props.images = arrayHelper.parseArray(stepYaml.images);
+		if (definition.images) {
+			this.props.images = arrayHelper.parseArray(definition.images);
 
 			for (let i = 0; i < this.props.images.length; i++) {
 				if (typeof this.props.images[i] === 'string') {
@@ -199,16 +210,16 @@ module.exports = class Step {
 		for (const yamlKey in blocks) {
 			// user-generated YAML has different property names than internal JS property names
 			const jsKey = blocks[yamlKey];
-			this.props[jsKey] = this.parseBlock(stepYaml[yamlKey]);
+			this.props[jsKey] = this.parseBlock(definition[yamlKey]);
 		}
 
 		// Check for substeps
-		if (stepYaml.substeps) {
-			this.props.substeps = this.parseSubsteps(stepYaml.substeps);
+		if (definition.substeps) {
+			this.props.substeps = this.parseSubsteps(definition.substeps);
 		}
 
 		for (const module of stepModules) {
-			if (stepYaml[module.key]) {
+			if (definition[module.key]) {
 				if (!loadedModules[module.key]) {
 					loadedModules[module.key] = require(`../writer/step-mods/${module.class}`);
 				}
@@ -221,7 +232,7 @@ module.exports = class Step {
 				// todo (3) add warnings for modules in neither module.suggest nor module.reject
 
 				// instantiate StepModule
-				this.props.modules.push(new loadedModules[module.key](this, stepYaml));
+				this.props.modules.push(new loadedModules[module.key](this, definition));
 			}
 		}
 	}
@@ -256,37 +267,39 @@ module.exports = class Step {
 	 *                    }
 	 */
 	mapTaskRolesToActor(taskRoles) {
-		this.props.taskRoles = taskRoles;
-		this.props.taskRolesMap = {};
+		this.context.taskRoles = taskRoles;
+		this.context.taskRolesMap = {};
 		for (const role in taskRoles) {
-			this.props.taskRolesMap[role] = taskRoles[role].actor;
+			this.context.taskRolesMap[role] = taskRoles[role].actor;
 		}
 	}
 
 	replaceTaskRoles(text) {
-		for (const role in this.props.taskRolesMap) {
-			text = text.replace(`{{role:${role}}}`, this.props.taskRolesMap[role]);
+		for (const role in this.context.taskRolesMap) {
+			text = text.replace(`{{role:${role}}}`, this.context.taskRolesMap[role]);
 		}
 		return text;
 	}
 
-	setActors(actorIdOrIds = false, definitionActor = null) {
+	// fixme good docs
+	setActors(actorIdOrIds = false, definition = false) { // FIXME WAS definitionActor = null) {
 
-		// if no new value provided, don't change this.props.actorIdOrIds to a falsy value
+		// if no new value provided, don't change this.context.actorIdOrIds to a falsy value
+		// fixme why?
 		if (actorIdOrIds) {
-			this.props.actorIdOrIds = arrayHelper.parseArray(actorIdOrIds);
+			this.context.actorIdOrIds = arrayHelper.parseArray(actorIdOrIds);
 		}
 
-		// similarly to actorIdOrIds, if no new value is provided this.props.definitionActor can be
-		// left as it is. However, definitionActor is often undefined. Most steps do not explicitly
+		// def.actor often undefined. Most steps do not explicitly
 		// define who the actor  is. Instead, it's inferred from the Series the Step is within. If
-		// it is explicitly defined, set it here.
-		if (definitionActor) {
-			this.props.definitionActor = definitionActor;
+		// it is defined, set it here. Otherwise, allow to be set to undefined. If definition not
+		// supplied to this function, allow this.props.definitionActor to stay unchanged.
+		if (definition) {
+			this.props.definitionActor = definition.actor;
 		}
 
-		this.props.actors = arrayHelper.parseArray(
-			this.props.definitionActor ? this.props.definitionActor : this.props.actorIdOrIds
+		this.context.actors = arrayHelper.parseArray(
+			this.props.definitionActor ? this.props.definitionActor : this.context.actorIdOrIds
 		);
 	}
 
@@ -336,6 +349,17 @@ module.exports = class Step {
 		return this.replaceTaskRoles(stepTextYaml);
 	}
 
+	// this is a shim because Step now requires reference to the Series it resides within, and thus
+	// so do Steps in substeps, e.g. Step.props.substeps === [Step, Step, ...]. At some point this
+	// may change to Step.subseries === Subseries, where Subseries is related to Series (one
+	// inherits from the other, or they share an ancestor).
+	makeSubseries() {
+		return {
+			taskRoles: this.parent.taskRoles,
+			seriesActors: this.parent.seriesActors
+		};
+	}
+
 	/**
 	 * Returns an array of substeps for the step, or an empty array if none are found.
 	 *
@@ -349,12 +373,12 @@ module.exports = class Step {
 		// Check for string. If string, it's not multiple substeps but a single
 		// ! FIXME: Realistically why write a substep this way? Wouldn't you want it indented?
 		if (typeof substepsDefinition === 'string') {
-			substeps.push(new Step(substepsDefinition, this.props.actors, this.props.taskRoles));
+			substeps.push(new Step(substepsDefinition, this.makeSubseries()));
 
 		// Check for array
 		} else if (Array.isArray(substepsDefinition)) {
 			for (const singleSubstepDef of substepsDefinition) {
-				substeps.push(new Step(singleSubstepDef, this.props.actors, this.props.taskRoles));
+				substeps.push(new Step(singleSubstepDef, this.makeSubseries()));
 			}
 
 		// Don't know how to process

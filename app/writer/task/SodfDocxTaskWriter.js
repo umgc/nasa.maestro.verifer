@@ -98,7 +98,7 @@ module.exports = class SodfDocxTaskWriter extends DocxTaskWriter {
 		const steps = [];
 		this.preInsertSteps();
 		for (const step of series.steps) {
-			const actor = step.props.actors[0];
+			const actor = step.context.actors[0];
 			const location = step.props.location;
 			steps.push({
 				actor: actor,

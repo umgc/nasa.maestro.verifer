@@ -17,9 +17,6 @@ class InsertStepButtonComponent extends React.Component {
 		const series = stateHandler.state.procedure.tasks[activityIndex]
 			.getDivisionByUuid(this.props.divisionUuid).subscenes[this.props.primaryColumnKey];
 
-		// WAS: this.props.insertStepIntoSeries(this.props.stepIndex);
-		// ^ in SeriesComponent does --> this.props.seriesState
-		//                                .insertStep(stepIndex, this.props.seriesState.makeStep());
 		if (this.props.stepIndex === -1) {
 			series.appendStep();
 		} else {

@@ -10,9 +10,8 @@ module.exports = class Series {
 	 * @param {Array} seriesActors - Array in form ['EV1'] for a single actor or
 	 *                               ['EV1 + EV2', 'EV1', 'EV2'] for a joint actor Series.
 	 * @param {Array} taskRoles
-	 * @param {Array} steps          Optional array of Step objects
 	 */
-	constructor(seriesActors, taskRoles, steps = []) {
+	constructor(seriesActors, taskRoles) {
 		this.subscriberFns = {
 			appendStep: [],
 			deleteStep: [],
@@ -21,11 +20,7 @@ module.exports = class Series {
 		};
 		this.seriesActors = seriesActors;
 		this.taskRoles = taskRoles;
-		this.doConstruct(steps);
-	}
-
-	doConstruct(steps = []) {
-		this.steps = steps;
+		this.steps = [];
 	}
 
 	getDefinition() {
@@ -49,16 +44,27 @@ module.exports = class Series {
 		return unsubscribeFn;
 	}
 
+	modelFromDefOrModel(stepDefOrModel) {
+		let stepModel;
+		if (stepDefOrModel instanceof Step) {
+			stepModel = stepDefOrModel;
+		} else {
+			stepModel = this.makeStep(stepDefOrModel);
+		}
+		return stepModel;
+	}
+
 	/**
 	 *
-	 * @param {Step} step  Step model to push to this Series
+	 * @param {Step|Object|string} stepDefOrModel - Either: (a) Step model to push to this Series,
+	 *                                              or (b) plain Object step definition from which
+	 *                                              to create a Step model and push to this series.
 	 */
-	appendStep(step = false) {
+	appendStep(stepDefOrModel = false) {
 		// console.log('Series.appendStep');
-		if (!step) {
-			step = this.makeStep();
-		}
-		this.steps.push(step);
+		const stepModel = this.modelFromDefOrModel(stepDefOrModel);
+		this.steps.push(stepModel);
+		stepModel.setContext(this);
 		subscriptionHelper.run(this.subscriberFns.appendStep, this);
 	}
 
@@ -68,12 +74,11 @@ module.exports = class Series {
 		subscriptionHelper.run(this.subscriberFns.deleteStep, this);
 	}
 
-	insertStep(insertIndex, step = false) {
+	insertStep(insertIndex, stepDefOrModel = false) {
 		// console.log('Series.insertStep');
-		if (!step) {
-			step = this.makeStep();
-		}
-		this.steps.splice(insertIndex, 0, step);
+		const stepModel = this.modelFromDefOrModel(stepDefOrModel);
+		this.steps.splice(insertIndex, 0, stepModel);
+		stepModel.setContext(this);
 		subscriptionHelper.run(this.subscriberFns.insertStep, this);
 	}
 
@@ -98,7 +103,7 @@ module.exports = class Series {
 
 			// transferring step from this Series to another Series
 			destinationSeries.insertStep(insertIndex + 1, stepToTransfer);
-
+			stepToTransfer.setContext(destinationSeries);
 		}
 
 		// FIXME is this right name? or should this be registered as an deleteStep? Or both?
@@ -107,12 +112,13 @@ module.exports = class Series {
 	}
 
 	/**
-	 * Make a Step based upon the context of this Series
+	 * Make a Step based upon the context of this Series. Does not attach the step to the Series.
+	 *
 	 * @param {Object|string}  stepDefinition
 	 * @return {Step}          Resulting step object
 	 */
 	makeStep(stepDefinition = {}) {
-		return new Step(stepDefinition, this.seriesActors, this.taskRoles);
+		return new Step(stepDefinition, this); // this.seriesActors, this.taskRoles);
 	}
 
 };
