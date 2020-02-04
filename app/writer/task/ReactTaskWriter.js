@@ -96,23 +96,17 @@ module.exports = class ReactTaskWriter extends TaskWriter {
 					// console.log(columns[colId].series); // FIXME remove
 					const startStep = this.preInsertSteps(); // FIXME this doesn't seem right
 
-					const key = maestroKey.getKey(
-						activityUuid,
-						divisionUuid,
-						columns[colId].stateColumnKey
-					);
+					const seriesState = columns[colId].series;
 
 					return (
 						<SeriesComponent
-							key={key}
+							key={seriesState.uuid}
 							startStep={startStep}
 							colspan={columns[colId].colspan}
 							primaryColumnKey={columns[colId].stateColumnKey}
 							columnKeys={columns[colId].columnKeys}
-							seriesState={columns[colId].series}
-							// activityIndex={activityIndex}
+							seriesState={seriesState}
 							activityUuid={activityUuid}
-							// divisionIndex={divisionIndex}
 							divisionUuid={divisionUuid}
 							taskWriter={this}
 						/>

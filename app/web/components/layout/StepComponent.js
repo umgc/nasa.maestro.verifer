@@ -33,6 +33,7 @@ class StepComponent extends React.Component {
 
 		// when Step.reload() is called, run function to update this component state
 		this.unsubscribeReloadFn = this.props.stepState.subscribeReload((newState) => {
+			// FIXME asdfasdfasdf insert something about making the next step re-render if necessary
 			this.setState({ stepState: newState });
 		});
 	}

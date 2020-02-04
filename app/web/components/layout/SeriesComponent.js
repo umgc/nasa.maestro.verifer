@@ -119,7 +119,6 @@ class SeriesComponent extends React.Component {
 
 	render() {
 		// const startStep = this.props.taskWriter.preInsertSteps();
-
 		// console.log(`rendering series with colKeys = ${this.props.columnKeys}`);
 
 		return (
@@ -130,29 +129,20 @@ class SeriesComponent extends React.Component {
 						FIXME start={startStep} removed from <ol> above -- need to fix step nums
 						*/}
 						{this.props.seriesState.steps.map((step, index) => {
-							const key = maestroKey.getKey(
-								this.props.activityUuid,
-								this.props.divisionUuid,
-								this.props.primaryColumnKey,
-								index
-							);
 							return (
 								<StepComponent
-									key={key}
+									key={step.uuid}
 									stepState={step}
 									columnKeys={this.props.columnKeys}
 									taskWriter={this.props.taskWriter}
 
-									// activityIndex={this.props.activityIndex}
 									activityUuid={this.props.activityUuid}
-									// divisionIndex={this.props.divisionIndex}
 									divisionUuid={this.props.divisionUuid}
 									primaryColumnKey={this.props.primaryColumnKey}
 									stepIndex={index}
 
 									deleteStepFromSeries={this.deleteStepFromSeries}
 									handleMoveStep={this.handleMoveStep}
-									// insertStepIntoSeries={this.insertStepIntoSeries}
 								/>
 							);
 						})}
@@ -183,14 +173,11 @@ class SeriesComponent extends React.Component {
 SeriesComponent.propTypes = {
 	colspan: PropTypes.number.isRequired,
 	startStep: PropTypes.number.isRequired,
-	// steps: PropTypes.array.isRequired,
 	columnKeys: PropTypes.array.isRequired,
 	seriesState: PropTypes.object.isRequired,
 	taskWriter: PropTypes.object.isRequired,
 
-	// activityIndex: PropTypes.number.isRequired,
 	activityUuid: PropTypes.string.isRequired,
-	// divisionIndex: PropTypes.number.isRequired,
 	divisionUuid: PropTypes.string.isRequired,
 	primaryColumnKey: PropTypes.string.isRequired
 };
