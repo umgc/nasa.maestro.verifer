@@ -82,18 +82,18 @@ module.exports = class ConcurrentStep {
 	 * @param  {Object} definition  An object representing a set of steps
 	 *
 	 *                  Examples:
-	 *                    concurrentStepYaml === {
+	 *                    definition === {
 	 *                      simo: {
 	 *                        IV: [ Step, Step, Step ],
 	 *                        crewA: [ Step ],
 	 *                        crewB: Step not in array
 	 *                      }
 	 *                    }
-	 *                    concurrentStepYaml === {
+	 *                    definition === {
 	 *                        IV: [ Step, Step, Step ]
 	 *                            <-- can't have second actor here in non-simo case
 	 *                    }
-	 *                    concurrentStepYaml === {
+	 *                    definition === {
 	 *                        IV: Step not in array
 	 *                    }
 	 * @param  {Task} parent  The Task object this object resides within

@@ -64,27 +64,13 @@ class StepComponent extends React.Component {
 		stateHandler.saveChange(activityIndex);
 	}
 
-	handleInsertStepBefore = (e) => {
-		console.log('insert-step-before button click');
-		e.preventDefault();
-		e.stopPropagation();
-
-		this.props.insertStepIntoSeries(this.props.stepIndex);
-
-		const activityIndex = stateHandler.state.procedure
-			.TasksHandler.getTaskIndexByUuid(this.props.activityUuid);
-
-		stateHandler.saveChange(activityIndex);
-
-	}
-
 	// FIXME isn't this in separete maestroKey.js file now?
 	getKey() {
 		return `act${this.props.activityUuid}-div${this.props.divisionUuid}-${this.props.primaryColumnKey}-step${this.props.stepIndex}`;
 	}
 
 	render() {
-		// console.log(`rendering StepComponent ${this.props.stepIndex}`);
+		console.log(`rendering StepComponent ${this.props.stepIndex}`);
 
 		const emptyDefinition = Object.keys(this.props.stepState.getDefinition()).length === 0;
 
@@ -103,7 +89,6 @@ class StepComponent extends React.Component {
 
 					handleEditButtonClick={this.handleEditButtonClick}
 					handleDeleteButtonClick={this.handleDeleteButtonClick}
-					handleInsertStepBefore={this.handleInsertStepBefore}
 					handleMoveStep={this.props.handleMoveStep}
 				/>
 			);
