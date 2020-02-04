@@ -28,7 +28,6 @@ module.exports = class Series {
 
 	setContext(parent) {
 		this.parent = parent;
-
 		this.taskRoles = parent.taskRoles;
 	}
 

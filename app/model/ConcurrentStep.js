@@ -14,7 +14,7 @@ const subscriptionHelper = require('../helpers/subscriptionHelper');
  * replaced with whomever the procedure is passing in as an actor for the role.
  *
  * @param {Object} taskRoles     Object of TaskRole objects. See constructor for ConcurrentStep
- * @param {string} actorIdGuess  May be a proper actor ID like "EV1" or it may be a placeholder
+ * @param {string} roleOrActorId  May be a proper actor ID like "EV1" or it may be a placeholder
  *                               "role" like "crewA". Procedures will then have to pass in
  *                               crewA === EV1 into the task, and it is the job of the
  *                               Task/ConcurrentStep/Step to attribute those steps to EV1 instead
@@ -22,18 +22,20 @@ const subscriptionHelper = require('../helpers/subscriptionHelper');
  *                               {{role:crewA}}. This is replaced within Step.
  * @return {string}
  */
-function getRealActorId(taskRoles, actorIdGuess) {
-	if (taskRoles[actorIdGuess]) {
-		return taskRoles[actorIdGuess].actor;
+function getRealActorId(taskRoles, roleOrActorId) {
+	if (taskRoles[roleOrActorId]) {
+		return taskRoles[roleOrActorId].actor;
 	} else {
-		return actorIdGuess;
+		return roleOrActorId;
 	}
 }
 
 /**
  * Return main ID for an actorIdGuess and the list of IDs of all IDs
- * @param {string} actorIdGuess  be a proper actor ID like "EV1" or it may be a placeholder
- *                               "role" like "crewA". See details in getRealActorId()
+ * @param {string} roleOrActorOrJoint  May be an actor ID like "EV1" or may be a role like "crewA".
+ *                                     Also may include joint actors and/or roles, like:
+ *                                       roleOrActorOrJoint === "someRole + someActor + anotherRole"
+ *                                     See details in getRealActorId()
  * @param  {Object} taskRoles    Object of TaskRole objects. See constructor for ConcurrentStep
  * @return {Object}              Examples:
  *                                 actorIdGuess = crewA --> { id: 'EV1', idOrIds: 'EV1' }
@@ -46,17 +48,17 @@ function getRealActorId(taskRoles, actorIdGuess) {
  *                                   idOrIds: ['EV1 + EV2', 'EV1, 'EV2']
  *                                 }
  */
-function getActorInfo(actorIdGuess, taskRoles) {
+function getActorInfo(roleOrActorOrJoint, taskRoles) {
 
 	let idOrIds,
 		id;
 
 	// check for joint actors
-	if (actorIdGuess.indexOf('+') !== -1) {
+	if (roleOrActorOrJoint.indexOf('+') !== -1) {
 
 		// split the actors/roles on +, then replace things like "crewB" with "EV2" (if
 		// EV2 is assigned to crewB role)
-		idOrIds = actorIdGuess.split('+').map((str) => {
+		idOrIds = roleOrActorOrJoint.split('+').map((str) => {
 			return getRealActorId(taskRoles, str.trim());
 		});
 
@@ -65,7 +67,7 @@ function getActorInfo(actorIdGuess, taskRoles) {
 
 		idOrIds.unshift(id); // stick the composite back on the front. TODO necessary?
 	} else {
-		idOrIds = getRealActorId(taskRoles, actorIdGuess);
+		idOrIds = getRealActorId(taskRoles, roleOrActorOrJoint);
 		id = idOrIds;
 	}
 
@@ -178,17 +180,15 @@ module.exports = class ConcurrentStep {
 		subscriptionHelper.run(this.subscriberFns.setState, this);
 	}
 
-	handleActorSteps(concurrentStepYaml, actorIdGuess) {
+	handleActorSteps(concurrentStepYaml, roleOrActorOrJoint) {
 
 		// if .simo exists, use it. Otherwise it's not a simo block and directly access actor
 		const actorStepsDefinition = concurrentStepYaml.simo ?
-			concurrentStepYaml.simo[actorIdGuess] :
-			concurrentStepYaml[actorIdGuess];
+			concurrentStepYaml.simo[roleOrActorOrJoint] :
+			concurrentStepYaml[roleOrActorOrJoint];
 
-		const actorInfo = getActorInfo(actorIdGuess, this.taskRoles);
-
-		// Initiate the array of steps for the actor
-		const series = new Series(actorInfo.idOrIds, this);
+		const seriesKey = this.addSeries(roleOrActorOrJoint);
+		const series = this.subscenes[seriesKey];
 
 		if (typeof actorStepsDefinition === 'string') {
 			series.appendStep(actorStepsDefinition);
@@ -206,18 +206,19 @@ module.exports = class ConcurrentStep {
 			);
 		}
 
-		// Set the actor and steps in the object
-		this.subscenes[actorInfo.id] = series;
-
 	}
 
 	/**
 	 * FIXME: Handle with setState?
-	 * @param {string} seriesKey - The key in the Division.subscenes object pointing to the Series
+	 * @param {string} roleOrActorOrJoint - The role, actor, or joint (aRole + anActor + another)
+	 *                                      the Series belongs to. From this, the key in the
+	 *                                      this.subscenes object can be determined.
+	 * @return {string}                   - The key of the new Series in this.subscenes
 	 */
-	addSeries(seriesKey) {
-		const actorInfo = getActorInfo(seriesKey, this.taskRoles);
-		this.subscenes[seriesKey] = new Series(actorInfo.idOrIds, this);
+	addSeries(roleOrActorOrJoint) {
+		const actorInfo = getActorInfo(roleOrActorOrJoint, this.taskRoles);
+		this.subscenes[actorInfo.id] = new Series(actorInfo.idOrIds, this);
+		return actorInfo.id;
 	}
 
 };
