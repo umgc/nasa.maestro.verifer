@@ -9,7 +9,6 @@ const SeriesComponent = require('../../web/components/layout/SeriesComponent');
 const getImageFileDimensions = require('image-size');
 const TextTransform = require('../text-transform/TextTransform');
 
-const maestroKey = require('../../web/components/helpers/maestroKey');
 const uuidv4 = require('uuid/v4');
 
 const TaskWriter = require('./TaskWriter');
@@ -118,8 +117,8 @@ module.exports = class ReactTaskWriter extends TaskWriter {
 	}
 
 	// used by sub-steps
-	wrapStepLists(steps, startStep = 1) {
-		return (<ol key={uuidv4()} start={startStep}>{steps}</ol>);
+	wrapStepLists(steps) {
+		return (<div key={uuidv4()} style={{ marginLeft: '20px' }}>{steps}</div>);
 	}
 
 	/**
@@ -210,7 +209,7 @@ module.exports = class ReactTaskWriter extends TaskWriter {
 		}
 
 		let actorText = '';
-		if (options.actors.length > 0) {
+		if (options.actors.length > 0 && options.columnKeys.length > 0) {
 			const actorToColumnIntersect = options.actors.filter((value) => {
 				return options.columnKeys.includes(value);
 			});
@@ -260,7 +259,7 @@ module.exports = class ReactTaskWriter extends TaskWriter {
 
 	addCheckStepText(stepText, level, parent) {
 		return (
-			<li key={uuidv4()} className={`li-level-${level}`}>
+			<div key={uuidv4()} className={`li-level-${level}`}>
 				<label>
 					<input
 						data-level="step"
@@ -270,7 +269,7 @@ module.exports = class ReactTaskWriter extends TaskWriter {
 					/>
 					{this.textTransform.transform(stepText)}
 				</label>
-			</li>
+			</div>
 		);
 	}
 
@@ -300,6 +299,39 @@ module.exports = class ReactTaskWriter extends TaskWriter {
 
 	setModuleOutputType() {
 		return 'React';
+	}
+
+	insertStepPostProcess(elements, step) {
+
+		const validBody = (Array.isArray(elements.body) && elements.body.length) ||
+			(!Array.isArray(elements.body) && elements.body);
+
+		if (validBody) {
+			let stepNum;
+			try {
+				stepNum = step.parent.constructor.name === 'Series' ?
+					step.getActivityStepNumber() :
+					step.getSubstepNumber();
+			} catch (e) {
+				stepNum = '☠';
+				console.error(e);
+				console.error(step);
+			}
+			// stepNum = 'X';
+			elements.body = [ // <-- needs to be wrapped in array for handling in insertStep()
+				<div
+					style={{ display: 'flex', flexFlow: 'row nowrap' }}
+					key={step.uuid + '-test-fakey-fakey'}
+				>
+					<div style={{ margin: '0 10px 0 0' }}>
+						<p>{`${stepNum}.`}</p>
+					</div>
+					<div style={{ flex: 1 }}>
+						{elements.body}
+					</div>
+				</div>
+			];
+		}
 	}
 
 };

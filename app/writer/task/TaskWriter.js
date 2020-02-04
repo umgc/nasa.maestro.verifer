@@ -245,15 +245,6 @@ module.exports = class TaskWriter extends Abstract {
 			}
 		}
 
-		const children = [
-			...elements.images,
-			...elements.title,
-			...elements.prebody,
-			elements.body,
-			...elements.postbody,
-			...elements.checkboxes
-		];
-
 		if (step.props.substeps.length) {
 			const grandChildren = [];
 
@@ -265,16 +256,34 @@ module.exports = class TaskWriter extends Abstract {
 			this.postInsertSteps(level + 1);
 
 			if (this.wrapStepLists) {
-				children.push(this.wrapStepLists(grandChildren));
+				elements.grandChildren = [this.wrapStepLists(grandChildren)];
 			} else {
-				children.push(...grandChildren);
+				elements.grandChildren = grandChildren;
 			}
+		} else {
+			elements.grandChildren = [];
 		}
+
+		this.insertStepPostProcess(elements, step); // allow TaskWriters to alter elements at this point.
+
+		const children = [
+			...elements.images,
+			...elements.prebody,
+			...elements.title,
+			elements.body,
+			...elements.postbody,
+			...elements.checkboxes,
+			...elements.grandChildren
+		];
 
 		if (!level || level === 0) {
 			this.stepNumber++;
 		}
 
 		return children;
+	}
+
+	insertStepPostProcess(elements, step) {
+		return true;
 	}
 };

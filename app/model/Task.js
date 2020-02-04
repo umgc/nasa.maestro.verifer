@@ -579,4 +579,23 @@ module.exports = class Task {
 		return canonical;
 	}
 
+	getNumStepsPriorToDivision(division) {
+		let totalSteps = 0;
+		for (let i = 0; i < this.concurrentSteps.length; i++) {
+			if (division !== this.concurrentSteps[i]) {
+				totalSteps += this.concurrentSteps[i].getTotalSteps();
+			} else {
+				return totalSteps;
+			}
+		}
+		throw new Error(`ConcurrentStep ${division.uuid} not within Task ${this.uuid}`);
+	}
+
+	getTotalSteps() {
+		let totalSteps = 0;
+		for (const division of this.concurrentSteps) {
+			totalSteps += division.getTotalSteps();
+		}
+		return totalSteps;
+	}
 };

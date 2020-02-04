@@ -71,7 +71,7 @@ class StepComponent extends React.Component {
 	}
 
 	render() {
-		console.log(`rendering StepComponent ${this.props.stepIndex}`);
+		// console.log(`rendering StepComponent ${this.props.stepIndex}`);
 
 		const emptyDefinition = Object.keys(this.props.stepState.getDefinition()).length === 0;
 
@@ -108,7 +108,7 @@ class StepComponent extends React.Component {
 
 		// had: onChange={this.handleEditTextChange}
 		return (
-			<li
+			<div
 				style={liStyle}
 				className={`li-level-${options.level}`}
 			>
@@ -122,7 +122,7 @@ class StepComponent extends React.Component {
 				</div>
 				<button className='save-button' onClick={this.handleSave}>save</button>
 				<button className='cancel-button' onClick={this.handleCancel}>cancel</button>
-			</li>
+			</div>
 		);
 
 	}

@@ -129,4 +129,38 @@ module.exports = class Series {
 		return new Step(stepDefinition, this); // this.seriesActors, this.taskRoles);
 	}
 
+	getStepIndex(step) {
+		for (let i = 0; i < this.steps.length; i++) {
+			const s = this.steps[i];
+			if (s === step) {
+				return i;
+			}
+		}
+		throw new Error(`Step ${step.uuid} not within Series ${this.uuid}`);
+	}
+
+	// NOTE: step number and step index are not directly related. Steps can contain only non-
+	// incrementing content like images and NCWs. These do not impact step numbers, but they do
+	// count towards indexing.
+	getSeriesStepNumber(step) {
+		let stepNum = 1;
+		for (let i = 0; i < this.steps.length; i++) {
+			const s = this.steps[i];
+			if (s === step) {
+				return stepNum;
+			} else {
+				stepNum += s.getNumberingImpact();
+			}
+		}
+		throw new Error(`Step ${step.uuid} not within Series ${this.uuid}`);
+	}
+
+	getTotalSteps() {
+		let totalSteps = 0;
+		for (const step of this.steps) {
+			totalSteps += step.getNumberingImpact();
+		}
+		return totalSteps;
+	}
+
 };

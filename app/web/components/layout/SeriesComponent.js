@@ -124,7 +124,8 @@ class SeriesComponent extends React.Component {
 		return (
 			<td key={uuidv4()} colSpan={this.props.colspan} className='series-td'>
 				<div style={{ position: 'relative' }}>
-					<ol>
+					{/* <ol> */}
+					<div>
 						{/*
 						FIXME start={startStep} removed from <ol> above -- need to fix step nums
 						*/}
@@ -146,7 +147,8 @@ class SeriesComponent extends React.Component {
 								/>
 							);
 						})}
-					</ol>
+					</div>
+					{/* </ol> */}
 					<div className='series-insert-step-wrapper'>
 						<div>
 							<InsertStepButtonComponent

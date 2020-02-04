@@ -209,4 +209,51 @@ module.exports = class ConcurrentStep {
 		return actorInfo.id;
 	}
 
+	getNumStepsPriorToSeries(series) {
+		const activityColumnKeys = this.parent.getColumns();
+		const seriesKeys = Object.keys(this.subscenes);
+		const actorKeyToSeriesKey = {};
+		for (const key of seriesKeys) {
+			if (activityColumnKeys.indexOf(key) > -1) {
+				actorKeyToSeriesKey[key] = key;
+			} else {
+				key.split('+').map((actor) => {
+					const a = actor.trim();
+					actorKeyToSeriesKey[a] = key;
+				});
+			}
+			// FIXME this doesn't account for a series not directly attached to a column, e.g. if
+			// you made an SSRMS series that got mapped onto the IV column. The UI won't support
+			// that but the maestro yaml spec will.
+		}
+
+		const completed = [];
+		let totalSteps = 0;
+		for (const key of activityColumnKeys) {
+			let checkSeries = this.subscenes[key];
+			if (!checkSeries) {
+				const jointActorKey = actorKeyToSeriesKey[key];
+				if (completed.indexOf(jointActorKey) > -1) {
+					break; // already did this one, move on
+				}
+				checkSeries = this.subscenes[jointActorKey];
+			}
+
+			if (series !== checkSeries) {
+				totalSteps += checkSeries.getTotalSteps();
+			} else {
+				return totalSteps;
+			}
+		}
+		throw new Error(`Series ${series.uuid} not within ConcurrentStep ${this.uuid}`);
+	}
+
+	getTotalSteps() {
+		let totalSteps = 0;
+		for (const seriesKey in this.subscenes) {
+			totalSteps += this.subscenes[seriesKey].getTotalSteps();
+		}
+		return totalSteps;
+	}
+
 };

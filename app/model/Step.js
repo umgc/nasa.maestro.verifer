@@ -64,13 +64,9 @@ module.exports = class Step {
 	}
 
 	// FIXME this should probably be broken up into separate external use of setState and setContext
-	reload(
-		newDefinition = {},
-		newActorIdOrIds = this.context.actorIdOrIds,
-		newTaskRoles = this.context.taskRoles
-	) {
+	reload(newDefinition = {}, parent = this.parent) {
 		this.setContext(parent, newDefinition);
-		this.setState(newDefinition, newActorIdOrIds, newTaskRoles);
+		this.setState(newDefinition);
 		subscriptionHelper.run(this.reloadSubscriberFns, this);
 	}
 
@@ -143,6 +139,8 @@ module.exports = class Step {
 
 		this.props = {}; // wipes out pre-existing properties, so reload() can start over
 
+		this.props.definitionActor = definition.actor;
+
 		// Initiate the vars as empty.
 		for (const prop of props.strings) {
 			this.props[prop] = '';
@@ -210,7 +208,9 @@ module.exports = class Step {
 		for (const yamlKey in blocks) {
 			// user-generated YAML has different property names than internal JS property names
 			const jsKey = blocks[yamlKey];
-			this.props[jsKey] = this.parseBlock(definition[yamlKey]);
+			const singularValue = this.parseBlock(definition[yamlKey]);
+			const pluralValue = this.parseBlock(definition[jsKey]);
+			this.props[jsKey] = singularValue.length ? singularValue : pluralValue;
 		}
 
 		// Check for substeps
@@ -299,7 +299,8 @@ module.exports = class Step {
 		}
 
 		this.context.actors = arrayHelper.parseArray(
-			this.props.definitionActor ? this.props.definitionActor : this.context.actorIdOrIds
+			// this.props.definitionActor ? this.props.definitionActor : this.context.actorIdOrIds
+			this.props.definitionActor || this.context.actorIdOrIds || []
 		);
 	}
 
@@ -355,9 +356,19 @@ module.exports = class Step {
 	// inherits from the other, or they share an ancestor).
 	makeSubseries() {
 		return {
+			constructor: { name: 'DummySeries' },
 			taskRoles: this.parent.taskRoles,
-			seriesActors: this.parent.seriesActors
+			seriesActors: this.parent.seriesActors,
+			parent: this
 		};
+	}
+
+	getRootSeries() {
+		let series = this.parent;
+		while (series.constructor.name !== 'Series') {
+			series = series.parent;
+		}
+		return series;
 	}
 
 	/**
@@ -390,6 +401,85 @@ module.exports = class Step {
 
 		return substeps;
 
+	}
+
+	getActivityStepNumber() {
+		const series = this.getRootSeries();
+		const division = series.parent;
+		const activity = division.parent;
+
+		// return series.getSeriesStepNumber(this) +
+		// division.getNumStepsPriorToSeries(series) +
+		// activity.getNumStepsPriorToDivision(division);
+		const s = series.getSeriesStepNumber(this);
+		const d = division.getNumStepsPriorToSeries(series);
+		const a = activity.getNumStepsPriorToDivision(division);
+
+		// console.log({ s, d, a });
+		return s + d + a;
+
+	}
+
+	getProcedureStepNumber() {
+		const activity = this.getRootSeries().parent.parent;
+		const procedure = activity.procedure;
+		return procedure.getNumStepsPriorToActivity(activity) + this.getActivityStepNumber();
+	}
+
+	getSubstepNumber() {
+		//            DummySeries ⮢       ⮣ parent Step
+		const substepList = this.parent.parent.props.substeps;
+		let stepNum = 1;
+		for (let i = 0; i < substepList.length; i++) {
+			if (substepList[i] === this) {
+				return stepNum;
+			} else {
+				stepNum += substepList[i].getNumberingImpact();
+			}
+		}
+		throw new Error(`sub-Step ${this.uuid} not within ${this.parent.parent.uuid}`);
+	}
+
+	getSubstepNumbers() {
+		const parentStepNums = [];
+		let currentStep = this;
+		let currentSeries = this.parent;
+		while (currentSeries.constructor.name === 'Step' ||
+			currentSeries.constructor.name === 'DummySeries'
+		) {
+			if (currentSeries.constructor.name === 'DummySeries') {
+				const substepNum = currentSeries.parent.props.substeps.indexOf(currentStep);
+				if (substepNum === -1) {
+					throw new Error(`Step ${currentStep.uuid} not substep of ${currentSeries.parent.uuid}`);
+				}
+				parentStepNums.push(substepNum + 1);
+			}
+
+			currentStep = currentSeries.parent;
+			currentSeries = currentStep.parent;
+		}
+		return parentStepNums.reverse();
+	}
+
+	// FIXME: TaskWriter needs to influence this, so it matches up with display
+	// FIXME: need to make modules state whether they impact numbering
+	getNumberingImpact(numberedProps = ['text']) {
+		for (const prop of numberedProps) {
+			if (this.propIsPresent(prop)) {
+				return 1;
+			}
+		}
+		return 0;
+	}
+
+	propIsPresent(prop) {
+		if (prop === 'text') {
+			return this.props.text.length > 0;
+		} else if (prop === 'title') {
+			return !!this.props.title;
+		} else {
+			throw new Error('This function not yet complete, more prop types must be added');
+		}
 	}
 
 };

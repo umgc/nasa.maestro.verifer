@@ -15,7 +15,7 @@ const editButtonsContainerStyle = {
 	position: 'absolute',
 	backgroundColor: '#eee',
 	right: '3px',
-	top: '-25px'
+	top: '-20px'
 };
 
 /**
@@ -121,7 +121,7 @@ const StepViewerComponent = ({
 	};
 
 	return (
-		<li
+		<div
 			style={{
 				...liStyle,
 				opacity: isDragging ? 0.5 : 1
@@ -138,7 +138,7 @@ const StepViewerComponent = ({
 				dropFn={dropOccurredBeforeStep}
 				position='top'
 			/>
-		</li>
+		</div>
 	);
 };
 

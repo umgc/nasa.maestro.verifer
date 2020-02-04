@@ -411,4 +411,16 @@ module.exports = class Procedure {
 		return this.tasks[index];
 	}
 
+	getNumStepsPriorToActivity(activity) {
+		let totalSteps = 0;
+		for (let i = 0; i < this.tasks.length; i++) {
+			if (activity !== this.tasks[i]) {
+				totalSteps += this.tasks[i].getTotalSteps();
+			} else {
+				return totalSteps;
+			}
+		}
+		throw new Error(`Task ${activity.uuid} not within Procedure ${this.procedure_name}`);
+	}
+
 };
