@@ -180,7 +180,7 @@ module.exports = class CommanderProgram extends Program {
 
 		this.setPathsFromProject(this.project);
 
-		pathMustExist(this.procedurePath);
+		pathMustExist(this.proceduresPath);
 		pathMustExist(this.tasksPath);
 
 		// at this point tasks and procedures paths exist. Reasonably certain this
@@ -196,7 +196,7 @@ module.exports = class CommanderProgram extends Program {
 	}
 
 	doCompose() {
-		fs.readdir(this.procedurePath, (err, files) => {
+		fs.readdir(this.proceduresPath, (err, files) => {
 			if (err) {
 				console.log(`Unable to scan procedures directory: ${err}`);
 				process.exit();
@@ -211,11 +211,11 @@ module.exports = class CommanderProgram extends Program {
 
 		console.log(`Generating procedure from ${file}`);
 
-		const procedureFile = path.join(this.procedurePath, file);
+		const procedureFilepath = path.join(this.proceduresPath, file);
 
 		// Parse the input file
 		const procedure = new Procedure();
-		const err = procedure.addProcedureDefinitionFromFile(procedureFile);
+		const err = procedure.addProcedureDefinitionFromFile(procedureFilepath);
 		if (err) {
 			procedure.handleParsingError(err, file);
 		}

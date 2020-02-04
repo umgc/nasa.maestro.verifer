@@ -1,10 +1,10 @@
 const React = require('react');
 
-const Procedure = require('../../../model/Procedure');
-const Task = require('../../../model/Task');
-const ConcurrentStep = require('../../../model/ConcurrentStep');
-const Series = require('../../../model/Series');
-const Step = require('../../../model/Procedure');
+// const Procedure = require('../../../model/Procedure');
+// const Task = require('../../../model/Task');
+// const ConcurrentStep = require('../../../model/ConcurrentStep');
+// const Series = require('../../../model/Series');
+// const Step = require('../../../model/Procedure');
 
 const stateHandler = require('../../state/index');
 
@@ -30,9 +30,12 @@ class SidebarComponent extends React.Component {
 	}
 
 	render() {
-		for (const model of [Step, Series, ConcurrentStep, Task, Procedure]) {
-			if (this.state.editorNode instanceof model) {
-				return this[`render${model.name}Node`]();
+		for (const model of ['Step', 'Series', 'ConcurrentStep', 'Task', 'Procedure']) {
+			// if (this.state.editorNode instanceof model) {
+			if (this.state.editorNode && this.state.editorNode.constructor &&
+				this.state.editorNode.constructor.name === model
+			) {
+				return this[`render${model}Node`]();
 			}
 		}
 		return this.renderNoEditorNode();

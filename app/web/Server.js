@@ -123,6 +123,7 @@ module.exports = class Server {
 			return;
 		};
 
+		// FIXME fs.exists deprecated
 		fs.exists(filepath, function(currentExists) {
 			if (!currentExists) {
 				return badFile('ERROR: original file path doesn\'t exist');
@@ -147,6 +148,23 @@ module.exports = class Server {
 		});
 	}
 
+	handleMoveFile2 = (req, res) => {
+		const filepath = this.validateFileRequest(req);
+		const newfilepath = this.validateFileRequest(req, 'newfilename');
+
+		const resultHandler = function(result) {
+			console.log(result);
+			res.send(result);
+		};
+
+		this.program.moveFile(
+			filepath,
+			newfilepath,
+			resultHandler,
+			resultHandler // same action on error
+		);
+	}
+
 	serve() {
 		this.app.get('/', (req, res) => {
 			// res.sendFile(this.baseHtmlFile);
@@ -158,7 +176,7 @@ module.exports = class Server {
 
 		this.app.post('/edit/:filetype/:filename', this.handleFileUpdates);
 		this.app.post('/exists/:filetype/:filename', this.handleCheckFileExists);
-		this.app.post('/move/:filetype/:filename/:newfilename', this.handleMoveFile);
+		this.app.post('/move/:filetype/:filename/:newfilename', this.handleMoveFile2); // FIXME name
 
 		this.app.listen(this.port, () => {
 			consoleHelper.success(

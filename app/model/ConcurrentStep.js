@@ -211,12 +211,6 @@ module.exports = class ConcurrentStep {
 
 	}
 
-	hasSeries(seriesId) {
-		return this.subscenes[seriesId] &&
-			typeof this.subscenes[seriesId] === 'object' &&
-			this.subscenes[seriesId] instanceof Series;
-	}
-
 	/**
 	 * FIXME: Handle with setState?
 	 * @param {string} seriesKey - The key in the Division.subscenes object pointing to the Series

@@ -5,7 +5,7 @@ const path = require('path');
 const YAML = require('js-yaml');
 const jsdiff = require('diff');
 
-const Procedure = require('../../model/Procedure');
+// const Procedure = require('../../model/Procedure');
 const Task = require('../../model/Task');
 
 const state = {};
@@ -68,39 +68,24 @@ function recordAndReportChange() {
  *
  */
 function getPathParts(taskOrProcedure) {
-	if (taskOrProcedure instanceof Procedure) {
+
+	// FIXME
+	// checking instanceof may be problematic in Electron on Windows in some cases. Need to read [1]
+	// to fully understand. For now, just check constructor name.
+	// [1] https://github.com/electron/electron/issues/1289
+	if (taskOrProcedure.constructor.name === 'Procedure') {
 		return {
-			basepath: state.program.procedurePath,
+			basepath: state.program.proceduresPath,
 			filename: state.procedure.procedureFile
 		};
-	} else if (taskOrProcedure instanceof Task) {
+	} else if (taskOrProcedure.constructor.name === 'Task') {
 		return {
 			basepath: state.program.tasksPath,
-			filename: taskOrProcedure.taskReqs.file
+			filename: taskOrProcedure.taskReqs.file // electron this is full path, web just filename
 		};
 	}
+
 	throw new Error('taskOrProcedure must be Task or Procedure');
-}
-
-/**
- * Save yamlString to Activity file
- *
- * @param {Task|Procedure} taskOrProcedure  Task or Procedure object
- * @param {string} yamlString
- */
-function saveChangeElectron(taskOrProcedure, yamlString) {
-	const p = getPathParts(taskOrProcedure);
-	fs.writeFile(
-		path.join(p.basepath, p.filename),
-		yamlString,
-		{},
-		(err) => {
-			if (err) {
-				throw err;
-			}
-		}
-	);
-
 }
 
 /**
@@ -128,7 +113,15 @@ function exists(path) {
  */
 function moveFileElectron(taskOrProcedure, newFilename, completeFn) {
 	const p = getPathParts(taskOrProcedure);
-
+	const src = path.join(p.basepath, p.filename);
+	const dest = path.join(p.basepath, newFilename);
+	console.log(`moving file from ${src} to ${dest}`);
+	state.program.moveFile(
+		src,
+		dest,
+		completeFn,
+		completeFn
+	);
 }
 /**
  *
@@ -161,6 +154,26 @@ function moveFile(taskOrProcedure, newFilename, completeFn = function() {}) {
 	} else {
 		moveFileWeb(taskOrProcedure, newFilename, completeFn);
 	}
+}
+
+/**
+ * Save yamlString to Activity file
+ *
+ * @param {Task|Procedure} taskOrProcedure  Task or Procedure object
+ * @param {string} yamlString
+ */
+function saveChangeElectron(taskOrProcedure, yamlString) {
+	const p = getPathParts(taskOrProcedure);
+	fs.writeFile(
+		path.join(p.basepath, p.filename),
+		yamlString,
+		{},
+		(err) => {
+			if (err) {
+				throw err;
+			}
+		}
+	);
 }
 
 /**

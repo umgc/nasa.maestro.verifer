@@ -29,6 +29,10 @@ module.exports = class WebProgram extends Program {
 		this.reactAppComponent.setProgram(this); // bind this to react App component
 	}
 
+	/**
+	 * @param {string} procedureFilename  File name of procedure, not full path.
+	 * @return {Promise}
+	 */
 	loadProcedure(procedureFilename) {
 
 		this.procedure = new Procedure({

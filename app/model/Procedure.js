@@ -24,8 +24,7 @@ function translatePath(procedureFilePath, taskFileName) {
 	// Look in tasks directory, sister to procedures directory
 	// Someday look in a directory provided by dependency manager, issue #21
 	const taskFilePath = path.join(
-		path.dirname(procedureFilePath),
-		'..',
+		path.dirname(path.dirname(procedureFilePath)),
 		'tasks',
 		taskFileName
 	);
@@ -221,14 +220,15 @@ module.exports = class Procedure {
 	 * @param {string} fileName The full path to the YAML file
 	 * @return {Error|null}
 	 */
-	addProcedureDefinitionFromFile(fileName) {
-		this.procedureFile = fileName;
+	addProcedureDefinitionFromFile(procedureFilepath) {
+		this.procedureFile = path.basename(procedureFilepath);
+		this.procedureFilepath = procedureFilepath;
 
-		if (!fs.existsSync(fileName)) {
-			return new Error(`Could not find file ${fileName}`);
+		if (!fs.existsSync(procedureFilepath)) {
+			return new Error(`Could not find file ${procedureFilepath}`);
 		}
 
-		const procDef = YAML.safeLoad(fs.readFileSync(fileName, 'utf8'));
+		const procDef = YAML.safeLoad(fs.readFileSync(procedureFilepath, 'utf8'));
 
 		const err = this.addProcedureDefinition(procDef);
 		if (err) {
@@ -279,7 +279,7 @@ module.exports = class Procedure {
 		for (const task of this.TasksHandler.tasks) {
 			// Since the task file is in relative path to the procedure
 			// file, need to translate it!
-			const taskFileName = translatePath(this.procedureFile, task.file);
+			const taskFileName = translatePath(this.procedureFilepath, task.file);
 			taskDefinitions[task.file] = YAML.safeLoad(fs.readFileSync(taskFileName, 'utf8'));
 		}
 
