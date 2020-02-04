@@ -1,5 +1,7 @@
 'use strict';
 
+const uuidv4 = require('uuid/v4');
+
 const Step = require('./Step');
 const subscriptionHelper = require('../helpers/subscriptionHelper');
 
@@ -9,18 +11,25 @@ module.exports = class Series {
 	 *
 	 * @param {Array} seriesActors - Array in form ['EV1'] for a single actor or
 	 *                               ['EV1 + EV2', 'EV1', 'EV2'] for a joint actor Series.
-	 * @param {Array} taskRoles
+	 * @param {ConcurrentStep} parent  ConcurrentStep object containing this series
 	 */
-	constructor(seriesActors, taskRoles) {
+	constructor(seriesActors, parent) {
+		this.uuid = uuidv4();
 		this.subscriberFns = {
 			appendStep: [],
 			deleteStep: [],
 			insertStep: [],
 			transferStep: []
 		};
+		this.setContext(parent);
 		this.seriesActors = seriesActors;
-		this.taskRoles = taskRoles;
 		this.steps = [];
+	}
+
+	setContext(parent) {
+		this.parent = parent;
+
+		this.taskRoles = parent.taskRoles;
 	}
 
 	getDefinition() {
@@ -46,7 +55,7 @@ module.exports = class Series {
 
 	modelFromDefOrModel(stepDefOrModel) {
 		let stepModel;
-		if (stepDefOrModel instanceof Step) {
+		if (stepDefOrModel instanceof Step) { // Ref #121, why able to use 'instanceof' here?
 			stepModel = stepDefOrModel;
 		} else {
 			stepModel = this.makeStep(stepDefOrModel);

@@ -69,10 +69,7 @@ function recordAndReportChange() {
  */
 function getPathParts(taskOrProcedure) {
 
-	// FIXME
-	// checking instanceof may be problematic in Electron on Windows in some cases. Need to read [1]
-	// to fully understand. For now, just check constructor name.
-	// [1] https://github.com/electron/electron/issues/1289
+	// FIXME: Maestro issue #121, no using 'instanceof'
 	if (taskOrProcedure.constructor.name === 'Procedure') {
 		return {
 			basepath: state.program.proceduresPath,

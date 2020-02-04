@@ -188,7 +188,7 @@ module.exports = class ConcurrentStep {
 		const actorInfo = getActorInfo(actorIdGuess, this.taskRoles);
 
 		// Initiate the array of steps for the actor
-		const series = new Series(actorInfo.idOrIds, this.taskRoles);
+		const series = new Series(actorInfo.idOrIds, this);
 
 		if (typeof actorStepsDefinition === 'string') {
 			series.appendStep(actorStepsDefinition);
@@ -217,7 +217,7 @@ module.exports = class ConcurrentStep {
 	 */
 	addSeries(seriesKey) {
 		const actorInfo = getActorInfo(seriesKey, this.taskRoles);
-		this.subscenes[seriesKey] = new Series(actorInfo.idOrIds, this.taskRoles);
+		this.subscenes[seriesKey] = new Series(actorInfo.idOrIds, this);
 	}
 
 };
