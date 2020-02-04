@@ -36,7 +36,6 @@ class ActivityComponent extends React.Component {
 				activityModelMethod, // insertDivision, deleteDivision, etc
 				(newState) => { // perform this func when the Activity method is run
 					console.log(`Running subscribed method for Task.${activityModelMethod}`);
-					console.log(newState);
 					this.setState({ activityState: newState });
 				}
 			);

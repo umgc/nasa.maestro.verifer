@@ -270,7 +270,7 @@ module.exports = class Task {
 	insertDivision(divisionIndex, division = null) {
 		console.log(`Activity.insertDivision, index = ${divisionIndex}`);
 		if (!division) {
-			division = new ConcurrentStep(this.getEmptyDivisionDefinition(), this.rolesDict);
+			division = new ConcurrentStep(this.getEmptyDivisionDefinition(), this);
 		}
 		this.concurrentSteps.splice(divisionIndex, 0, division);
 		this.divisionUuidToObj[division.uuid] = division;
@@ -280,10 +280,10 @@ module.exports = class Task {
 	appendDivision(division = null) {
 		console.log('Activity.appendDivision');
 		if (!division) {
-			division = new ConcurrentStep(this.getEmptyDivisionDefinition(), this.rolesDict);
+			division = new ConcurrentStep(this.getEmptyDivisionDefinition(), this);
 		} else if (typeof division === 'object' && !(division instanceof ConcurrentStep)) {
 			// assume it's a division definition
-			division = new ConcurrentStep(division, this.rolesDict);
+			division = new ConcurrentStep(division, this);
 		} else {
 			throw new Error('division must be ConcurrentStep, division definition, or falsy');
 		}
@@ -332,7 +332,7 @@ module.exports = class Task {
 
 		// Get the steps.  ConcurrentSteps class will handle the simo vs actor stuff in the yaml.
 		for (var concurrentStepYaml of taskDef.steps) {
-			const division = new ConcurrentStep(concurrentStepYaml, this.rolesDict);
+			const division = new ConcurrentStep(concurrentStepYaml, this);
 			this.divisionUuidToObj[division.uuid] = division;
 			this.concurrentSteps.push(division);
 		}

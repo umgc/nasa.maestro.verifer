@@ -35,7 +35,6 @@ class ASMenuComponent extends React.Component {
 				modelMethod,
 				(newState) => { // perform this func when the TasksHandler method is run
 					console.log(`Running subscribed method for TasksHandler.${modelMethod}`);
-					console.log(newState); // FIXME remove
 					this.setState({ activityOrder: newState.getTaskUuids() });
 				}
 			);

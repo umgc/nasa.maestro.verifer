@@ -43,7 +43,6 @@ class SummaryTimelineComponent extends React.Component {
 					modelMethod,
 					(newState) => {
 						console.log(`Running subscribed method for TasksHandler.${modelMethod}`);
-						console.log(newState); // FIXME remove
 						this.setState({ activityOrder: newState.getTaskUuids() });
 					}
 				)

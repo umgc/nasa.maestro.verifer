@@ -79,7 +79,7 @@ module.exports = class ConcurrentStep {
 	/**
 	 * Create new ConcurrentStep
 	 *
-	 * @param  {Object} concurrentStepYaml An object representing a set of steps
+	 * @param  {Object} definition  An object representing a set of steps
 	 *
 	 *                  Examples:
 	 *                    concurrentStepYaml === {
@@ -96,31 +96,21 @@ module.exports = class ConcurrentStep {
 	 *                    concurrentStepYaml === {
 	 *                        IV: Step not in array
 	 *                    }
-	 * @param  {Object} taskRoles object of TaskRole objects. Example:
-	 *                    taskRoles === {
-	 *                      crewA: TaskRole{
-	 *                        name: 'crewA',
-	 *                        description: 'Crewmember exiting A/L first',
-	 *                        actor: 'EV1'
-	 *                      },
-	 *                      crewB: TaskRole{
-	 *                        name: 'crewB',
-	 *                        description: 'Crewmember exiting A/L second',
-	 *                        actor: 'EV2'
-	 *                      }
-	 *                    }
+	 * @param  {Task} parent  The Task object this object resides within
 	 */
-	constructor(concurrentStepYaml, taskRoles) {
-
+	constructor(definition, parent) {
 		this.subscenes = {};
-		this.taskRoles = taskRoles; // make this available for re-rendering steps later
-
 		this.uuid = uuidv4();
-
 		this.subscriberFns = {
 			setState: []
 		};
-		this.setState(concurrentStepYaml);
+		this.setContext(parent);
+		this.setState(definition);
+	}
+
+	setContext(parent) {
+		this.parent = parent;
+		this.taskRoles = parent.rolesDict;
 	}
 
 	getDefinition() {
@@ -174,8 +164,6 @@ module.exports = class ConcurrentStep {
 
 			this.handleActorSteps(definition, actorIdGuess);
 		}
-
-		console.log(this.subscriberFns);
 
 		subscriptionHelper.run(this.subscriberFns.setState, this);
 	}
