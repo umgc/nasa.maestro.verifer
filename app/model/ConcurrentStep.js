@@ -209,7 +209,7 @@ module.exports = class ConcurrentStep {
 		return actorInfo.id;
 	}
 
-	getNumStepsPriorToSeries(series) {
+	getSeriesOrder() {
 		const activityColumnKeys = this.parent.getColumns();
 		const seriesKeys = Object.keys(this.subscenes);
 		const actorKeyToSeriesKey = {};
@@ -228,22 +228,33 @@ module.exports = class ConcurrentStep {
 		}
 
 		const completed = [];
-		let totalSteps = 0;
+		const order = [];
 		for (const key of activityColumnKeys) {
-			let checkSeries = this.subscenes[key];
-			if (!checkSeries) {
+			let checkKey = key;
+			if (!this.subscenes[checkKey]) {
 				const jointActorKey = actorKeyToSeriesKey[key];
 				if (completed.indexOf(jointActorKey) > -1) {
-					break; // already did this one, move on
+					continue; // already did this one, move on
 				}
-				checkSeries = this.subscenes[jointActorKey];
+				completed.push(jointActorKey);
+				checkKey = jointActorKey;
 			}
+			order.push(checkKey);
+		}
+		return order;
+	}
 
+	getNumStepsPriorToSeries(series) {
+		const seriesOrder = this.getSeriesOrder();
+		let totalSteps = 0;
+		for (const seriesKey of seriesOrder) {
+			const checkSeries = this.subscenes[seriesKey];
 			if (series !== checkSeries) {
 				totalSteps += checkSeries.getTotalSteps();
 			} else {
 				return totalSteps;
 			}
+
 		}
 		throw new Error(`Series ${series.uuid} not within ConcurrentStep ${this.uuid}`);
 	}
@@ -254,6 +265,84 @@ module.exports = class ConcurrentStep {
 			totalSteps += this.subscenes[seriesKey].getTotalSteps();
 		}
 		return totalSteps;
+	}
+
+	getSeriesOrderWithIndex(series) {
+		const seriesOrder = this.getSeriesOrder();
+		let seriesIndex;
+		for (let i = 0; i < seriesOrder.length; i++) {
+			const seriesKey = seriesOrder[i];
+			const checkSeries = this.subscenes[seriesKey];
+			if (series === checkSeries) {
+				seriesIndex = i;
+				break;
+			}
+		}
+		if (typeof seriesIndex !== 'number') {
+			throw new Error(`Series ${series.uuid} not found in keys ${seriesOrder} of ${this.uuid}`);
+		}
+
+		return { order: seriesOrder, index: seriesIndex };
+	}
+
+	getStepPriorToSeries(series) {
+		const { order, index } = this.getSeriesOrderWithIndex(series);
+
+		if (index === 0) {
+			return null; // there are no prior serieses, so there can be no prior steps
+		}
+
+		for (let i = index - 1; i >= 0; i--) {
+			const key = order[i];
+			const priorSeries = this.subscenes[key];
+
+			if (priorSeries.steps.length > 0) {
+				// found steps in this prior series; return the last one
+				return priorSeries.steps[priorSeries.steps.length - 1];
+			}
+		}
+
+		return null; // no steps found in any prior series
+	}
+
+	getStepAfterSeries(series) {
+		const { order, index } = this.getSeriesOrderWithIndex(series);
+
+		if (index === order.length - 1) {
+			return null; // there are no serieses after this one, so there can be no next steps
+		}
+
+		for (let i = index + 1; i < order.length; i++) {
+			const key = order[i];
+			const followingSeries = this.subscenes[key];
+
+			if (followingSeries.steps.length > 0) {
+				// found steps in this following series; return the first one
+				return followingSeries.steps[0];
+			}
+		}
+
+		return null; // no steps found in any following series
+	}
+
+	firstStep() {
+		const seriesOrder = this.getSeriesOrder();
+		for (const seriesKey of seriesOrder) {
+			const steps = this.subscenes[seriesKey].steps;
+			if (steps.length > 0) {
+				return steps[0];
+			}
+		}
+	}
+
+	finalStep() {
+		const reverseSeriesOrder = this.getSeriesOrder().reverse();
+		for (const seriesKey of reverseSeriesOrder) {
+			const steps = this.subscenes[seriesKey].steps;
+			if (steps.length > 0) {
+				return steps[steps.length - 1];
+			}
+		}
 	}
 
 };

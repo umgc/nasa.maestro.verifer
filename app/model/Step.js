@@ -482,4 +482,39 @@ module.exports = class Step {
 		}
 	}
 
+	getAdjacentActivitySteps() {
+		const rootSeries = this.getRootSeries();
+		const adjacents = rootSeries.getAdjacentSteps(this);
+
+		if (adjacents.next && adjacents.prev) {
+			return adjacents;
+		}
+
+		const division = rootSeries.parent;
+		for (const direction of ['prev', 'next']) {
+			if (!adjacents[direction]) {
+				adjacents[direction] = direction === 'prev' ?
+					division.getStepPriorToSeries(rootSeries) :
+					division.getStepAfterSeries(rootSeries);
+			}
+		}
+
+		if (adjacents.next && adjacents.prev) {
+			return adjacents;
+		}
+
+		const activity = division.parent;
+		for (const direction of ['prev', 'next']) {
+			if (!adjacents[direction]) {
+				adjacents[direction] = direction === 'prev' ?
+					activity.getStepPriorToDivision(division) :
+					activity.getStepAfterDivision(division);
+			}
+		}
+
+		// regardless of whether next/prev steps found, return now. If either are null then there
+		// are no steps in that direction.
+		return adjacents;
+	}
+
 };

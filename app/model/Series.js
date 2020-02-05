@@ -139,6 +139,17 @@ module.exports = class Series {
 		throw new Error(`Step ${step.uuid} not within Series ${this.uuid}`);
 	}
 
+	getAdjacentSteps(step) {
+		for (let i = 0; i < this.steps.length; i++) {
+			const s = this.steps[i];
+			if (s === step) {
+				return { prev: this.steps[i - 1], next: this.steps[i + 1] };
+			}
+		}
+		throw new Error(`Step ${step.uuid} not within Series ${this.uuid}`);
+
+	}
+
 	// NOTE: step number and step index are not directly related. Steps can contain only non-
 	// incrementing content like images and NCWs. These do not impact step numbers, but they do
 	// count towards indexing.
