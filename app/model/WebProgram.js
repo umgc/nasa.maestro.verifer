@@ -56,6 +56,7 @@ module.exports = class WebProgram extends Program {
 						Promise.all(taskLoadPromises)
 							.then(() => {
 								this.procedure.setupTimeSync();
+								this.procedure.setupIndex();
 								resolveOuter();
 							})
 							.catch((error) => {

@@ -12,6 +12,7 @@ const validateSchema = require('../schema/validateSchema');
 const Duration = require('./Duration');
 const TimeSync = require('./TimeSync');
 const consoleHelper = require('../helpers/consoleHelper');
+const Indexer = require('./Indexer');
 
 /**
  * Get path to task file relative to procedure file, or throw error.
@@ -43,6 +44,7 @@ module.exports = class Procedure {
 		this.name = '';
 		this.filename = '';
 		this.actors = [];
+		this.indexer = new Indexer();
 
 		// this.columns = []; // <-- switch to model below instead
 		this.ColumnsHandler = new ColumnsHandler(false, options);
@@ -237,6 +239,21 @@ module.exports = class Procedure {
 
 		this.loadTaskDefinitionsFromFiles();
 		this.setupTimeSync();
+		this.setupIndex();
+	}
+
+	setupIndex() {
+		const indexer = this.indexer;
+		for (const uuid in indexer.index) {
+			if (indexer.index[uuid].type !== 'Step') {
+				continue;
+			}
+			const step = indexer.index[uuid].item;
+			const { prev, next } = step.getAdjacentActivitySteps();
+			const prevUuid = prev ? prev.uuid : null;
+			const nextUuid = next ? next.uuid : null;
+			indexer.alter(uuid, { prevUuid, nextUuid });
+		}
 	}
 
 	/**

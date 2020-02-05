@@ -45,15 +45,68 @@ class SeriesComponent extends React.Component {
 	}
 
 	componentDidMount() {
-		for (const seriesModelMethod in this.unsubscribeFns) {
-			this.unsubscribeFns[seriesModelMethod] = this.props.seriesState.subscribe(
-				seriesModelMethod, // transferStep, appendStep, etc
-				(newState) => { // perform this func when the Series method is run
-					// console.log(`Running subscribed Fn for Series.${seriesModelMethod}`);
-					this.setState({ seriesState: newState });
+		// for (const seriesModelMethod in this.unsubscribeFns) {
+		// 	this.unsubscribeFns[seriesModelMethod] = this.props.seriesState.subscribe(
+		// 		seriesModelMethod, // transferStep, appendStep, etc
+		// 		(newState) => { // perform this func when the Series method is run
+		// 			// console.log(`Running subscribed Fn for Series.${seriesModelMethod}`);
+		// 			this.setState({ seriesState: newState });
+		// 		}
+		// 	);
+		// }
+
+		this.unsubscribeFns.appendStep = this.props.seriesState.subscribe(
+			'appendStep',
+			(newState, stepModel) => {
+				this.setState({ seriesState: newState });
+				this.triggerStepAfterUuid(stepModel.uuid);
+			}
+		);
+
+		this.unsubscribeFns.deleteStep = this.props.seriesState.subscribe(
+			'deleteStep',
+			(newState, prevUuid, nextUuid) => {
+				this.setState({ seriesState: newState });
+				const uuid = prevUuid || nextUuid;
+				if (uuid) {
+					this.triggerStepAfterUuid(uuid);
 				}
-			);
-		}
+			}
+		);
+
+		this.unsubscribeFns.insertStep = this.props.seriesState.subscribe(
+			'insertStep',
+			(newState, stepModel) => {
+				this.setState({ seriesState: newState });
+				this.triggerStepAfterUuid(stepModel.uuid);
+			}
+		);
+
+		this.unsubscribeFns.transferStep = this.props.seriesState.subscribe(
+			'transferStep',
+			(contextSeries, sourceSeries, removalIndex, destinationSeries, transferredStep) => {
+				this.setState({ seriesState: contextSeries });
+
+				// transferStep emits two notifications to subscription functions: one for the
+				// source series, one for the destination. Don't run this update for both.
+				if (contextSeries === sourceSeries) {
+					const priorStep = sourceSeries.steps[removalIndex - 1];
+					let removalUuid;
+					if (priorStep) {
+						removalUuid = priorStep.uuid;
+					} else {
+						removalUuid = sourceSeries.getStepBefore();
+						if (!removalUuid) {
+							removalUuid = sourceSeries.getStepAfter();
+						}
+					}
+					const earlierUuid = stateHandler.state.procedure.indexer.earlier(
+						removalUuid, transferredStep.uuid
+					);
+					this.triggerStepAfterUuid(earlierUuid);
+				}
+			}
+		);
 	}
 
 	getSeriesPath = () => {
@@ -64,6 +117,23 @@ class SeriesComponent extends React.Component {
 			primaryColumnKey: this.props.primaryColumnKey
 		};
 	};
+
+	triggerStepAfterUuid(afterUuid) {
+
+		const indexer = this.props.seriesState.indexer;
+		if (indexer) {
+			console.log('doing indexer');
+			// FIXME for now this is always re-rendering following steps. That's bad. Add a
+			// subscription to Indexer?
+			indexer.after(afterUuid).map((uuid) => {
+				const step = indexer.get(uuid).item;
+				step.trigger();
+			});
+		} else {
+			console.log('no indexer');
+		}
+
+	}
 
 	componentWillUnmount() {
 		for (const seriesModelMethod in this.unsubscribeFns) {

@@ -31,8 +31,14 @@ module.exports = class Step {
 		this.context = {};
 		this.props = {}; // fixme setState wipes out this.props, which previously would have wiped out taskroles and actor stuff. verify no issues with switch to this.context. also this.props should be this.state maybe
 		this.reloadSubscriberFns = []; // these can't be wiped out...FIXME keep pondering this
+		this.subscriberFns = {
+			reload: [],
+			trigger: []
+		};
+
 		this.setContext(parent, definition);
 		this.setState(definition);
+		this.getRootSeries().parent.parent.procedure.indexer.add(this);
 	}
 
 	/**
@@ -55,10 +61,15 @@ module.exports = class Step {
 		);
 	}
 
-	subscribeReload(subscriberFn) {
+	// FIXME this is copied* directly from Series. Create "ReloadableModel" and make them extend it?
+	// and that may be a better place than the subscriptionHelper.js file, except that maybe the
+	// stateHandler logic needs it, too...?
+	//
+	// * copied, then refactored since Series has way more subscribable functions
+	subscribe(subscriptionMethod, subscriberFn) {
 		const unsubscribeFn = subscriptionHelper.subscribe(
 			subscriberFn,
-			this.reloadSubscriberFns
+			this.subscriberFns[subscriptionMethod]
 		);
 		return unsubscribeFn;
 	}
@@ -67,7 +78,15 @@ module.exports = class Step {
 	reload(newDefinition = {}, parent = this.parent) {
 		this.setContext(parent, newDefinition);
 		this.setState(newDefinition);
-		subscriptionHelper.run(this.reloadSubscriberFns, this);
+		const { prev, next } = this.getAdjacentActivitySteps();
+		this.props.prevUuid = prev ? prev.uuid : null;
+		this.props.nextUuid = next ? next.uuid : null;
+		subscriptionHelper.run(this.subscriberFns.reload, this);
+	}
+
+	trigger() {
+		console.log();
+		subscriptionHelper.run(this.subscriberFns.trigger, this);
 	}
 
 	getDefinition() {
@@ -483,32 +502,22 @@ module.exports = class Step {
 	}
 
 	getAdjacentActivitySteps() {
-		const rootSeries = this.getRootSeries();
+
+		const rootSeries = this.parent;
+		if (this.parent.constructor.name !== 'Series') {
+			return { prev: null, next: null };
+		}
 		const adjacents = rootSeries.getAdjacentSteps(this);
 
 		if (adjacents.next && adjacents.prev) {
 			return adjacents;
 		}
 
-		const division = rootSeries.parent;
 		for (const direction of ['prev', 'next']) {
 			if (!adjacents[direction]) {
 				adjacents[direction] = direction === 'prev' ?
-					division.getStepPriorToSeries(rootSeries) :
-					division.getStepAfterSeries(rootSeries);
-			}
-		}
-
-		if (adjacents.next && adjacents.prev) {
-			return adjacents;
-		}
-
-		const activity = division.parent;
-		for (const direction of ['prev', 'next']) {
-			if (!adjacents[direction]) {
-				adjacents[direction] = direction === 'prev' ?
-					activity.getStepPriorToDivision(division) :
-					activity.getStepAfterDivision(division);
+					rootSeries.getStepBefore() :
+					rootSeries.getStepAfter();
 			}
 		}
 

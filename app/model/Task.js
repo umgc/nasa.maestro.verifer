@@ -608,42 +608,4 @@ module.exports = class Task {
 		throw new Error(`Division ${division.uuid} not found in ${this.uuid}`);
 	}
 
-	getStepPriorToDivision(division) {
-		const index = this.getDivisionIndex(division);
-
-		if (index === 0) {
-			return null; // there are no prior serieses, so there can be no prior steps
-		}
-
-		for (let i = index - 1; i >= 0; i--) {
-			const priorDivision = this.concurrentSteps[i];
-
-			const last = priorDivision.finalStep();
-			if (last) {
-				return last;
-			}
-		}
-
-		return null; // no steps found in any prior divisions
-	}
-
-	getStepAfterDivision(division) {
-		const index = this.getDivisionIndex(division);
-
-		if (index === this.concurrentSteps.length - 1) {
-			return null; // there are no following divisions, so there can be no following steps
-		}
-
-		for (let i = index + 1; i < this.concurrentSteps.length; i++) {
-			const followingDivision = this.concurrentSteps[i];
-
-			const first = followingDivision.firstStep();
-			if (first) {
-				return first;
-			}
-		}
-
-		return null; // no steps found in any following divisions
-	}
-
 };

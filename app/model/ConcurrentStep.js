@@ -285,44 +285,43 @@ module.exports = class ConcurrentStep {
 		return { order: seriesOrder, index: seriesIndex };
 	}
 
-	getStepPriorToSeries(series) {
-		const { order, index } = this.getSeriesOrderWithIndex(series);
+	getStepBefore() {
+		const index = this.parent.getDivisionIndex(this);
 
 		if (index === 0) {
-			return null; // there are no prior serieses, so there can be no prior steps
+			return null;
 		}
 
 		for (let i = index - 1; i >= 0; i--) {
-			const key = order[i];
-			const priorSeries = this.subscenes[key];
+			const priorDivision = this.parent.concurrentSteps[i];
 
-			if (priorSeries && priorSeries.steps.length > 0) {
-				// found steps in this prior series; return the last one
-				return priorSeries.steps[priorSeries.steps.length - 1];
+			const last = priorDivision.finalStep();
+			if (last) {
+				return last;
 			}
 		}
 
-		return null; // no steps found in any prior series
+		return null; // no steps found in any prior divisions
 	}
 
-	getStepAfterSeries(series) {
-		const { order, index } = this.getSeriesOrderWithIndex(series);
+	getStepAfter() {
+		const index = this.parent.getDivisionIndex(this);
 
-		if (index === order.length - 1) {
-			return null; // there are no serieses after this one, so there can be no next steps
+		if (index === this.parent.concurrentSteps.length - 1) {
+			return null; // there are no following divisions, so there can be no following steps
 		}
 
-		for (let i = index + 1; i < order.length; i++) {
-			const key = order[i];
-			const followingSeries = this.subscenes[key];
+		for (let i = index + 1; i < this.parent.concurrentSteps.length; i++) {
+			const followingDivision = this.parent.concurrentSteps[i];
 
-			if (followingSeries && followingSeries.steps.length > 0) {
-				// found steps in this following series; return the first one
-				return followingSeries.steps[0];
+			const first = followingDivision.firstStep();
+			if (first) {
+				return first;
 			}
 		}
 
-		return null; // no steps found in any following series
+		return null; // no steps found in any following divisions
+
 	}
 
 	firstStep() {

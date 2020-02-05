@@ -19,8 +19,7 @@ const textareaStyle = {
 class StepComponent extends React.Component {
 
 	state = {
-		editMode: false,
-		stepState: false
+		editMode: false
 	}
 
 	constructor(props) {
@@ -31,26 +30,55 @@ class StepComponent extends React.Component {
 
 		this.editorInput = React.createRef();
 
-		// when Step.reload() is called, run function to update this component state
-		this.unsubscribeReloadFn = this.props.stepState.subscribeReload((newState) => {
-			// FIXME asdfasdfasdf insert something about making the next step re-render if necessary
-			this.setState({ stepState: newState });
-		});
+		this.state.stepState = this.props.stepState;
+		// const { prev, next } = this.state.stepState.getAdjacentActivitySteps();
+		// this.state.prevUuid = prev ? prev.uuid : null;
+		// this.state.nextUuid = next ? next.uuid : null;
+
+		this.unsubscribeFns = {
+			reload: null,
+			trigger: null
+		};
+
+	}
+
+	componentDidMount() {
+		this.unsubscribeFns.reload = this.props.stepState.subscribe(
+			'reload',
+			(newState) => {
+				// console.log(`running reload subscription for:
+				// step # ${newState.getActivityStepNumber()}, ${newState.uuid}`);
+				this.setState({
+					stepState: newState
+				});
+			}
+		);
+		this.unsubscribeFns.trigger = this.props.stepState.subscribe(
+			'trigger',
+			() => {
+				// const state = this.state.stepState;
+				// console.log(`running trigger subscription for:
+				// step # ${state.getActivityStepNumber()}, ${state.uuid}`);
+				this.forceUpdate();
+			}
+		);
 	}
 
 	componentWillUnmount() {
-		this.unsubscribeReloadFn();
+		for (const modelMethod in this.unsubscribeFns) {
+			this.unsubscribeFns[modelMethod](); // run each unsubscribe function
+		}
 	}
 
 	handleEditButtonClick = (e) => {
-		console.log('edit button click');
+		console.log(`edit button click for ${this.state.stepState.uuid}`);
 		e.preventDefault();
 		e.stopPropagation();
 		this.setState({ editMode: true });
 	}
 
 	handleDeleteButtonClick = (e) => {
-		console.log('edit button click');
+		console.log('DELETE button click');
 		e.preventDefault();
 		e.stopPropagation();
 		this.doDelete();
