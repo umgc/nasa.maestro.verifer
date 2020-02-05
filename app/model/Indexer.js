@@ -135,11 +135,15 @@ module.exports = class Indexer {
 
 	existOrError(uuid) {
 		if (!this.index[uuid]) {
+
 			throw new Error(`${uuid} does not exist in this index`);
 		}
 	}
 
 	earlier(uuid1, uuid2) {
+		if (uuid1 === uuid2) {
+			return uuid1;
+		}
 		const after1 = this.after(uuid1);
 		if (after1.indexOf(uuid2) > -1) {
 			return uuid1;

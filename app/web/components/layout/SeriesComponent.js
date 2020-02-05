@@ -90,18 +90,16 @@ class SeriesComponent extends React.Component {
 				// transferStep emits two notifications to subscription functions: one for the
 				// source series, one for the destination. Don't run this update for both.
 				if (contextSeries === sourceSeries) {
-					const priorStep = sourceSeries.steps[removalIndex - 1];
-					let removalUuid;
-					if (priorStep) {
-						removalUuid = priorStep.uuid;
-					} else {
-						removalUuid = sourceSeries.getStepBefore();
-						if (!removalUuid) {
-							removalUuid = sourceSeries.getStepAfter();
+					let priorStep = sourceSeries.steps[removalIndex - 1];
+					if (!priorStep) {
+						priorStep = sourceSeries.getStepBefore();
+						if (!priorStep) {
+							priorStep = sourceSeries.getStepAfter();
 						}
 					}
+					console.log({ priorStep, priorUUid: priorStep.uuid, transferredStep, transferStepUUID: transferredStep.uuid });
 					const earlierUuid = stateHandler.state.procedure.indexer.earlier(
-						removalUuid, transferredStep.uuid
+						priorStep.uuid, transferredStep.uuid
 					);
 					this.triggerStepAfterUuid(earlierUuid);
 				}
