@@ -31,6 +31,23 @@ function getRealActorId(taskRoles, roleOrActorId) {
 }
 
 /**
+ * Does the opposite of getRealActorId
+ *
+ * @parama {string} actor
+ * @param {Object} taskRoles  see above
+ * @return {string}
+ */
+function getActorRoleName(actor, taskRoles) {
+	for (const roleName in taskRoles) {
+		const taskRole = taskRoles[roleName];
+		if (actor === taskRole.actor) {
+			return roleName;
+		}
+	}
+	return actor; // no role found, keep the actor name
+}
+
+/**
  * Return main ID for an actorIdGuess and the list of IDs of all IDs
  * @param {string} roleOrActorOrJoint  May be an actor ID like "EV1" or may be a role like "crewA".
  *                                     Also may include joint actors and/or roles, like:
@@ -74,6 +91,24 @@ function getActorInfo(roleOrActorOrJoint, taskRoles) {
 	return { id: id, idOrIds: idOrIds };
 }
 
+/**
+ * Convert "EV2" or "IV + EV1" actor-type series keys to role-type like "crewB" or "IV + crewA"
+ *
+ * @param {string} seriesKey  Like "EV1" or "IV + EV1"
+ * @param {Object} taskRoles
+ * @return {string}
+ */
+function convertSeriesKeyToRoles(seriesKey, taskRoles) {
+	if (seriesKey.indexOf('+') !== -1) {
+		const rolifiedSeriesKey = seriesKey.split('+').map((str) => {
+			return getActorRoleName(str.trim(), taskRoles);
+		});
+		return rolifiedSeriesKey.join(' + ');
+	} else {
+		return getActorRoleName(seriesKey, taskRoles);
+	}
+}
+
 module.exports = class ConcurrentStep {
 
 	/**
@@ -115,10 +150,11 @@ module.exports = class ConcurrentStep {
 
 	getDefinition() {
 		const def = {};
-		for (const actor in this.subscenes) {
-			const seriesDef = this.subscenes[actor].getDefinition();
+		for (const seriesKey in this.subscenes) {
+			const seriesDef = this.subscenes[seriesKey].getDefinition();
+			const rolifiedSeriesKey = convertSeriesKeyToRoles(seriesKey, this.taskRoles);
 			if (Array.isArray(seriesDef) && seriesDef.length > 0) {
-				def[actor] = seriesDef;
+				def[rolifiedSeriesKey] = seriesDef;
 			}
 		}
 		const numActors = Object.keys(def).length;
