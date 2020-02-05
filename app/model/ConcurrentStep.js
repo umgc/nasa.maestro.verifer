@@ -296,7 +296,7 @@ module.exports = class ConcurrentStep {
 			const key = order[i];
 			const priorSeries = this.subscenes[key];
 
-			if (priorSeries.steps.length > 0) {
+			if (priorSeries && priorSeries.steps.length > 0) {
 				// found steps in this prior series; return the last one
 				return priorSeries.steps[priorSeries.steps.length - 1];
 			}
@@ -316,7 +316,7 @@ module.exports = class ConcurrentStep {
 			const key = order[i];
 			const followingSeries = this.subscenes[key];
 
-			if (followingSeries.steps.length > 0) {
+			if (followingSeries && followingSeries.steps.length > 0) {
 				// found steps in this following series; return the first one
 				return followingSeries.steps[0];
 			}
@@ -328,7 +328,11 @@ module.exports = class ConcurrentStep {
 	firstStep() {
 		const seriesOrder = this.getSeriesOrder();
 		for (const seriesKey of seriesOrder) {
-			const steps = this.subscenes[seriesKey].steps;
+			const series = this.subscenes[seriesKey];
+			if (!series) {
+				continue; // this series doesn't exist, skip it.
+			}
+			const steps = series.steps;
 			if (steps.length > 0) {
 				return steps[0];
 			}
@@ -338,7 +342,11 @@ module.exports = class ConcurrentStep {
 	finalStep() {
 		const reverseSeriesOrder = this.getSeriesOrder().reverse();
 		for (const seriesKey of reverseSeriesOrder) {
-			const steps = this.subscenes[seriesKey].steps;
+			const series = this.subscenes[seriesKey];
+			if (!series) {
+				continue; // this series doesn't exist, skip it.
+			}
+			const steps = series.steps;
 			if (steps.length > 0) {
 				return steps[steps.length - 1];
 			}
