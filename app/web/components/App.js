@@ -1,11 +1,7 @@
-// const fs = require('fs'); // FIXME cleanup
-// const path = require('path');
 const React = require('react');
 const YAML = require('js-yaml');
 
 const stateHandler = require('../state/index');
-// const PropTypes = require('prop-types'); FIXME CLEANPUP
-const HeaderComponent = require('./layout/HeaderComponent');
 const SidebarComponent = require('./layout/SidebarComponent');
 const ProcedureViewerComponent = require('./pages/ProcedureViewerComponent');
 const ProcedureSelectorComponent = require('./pages/ProcedureSelectorComponent');

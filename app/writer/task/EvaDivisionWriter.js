@@ -165,7 +165,9 @@ module.exports = class EvaDivisionWriter {
 
 			if (raw) {
 				columns[col].stateColumnKey = columnKey;
-				columns[col].series = division.subscenes[actor]; // FIXME shouldn't this be columnKey not actor
+
+				// FIXME shouldn't this be columnKey not actor
+				columns[col].series = division.subscenes[actor];
 				columns[col].columnKeys = [columnKey];
 
 			} else {

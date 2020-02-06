@@ -3,16 +3,11 @@ const PropTypes = require('prop-types');
 // const { render } = require('react-dom');
 const { Form } = require('react-final-form');
 const arrayMutators = require('final-form-arrays').default;
-const { FieldArray } = require('react-final-form-arrays');
-const uuidv4 = require('uuid/v4');
+// const { FieldArray } = require('react-final-form-arrays');
 
 const stateHandler = require('../../state/index');
 
-const {
-	validators, textInputField, checkboxInputField, durationInput, selectInputField
-} = require('./formInputTypes');
-
-const { isZeroish, minLength, isRGBstring, required } = validators;
+const { checkboxInputField } = require('./formInputTypes');
 
 const DivisionMetaForm = ({ division, editorOptions }) => {
 
@@ -104,23 +99,13 @@ const DivisionMetaForm = ({ division, editorOptions }) => {
 		const errors = {};
 
 		const change = calculateChange(values);
-		// console.log('CHANGES:', change);
-		const { deleting, keeping, creating } = change;
+		const { deleting } = change;
 
 		for (const key of deleting) {
 			if (division.subscenes[key].steps.length > 0) {
-				// console.error(`series ${key} has steps. It cannot be deleted.`);
 				errors.mergewithprevious = 'Cannot delete columns that have steps';
 			}
-			// else { console.log(`series ${key} can be deleted`); }
 		}
-
-		// for (const key of keeping) {
-		// console.log(`series ${key} is being kept. If it has steps, they should be preserved`);
-		// }
-		// for (const key of creating) {
-		// console.log(`series ${key} is being created with no content.`);
-		// }
 
 		return errors;
 	};
@@ -290,9 +275,7 @@ const DivisionMetaForm = ({ division, editorOptions }) => {
 				validate={validateForm}
 				render={({
 					handleSubmit,
-					form: {
-						mutators: { push }
-					}, // injected from final-form-arrays above
+					// form: { mutators: { push } }, // injected from final-form-arrays above
 					pristine,
 					form,
 					submitting

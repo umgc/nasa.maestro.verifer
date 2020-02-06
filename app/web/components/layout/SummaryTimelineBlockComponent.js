@@ -195,6 +195,7 @@ SummaryTimelineComponent.propTypes = {
 	title: PropTypes.string.isRequired,
 	duration: PropTypes.string.isRequired,
 	minutesGap: PropTypes.number,
+	columnIndex: PropTypes.number,
 	uuid: PropTypes.string.isRequired
 };
 

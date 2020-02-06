@@ -1,6 +1,5 @@
 const React = require('react');
 const { Field } = require('react-final-form');
-const uuidv4 = require('uuid/v4');
 
 const required = (value) => (value ? undefined : 'Required');
 const mustBeNumber = (value) => (isNaN(value) ? 'Must be a number' : undefined);

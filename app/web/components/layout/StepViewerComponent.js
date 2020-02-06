@@ -21,6 +21,10 @@ const editButtonsContainerStyle = {
 /**
  * @param {Function} editFn    Function to be run when clicking edit button
  * @param {Function} deleteFn  Function to be run when clicking delete button
+ * @param {string} activityUuid
+ * @param {string} divisionUuid
+ * @param {string} primaryColumnKey
+ * @param {number} stepIndex
  * @param {Function} insertStepBefore
  * @return {Object}            React component
  */

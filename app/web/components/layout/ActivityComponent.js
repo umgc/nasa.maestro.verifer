@@ -7,7 +7,6 @@ const DivisionControlsComponent = require('./DivisionControlsComponent');
 const stateHandler = require('../../state/index');
 
 const filters = require('../../../helpers/filters');
-const maestroKey = require('../helpers/maestroKey');
 
 class ActivityComponent extends React.Component {
 
@@ -92,7 +91,7 @@ class ActivityComponent extends React.Component {
 						</tr>
 					</thead>
 					<tbody>
-						{activity.concurrentSteps.map((division, index) => {
+						{activity.concurrentSteps.map((division) => {
 							return (
 								<React.Fragment
 									key={division.uuid + '-wrapper'}

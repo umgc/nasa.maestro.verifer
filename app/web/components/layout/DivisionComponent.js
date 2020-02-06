@@ -30,7 +30,7 @@ class DivisionComponent extends React.Component {
 		for (const modelMethod in this.unsubscribeFns) {
 			this.unsubscribeFns[modelMethod] = division.subscribe(
 				modelMethod,
-				(newState) => {
+				() => {
 					console.log('setting state for DivisionComponent');
 					this.setState({ arbitrary: Date.now() });
 				}

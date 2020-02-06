@@ -3,13 +3,12 @@
 const React = require('react');
 const PropTypes = require('prop-types');
 
-const Procedure = require('../../../model/Procedure');
-const Task = require('../../../model/Task');
-const ConcurrentStep = require('../../../model/ConcurrentStep');
-const Series = require('../../../model/Series');
-const Step = require('../../../model/Procedure');
-
-const stateHandler = require('../../state/index');
+// These were removed due to not being able to do instanceof
+// const Procedure = require('../../../model/Procedure');
+// const Task = require('../../../model/Task');
+// const ConcurrentStep = require('../../../model/ConcurrentStep');
+// const Series = require('../../../model/Series');
+// const Step = require('../../../model/Procedure');
 
 const textareaStyle = {
 	height: '80px',

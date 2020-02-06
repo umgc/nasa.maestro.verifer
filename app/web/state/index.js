@@ -5,9 +5,6 @@ const path = require('path');
 const YAML = require('js-yaml');
 const jsdiff = require('diff');
 
-// const Procedure = require('../../model/Procedure');
-const Task = require('../../model/Task');
-
 const state = {};
 
 // FIXME should this be in state too?
@@ -65,7 +62,8 @@ function recordAndReportChange() {
 }
 
 /**
- *
+ * @param {Task|Procedure} taskOrProcedure
+ * @return {Object}
  */
 function getPathParts(taskOrProcedure) {
 
@@ -86,8 +84,7 @@ function getPathParts(taskOrProcedure) {
 }
 
 /**
- *
- * @param {*} path
+ * @param {string} path
  */
 function exists(path) {
 	fetch(
@@ -106,7 +103,9 @@ function exists(path) {
 }
 
 /**
- *
+ * @param {Task|Procedure} taskOrProcedure
+ * @param {string} newFilename
+ * @param {Function} completeFn
  */
 function moveFileElectron(taskOrProcedure, newFilename, completeFn) {
 	const p = getPathParts(taskOrProcedure);
@@ -121,7 +120,9 @@ function moveFileElectron(taskOrProcedure, newFilename, completeFn) {
 	);
 }
 /**
- *
+ * @param {Task|Procedure} taskOrProcedure
+ * @param {string} newFilename
+ * @param {Function} completeFn
  */
 function moveFileWeb(taskOrProcedure, newFilename, completeFn) {
 	const p = getPathParts(taskOrProcedure);
@@ -143,7 +144,9 @@ function moveFileWeb(taskOrProcedure, newFilename, completeFn) {
 }
 
 /**
- *
+ * @param {Task|Procedure} taskOrProcedure
+ * @param {string} newFilename
+ * @param {Function} completeFn
  */
 function moveFile(taskOrProcedure, newFilename, completeFn = function() {}) {
 	if (window.isElectron) {

@@ -5,11 +5,6 @@ const stateHandler = require('../../../state/index');
 
 class ASButtonComponent extends React.Component {
 
-	// constructor(props) {
-	// 	super(props);
-	// 	this.state = { value: null };
-	// }
-
 	handleChange = (event) => {
 		// this.setState('')
 		this.props.updateCurrentActivity(event.target.value);

@@ -221,14 +221,29 @@ const ActivityMetaForm = ({ task }) => {
 							<FieldArray name="roles">
 								{({ fields }) =>
 									fields.map((name, index) => (
-										<div style={{ backgroundColor: 'white', margin: '5px', padding: '5px' }} key={name}>
+										<div
+											style={{
+												backgroundColor: 'white',
+												margin: '5px',
+												padding: '5px'
+											}}
+											key={name}
+										>
 											<div><label>Role #{index + 1}</label></div>
-											{textInputField(`${name}.name`, 'Role', [required, minLength(2)])}
+											{textInputField(
+												`${name}.name`, 'Role', [required, minLength(2)]
+											)}
 											{selectInputField(
 												`${name}.playedBy`,
-												stateHandler.state.procedure.ColumnsHandler.getActors().map((actor) => {
-													return <option key={actor} value={actor}>{actor}</option>;
-												}),
+												stateHandler.state.procedure.ColumnsHandler
+													.getActors().map((actor) => {
+														return <option
+															key={actor}
+															value={actor}
+														>
+															{actor}
+														</option>;
+													}),
 												'Actor in role',
 												[required]
 											)}

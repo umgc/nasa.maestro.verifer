@@ -6,9 +6,6 @@ const stateHandler = require('../../../state/index');
 const ASDropdownComponent = require('./ASDropdownComponent');
 const ASActivityButtonComponent = require('./ASActivityButtonComponent');
 
-const filters = require('../../../../helpers/filters');
-const maestroKey = require('../../helpers/maestroKey');
-
 class ASMenuComponent extends React.Component {
 
 	constructor(props) {
@@ -55,7 +52,7 @@ class ASMenuComponent extends React.Component {
 		return title.substring(0, 32) + '...';
 	}
 
-	handleViewTimelineClick = (e) => {
+	handleViewTimelineClick = () => {
 		this.props.showTimeline(true);
 	}
 

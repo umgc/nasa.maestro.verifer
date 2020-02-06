@@ -57,13 +57,6 @@ module.exports = class TaskRequirements {
 		return changed;
 	}
 
-	// FIXME remove
-	// setFileFromTitle(newTitle) {
-	// 	const filename = this.task.formatTitleToFilename(newTitle);
-	// 	this.setFile(filename);
-	// 	this.task.setTitle(newTitle);
-	// }
-
 	cloneRoles(source) {
 		const cloned = {};
 		for (const role in source) {
