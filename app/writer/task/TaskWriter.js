@@ -264,7 +264,8 @@ module.exports = class TaskWriter extends Abstract {
 			elements.grandChildren = [];
 		}
 
-		this.insertStepPostProcess(elements, step); // allow TaskWriters to alter elements at this point.
+		// allow TaskWriters to alter elements at this point.
+		this.insertStepPostProcess(elements, step);
 
 		const children = [
 			...elements.images,
@@ -283,7 +284,7 @@ module.exports = class TaskWriter extends Abstract {
 		return children;
 	}
 
-	insertStepPostProcess(elements, step) {
+	insertStepPostProcess(/* elements, step */) {
 		return true;
 	}
 };

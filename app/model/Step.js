@@ -29,7 +29,7 @@ module.exports = class Step {
 	constructor(definition, parent) { // actorIdOrIds, taskRoles) {
 		this.uuid = uuidv4();
 		this.context = {};
-		this.props = {}; // fixme setState wipes out this.props, which previously would have wiped out taskroles and actor stuff. verify no issues with switch to this.context. also this.props should be this.state maybe
+		this.props = {};
 		this.reloadSubscriberFns = []; // these can't be wiped out...FIXME keep pondering this
 		this.subscriberFns = {
 			reload: [],

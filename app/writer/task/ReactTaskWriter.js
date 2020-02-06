@@ -3,7 +3,6 @@
 const path = require('path');
 const React = require('react');
 
-const Series = require('../../model/Series');
 const SeriesComponent = require('../../web/components/layout/SeriesComponent');
 
 const getImageFileDimensions = require('image-size');

@@ -2,8 +2,6 @@ const React = require('react');
 const PropTypes = require('prop-types');
 const uuidv4 = require('uuid/v4');
 
-const maestroKey = require('../helpers/maestroKey');
-
 const StepComponent = require('./StepComponent');
 const StepDropLocationComponent = require('./StepDropLocationComponent');
 const InsertStepButtonComponent = require('./InsertStepButtonComponent');
@@ -45,15 +43,6 @@ class SeriesComponent extends React.Component {
 	}
 
 	componentDidMount() {
-		// for (const seriesModelMethod in this.unsubscribeFns) {
-		// 	this.unsubscribeFns[seriesModelMethod] = this.props.seriesState.subscribe(
-		// 		seriesModelMethod, // transferStep, appendStep, etc
-		// 		(newState) => { // perform this func when the Series method is run
-		// 			// console.log(`Running subscribed Fn for Series.${seriesModelMethod}`);
-		// 			this.setState({ seriesState: newState });
-		// 		}
-		// 	);
-		// }
 
 		this.unsubscribeFns.appendStep = this.props.seriesState.subscribe(
 			'appendStep',
@@ -97,7 +86,6 @@ class SeriesComponent extends React.Component {
 							priorStep = sourceSeries.getStepAfter();
 						}
 					}
-					console.log({ priorStep, priorUUid: priorStep.uuid, transferredStep, transferStepUUID: transferredStep.uuid });
 					const earlierUuid = stateHandler.state.procedure.indexer.earlier(
 						priorStep.uuid, transferredStep.uuid
 					);

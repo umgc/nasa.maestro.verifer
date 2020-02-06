@@ -219,7 +219,7 @@ module.exports = class Procedure {
 
 	/**
 	 * Populates data, reading in the specified file.
-	 * @param {string} fileName The full path to the YAML file
+	 * @param {string} procedureFilepath The full path to the YAML file
 	 * @return {Error|null}
 	 */
 	addProcedureDefinitionFromFile(procedureFilepath) {

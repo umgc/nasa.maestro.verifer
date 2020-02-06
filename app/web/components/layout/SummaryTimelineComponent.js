@@ -74,7 +74,7 @@ class SummaryTimelineComponent extends React.Component {
 	render() {
 		// FIXME hopefully we can make this not need to be rebuild on each render
 		const timelineWriter = new ReactTimelineWriter(stateHandler.state.procedure);
-		const { columnDisplay, columnWidth, timelineMarkings } = timelineWriter.create();
+		const { columnDisplay, timelineMarkings } = timelineWriter.create(); // columnWidth not used
 
 		const timelineStyle = {
 			marginTop: '10px'

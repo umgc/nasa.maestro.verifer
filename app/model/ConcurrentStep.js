@@ -2,7 +2,6 @@
 
 const uuidv4 = require('uuid/v4');
 
-const Step = require('./Step');
 const Series = require('./Series');
 const subscriptionHelper = require('../helpers/subscriptionHelper');
 
@@ -33,7 +32,7 @@ function getRealActorId(taskRoles, roleOrActorId) {
 /**
  * Does the opposite of getRealActorId
  *
- * @parama {string} actor
+ * @param {string} actor
  * @param {Object} taskRoles  see above
  * @return {string}
  */

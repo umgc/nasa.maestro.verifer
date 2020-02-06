@@ -177,7 +177,7 @@ module.exports = class Task {
 
 	setState(newState) {
 		let taskFileChanges = 0;
-		let procedureFileChanges = 0; // FIXME do someting with this
+		// let procedureFileChanges = 0;
 		if (newState.title) {
 			taskFileChanges += this.setTitle(newState.title) ? 1 : 0;
 		}
@@ -190,13 +190,10 @@ module.exports = class Task {
 		if (newState.file) {
 			const change = this.taskReqs.setFile(newState.file);
 			taskFileChanges += change;
-			procedureFileChanges += change;
+			// procedureFileChanges += change;
 		}
 
 		// if changes were made, notify
-		console.log('should be running it');
-		console.log('tasks handler', this.procedure.TasksHandler);
-		console.log('taskfilechanges', taskFileChanges);
 		if (this.procedure.TasksHandler && taskFileChanges > 0) {
 			console.log('            --------- Actually running Task.setState() notifications');
 			this.procedure.TasksHandler.notifyTaskSubscription('setState', this);
@@ -222,7 +219,7 @@ module.exports = class Task {
 	}
 
 	// FIXME use this or throw it away
-	setDivisions(divisions) {
+	setDivisions(/* divisions */) {
 		throw new Error('not yet implemented');
 	}
 
