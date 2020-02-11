@@ -1,128 +1,11 @@
-const fs = require('fs');
-const path = require('path');
 const React = require('react');
-const jsdiff = require('diff');
 const YAML = require('js-yaml');
 
 const stateHandler = require('../state/index');
-// const PropTypes = require('prop-types');
-const HeaderComponent = require('./layout/HeaderComponent');
+const SidebarComponent = require('./layout/SidebarComponent');
 const ProcedureViewerComponent = require('./pages/ProcedureViewerComponent');
 const ProcedureSelectorComponent = require('./pages/ProcedureSelectorComponent');
 const ReactProcedureWriter = require('../../writer/procedure/ReactProcedureWriter');
-
-const changes = {
-	lastDefinitionYaml: null,
-	diffs: []
-};
-
-/**
- * Compare procedure against previous version of procedure. Record state for comparison with future
- * changes and console.log() a diff from the previous change.
- *
- * @param {Procedure} latestProcedure  Procedure object with latest updates, used to generate latest
- *                                     YAML string to compare against previous change.
- */
-function recordAndReportChange(latestProcedure) {
-	const newYaml = YAML.dump(latestProcedure.getDefinition());
-
-	const diff = jsdiff.diffLines(
-		changes.lastDefinitionYaml,
-		newYaml
-	);
-
-	const css = [];
-
-	const diffText = diff
-		.map((change) => {
-			if (change.added) {
-				css.push('color: green');
-				return `%c+ ${change.value.trimEnd()}`;
-			} else if (change.removed) {
-				css.push('color: red');
-				return `%c- ${change.value.trimEnd()}`;
-			} else {
-				css.push('color: gray');
-				return `%c  (${change.count} unchanged line${change.count === 1 ? '' : 's'})`;
-			}
-		})
-		.join('\n');
-
-	changes.diffs.push(diffText);
-
-	console.log(diffText, ...css);
-	changes.lastDefinitionYaml = newYaml;
-
-}
-
-/**
- * Save yamlString to Activity file
- *
- * @param {ElectronProgram} program
- * @param {Task} activity
- * @param {string} yamlString
- */
-function saveChangeElectron(program, activity, yamlString) {
-	fs.writeFile(
-		path.join(program.tasksPath, activity.taskReqs.file),
-		yamlString,
-		{},
-		(err) => {
-			if (err) {
-				throw err;
-			}
-		}
-	);
-
-}
-
-/**
- * Save yamlString to Activity file
- *
- * @param {WebProgram} program
- * @param {Task} activity
- * @param {string} yamlString
- */
-function saveChangeWeb(program, activity, yamlString) {
-	fetch(
-		`edit/tasks/${activity.taskReqs.file}`,
-		{
-			method: 'POST', // or 'PUT'
-			headers: {
-				'Content-Type': 'application/json'
-			},
-			body: JSON.stringify({
-				yaml: yamlString
-			})
-		}
-	)
-		.then((response) => response.json())
-		.then((data) => {
-			console.log('Success:', data);
-		})
-		.catch((error) => {
-			console.error('Error:', error);
-		});
-}
-
-/**
- * Save changes for a particular Activity
- *
- * @param {WebProgram|ElectronProgram} program
- * @param {Procedure} procedure                 Procedure with latest changes to be saved back to
- *                                              files
- * @param {number} activityIndex                Activity file to save
- */
-function saveChange(program, procedure, activityIndex) {
-	const activity = procedure.tasks[activityIndex];
-	const yamlString = YAML.dump(activity.getTaskDefinition());
-
-	if (window.isElectron) {
-		saveChangeElectron(program, activity, yamlString);
-	} else {
-		saveChangeWeb(program, activity, yamlString);
-	}
-}
 
 class App extends React.Component {
 
@@ -132,45 +15,36 @@ class App extends React.Component {
 	}
 
 	state = {
-		procedure: null
-	};
+		procedureFile: null
+	}
 
 	setProcedure = (procObject) => {
-		stateHandler.state.procedure = procObject;
-		changes.lastDefinitionYaml = YAML.dump(procObject.getDefinition());
 
-		this.setState({
-			procedure: stateHandler.state.procedure,
-			procedureWriter: new ReactProcedureWriter(window.maestro.app, procObject)
+		stateHandler.setState({
+			procedure: procObject,
+
+			// this.program is set in ElectronProgram constructor...FIXME?
+			program: this.program,
+
+			procedureWriter: new ReactProcedureWriter(window.maestro.app, procObject),
+
+			// Set initial YAML representation of entire procedure (including activities). Changes
+			// can diff against this.
+			lastProcDefinitionYaml: YAML.dump(procObject.getDefinition())
 		});
 
-		stateHandler.modifyStep = (actIndex, divIndex, colKey, stepIndex, rawDefinition) => {
-
-			// previously cloned-deep this because I thought I might need to. Doesn't seem necessary
-			// at this point but keeping this here for a while to make sure.
-			// const newProc = cloneDeep(this.state.procedure);
-			const newProc = this.state.procedure;
-
-			const division = newProc.tasks[actIndex].concurrentSteps[divIndex];
-			const newStep = division.makeStep(colKey, rawDefinition);
-
-			division.subscenes[colKey][stepIndex] = newStep;
-
-			recordAndReportChange(newProc);
-
-			saveChange(this.program, newProc, actIndex);
-
-			this.setState({
-				procedure: newProc
-			});
-
-		};
+		this.setState({
+			procedureFile: stateHandler.state.procedure.filename
+		});
 
 		console.log(`Procedure set to ${procObject.name}`);
 	};
 
+	// FIXME is this still needed? Used by electron? should be easier to tell.
+	// Need to replace electrons <p>...</p> with a compoenent that at least makes it more obvious
 	getProcedureWriter = () => {
-		return this.state.procedureWriter;
+		// return this.state.procedureWriter;
+		return stateHandler.state.procedureWriter;
 	}
 
 	setProgram(program) {
@@ -182,30 +56,33 @@ class App extends React.Component {
 			return (<p>Please select a procedure file from the file:open menu</p>);
 		} else {
 			return (
-				<ProcedureSelectorComponent
-					procedureChoices={window.procedureChoices}
-					procedure={this.state.procedure}
-					setProcedure={this.setProcedure} />
+				<ProcedureSelectorComponent setProcedure={this.setProcedure} />
 			);
 		}
 	}
 
 	render() {
 		return (
-			<div className='app'>
-				<div className='container'>
-					<HeaderComponent />
-					{!this.state.procedure ?
-						this.renderNoProcedure() :
-						(
-							<ProcedureViewerComponent
-								procedure={this.state.procedure}
-								getProcedureWriter={this.getProcedureWriter}
-							/>
-						)
-					}
+			<React.Fragment>
+				<header id='main-header'>
+					<h1>Maestro</h1>
+				</header>
+				<div id='sidebar-and-content-wrapper'>
+					<div id="sidebar">
+						<SidebarComponent />
+					</div>
+					<div id='content'>
+						{typeof this.state.procedureFile === 'string' ?
+							(
+								<ProcedureViewerComponent
+									procedureFile={this.state.procedureFile}
+								/>
+							) :
+							this.renderNoProcedure()
+						}
+					</div>
 				</div>
-			</div>
+			</React.Fragment>
 		);
 	}
 }

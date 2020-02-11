@@ -152,7 +152,7 @@ module.exports = class Program {
 	}
 
 	getProjectProcedureFiles() {
-		return fs.readdirSync(this.procedurePath).filter((filename) => {
+		return fs.readdirSync(this.proceduresPath).filter((filename) => {
 			return filename.endsWith('.yml');
 		});
 	}
@@ -161,7 +161,7 @@ module.exports = class Program {
 
 		// property on this object --> directory name
 		const paths = {
-			procedurePath: 'procedures',
+			proceduresPath: 'procedures',
 			tasksPath: 'tasks',
 			imagesPath: 'images',
 			outputPath: 'build',
@@ -181,6 +181,61 @@ module.exports = class Program {
 			}
 		}
 
+	}
+
+	moveFile(originalPath, newPath, successHandler = null, errorHandler = null) {
+
+		const genericResponseHandler = function(result) {
+			console.log(result.msg);
+			return;
+		};
+
+		if (!successHandler) {
+			successHandler = genericResponseHandler;
+		}
+
+		if (!errorHandler) {
+			errorHandler = genericResponseHandler;
+		}
+
+		const formatResponse = function(success, msg, error = undefined) {
+			return {
+				success: success,
+				msg: msg,
+				originalPath,
+				newPath,
+				error
+			};
+		};
+
+		// FIXME fs.exists deprecated
+		fs.exists(originalPath, function(currentExists) {
+			if (!currentExists) {
+				return errorHandler(
+					formatResponse(false, 'ERROR: original file path doesn\'t exist')
+				);
+			}
+
+			fs.exists(newPath, function(newExists) {
+				if (newExists) {
+					return errorHandler(
+						formatResponse(false, 'ERROR: file already exists at new file path')
+					);
+				}
+
+				fs.rename(originalPath, newPath, function(err) {
+					if (err) {
+						return errorHandler(
+							formatResponse(false, err.message, err)
+						);
+					}
+
+					return successHandler(
+						formatResponse(true, `${originalPath} moved to ${newPath}`)
+					);
+				});
+			});
+		});
 	}
 
 };

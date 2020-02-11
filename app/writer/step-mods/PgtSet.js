@@ -159,7 +159,6 @@ module.exports = class PgtSet extends StepModule {
 		super();
 		this.key = 'pgt.set';
 		this.step = step;
-		this.raw = stepYaml;
 
 		// todo also accept torque/speed/etc separately (e.g. accept an obj instead of string)
 		const inputString = stepYaml[this.key];

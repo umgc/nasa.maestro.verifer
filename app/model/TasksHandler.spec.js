@@ -38,7 +38,7 @@ describe('TasksHandler', function() {
 			roles: [
 				{
 					name: 'crew',
-					description: '',
+					description: 'TBD',
 					duration: { minutes: 5 }
 				}
 			],
@@ -49,7 +49,7 @@ describe('TasksHandler', function() {
 			roles: [
 				{
 					name: 'crew',
-					description: '',
+					description: 'TBD',
 					duration: { minutes: 10 }
 				}
 			],

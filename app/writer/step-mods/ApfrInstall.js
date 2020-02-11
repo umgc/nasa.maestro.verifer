@@ -58,7 +58,6 @@ module.exports = class ApfrInstall extends StepModule {
 		super();
 		this.key = 'apfr.install';
 		this.step = step;
-		this.raw = stepYaml;
 
 		// todo also accept torque/speed/etc separately (e.g. accept an obj instead of string)
 		const settingsString = stepYaml[this.key].settings;
@@ -114,7 +113,7 @@ module.exports = class ApfrInstall extends StepModule {
 			text: `Install APFR in ${this.wif} `
 		});
 
-		if (this.step.text.length) {
+		if (this.step.props.text.length) {
 			// if there is step text, put first APFR text on a new line
 			installAPFR.break();
 		}

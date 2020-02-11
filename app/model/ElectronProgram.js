@@ -19,7 +19,10 @@ module.exports = class ElectronProgram extends Program {
 		const projectPath = path.dirname(path.dirname(procedureFilepath));
 		this.setPathsFromProject(projectPath);
 
-		this.procedure = new Procedure();
+		this.procedure = new Procedure({
+			alwaysShowRoleColumns: true,
+			alwaysShowWildcardColumn: true
+		});
 		this.procedure.addProcedureDefinitionFromFile(procedureFilepath);
 
 		this.reactAppComponent.setProcedure(this.procedure);

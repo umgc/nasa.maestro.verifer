@@ -55,13 +55,20 @@ module.exports = class ColumnsHandler {
 	 *                          { key: 'EV1', actors: ['EV1', 'Someone else'], display: 'EV1' }
 	 *                        ]
 	 */
-	constructor(columnsDef = false) {
+	constructor(columnsDef = false, { alwaysShowRoleColumns, alwaysShowWildcardColumn } = {}) {
 		// holds columns info
 		this.columns = [];
 
 		// holds pointers to info in array for convenience
 		this.actorToColumn = {};
 		this.columnToDisplay = {};
+
+		this.alwaysShowRoleColumns = alwaysShowRoleColumns || false;
+
+		// store an intent variable, since even if the intent is true, if there is no defined
+		// wildcard column then alwaysShowWildcardColumn should be false. Update on update columns.
+		this.intendAlwaysShowWildcardColumn = alwaysShowWildcardColumn || false;
+		this.alwaysShowWildcardColumn = alwaysShowWildcardColumn || false;
 
 		if (columnsDef) {
 			this.updateColumns(columnsDef);
@@ -87,6 +94,11 @@ module.exports = class ColumnsHandler {
 		});
 
 		doRemapFunctions(this);
+
+		if (this.intendAlwaysShowWildcardColumn) {
+			// if there's a * column, return true, else false
+			this.alwaysShowWildcardColumn = !!this.getActorColumnKey('*', true);
+		}
 	}
 
 	/**
@@ -146,10 +158,12 @@ module.exports = class ColumnsHandler {
 	 * for a column with a wildcard actor "*" (or error if no wildcard is specified).
 	 *
 	 * @param  {string} actor  actor id string
+	 * @param {boolean} allowMissing - If true, returns false on missing. If false, throws error on
+	 *                                 missing.
 	 * @return {string}        key of column (typically also key of primary actor of column), e.g.
 	 *                         this.columns[someIndex].key
 	 */
-	getActorColumnKey(actor) {
+	getActorColumnKey(actor, allowMissing = false) {
 
 		/**
 		 * this.actorToColumn is in form:
@@ -170,6 +184,8 @@ module.exports = class ColumnsHandler {
 			return this.actorToColumn[actor];
 		} else if (this.actorToColumn['*']) {
 			return this.actorToColumn['*']; // wildcard for all others
+		} else if (allowMissing) {
+			return false;
 		} else {
 			throw new Error(
 				`Unknown column for actor ${actor}. Consider adding wildcard * actor to a column`
@@ -224,6 +240,18 @@ module.exports = class ColumnsHandler {
 	 */
 	getDisplayTextFromColumnKey(colKey) {
 		return this.columnToDisplay[colKey];
+	}
+
+	getActors() {
+		const actors = [];
+		for (const col of this.columns) {
+			for (const actor of col.actors) {
+				if (actor !== '*') { // don't push wildcard
+					actors.push(actor);
+				}
+			}
+		}
+		return actors;
 	}
 
 };
