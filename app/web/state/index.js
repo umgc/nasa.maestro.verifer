@@ -55,8 +55,7 @@ function recordAndReportChange() {
 
 	changesDiffs.push(diffText);
 
-	// FIXME reenable this!
-	// console.log(diffText, ...css);
+	console.log(diffText, ...css);
 	setState({ lastProcDefinitionYaml: newYaml });
 
 }

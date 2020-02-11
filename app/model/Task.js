@@ -211,10 +211,6 @@ module.exports = class Task {
 		// console.log(`Running Task.setTitle(); Was ${this.title}. Is ${title}`);
 		this.title = title;
 
-		// allows UI to subscribe to all task events through TasksHandler
-		// FIXME REMOVE THIS SUBSCRIPTION
-		// this.procedure.TasksHandler.notifyTaskSubscription('setTitle', this);
-
 		return true;
 	}
 
@@ -346,15 +342,9 @@ module.exports = class Task {
 
 	setRoles(rolesDef, runTimeSync = true) { // was updateRolesDefinitions
 
-		// if (!this.rolesDict) {
 		this.rolesDict = {};
-		// }
-		// if (!this.rolesArr) {
 		this.rolesArr = [];
-		// }
-		// if (!this.actorRolesDict) {
 		this.actorRolesDict = {};
-		// }
 
 		// FIXME remove anything in this.actorRolesDict, etc, that isn't in new definition
 
@@ -380,12 +370,6 @@ module.exports = class Task {
 			console.log('running time sync after Task.setRoles()');
 			this.procedure.setupTimeSync();
 		}
-
-		// FIXME removed. use this.setState() instead
-		// allows UI to subscribe to all task events through TasksHandler
-		// if (this.procedure.TasksHandler) {
-		// this.procedure.TasksHandler.notifyTaskSubscription('updateRolesDefinitions', this);
-		// }
 
 		// FIXME this should return false if no changes were made.
 		return true;
@@ -466,8 +450,11 @@ module.exports = class Task {
 	getColumnIndex(actorKey) {
 		const columnIndexes = this.getColumnIndexes();
 		if (typeof columnIndexes[actorKey] === 'undefined') {
-			throw new Error(`Unknown actor "${actorKey}" passed to getColumnIndex.
-				Column index = ${JSON.stringify(columnIndexes)}`);
+			throw new Error(
+				`Unknown actor "${actorKey}" passed to getColumnIndex.
+				Task =  ${this.title}
+				Column index = ${JSON.stringify(columnIndexes)}`
+			);
 		} else {
 			return columnIndexes[actorKey];
 		}

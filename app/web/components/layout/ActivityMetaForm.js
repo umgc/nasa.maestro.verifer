@@ -123,9 +123,6 @@ const ActivityMetaForm = ({ task }) => {
 
 			task.setState(values);
 
-			// FIXME setState should run this now
-			// stateHandler.state.procedure.setupTimeSync();
-
 			stateHandler.saveChange(
 				stateHandler.state.procedure.TasksHandler.getTaskIndexByUuid(task.uuid)
 			);

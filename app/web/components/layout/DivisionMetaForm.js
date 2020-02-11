@@ -110,25 +110,6 @@ const DivisionMetaForm = ({ division, editorOptions }) => {
 		return errors;
 	};
 
-	// FIXME either use this to highlight the current division being edited, or delete this.
-	// React.useEffect(() => {
-	// /**
-	//  *
-	// */
-	// function cleanup() {
-	// const currentSelected = document.getElementsByClassName('timeline-selected');
-	// for (const block of currentSelected) {
-	// block.classList.remove('timeline-selected');
-	// }
-	// }
-	// cleanup();
-	// const blocks = document.getElementsByClassName(`block-${task.uuid}`);
-	// for (const block of blocks) {
-	// block.classList.add('timeline-selected');
-	// }
-	// return cleanup;
-	// });
-
 	const formatCheckbox = (colKey, actuallyAcheckbox) => {
 		if (actuallyAcheckbox) {
 			return <div key={colKey + '-merge-selector'}>

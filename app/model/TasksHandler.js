@@ -36,10 +36,6 @@ module.exports = class TasksHandler {
 
 			// Still do this?
 			updateTaskRequirements: [] // this data is stored in procedure file, but task model
-
-			// FIXME removed to instead use setState for all subscribable functions
-			// // NOT YET IMPLEMENTED updateTaskDefinition: [],
-			// setTitle: [],
 		};
 
 		procTaskDefs.forEach((procTaskDef, index) => {

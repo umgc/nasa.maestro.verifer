@@ -14,7 +14,7 @@ module.exports = class EvaDocxTaskWriter extends DocxTaskWriter {
 	constructor(task, procedureWriter) {
 		super(task, procedureWriter);
 
-		this.taskColumns = task.getColumns(task); // FIXME no need to pass task into getColumns
+		this.taskColumns = task.getColumns();
 
 		this.numCols = this.taskColumns.length;
 		this.numContentRows = task.concurrentSteps.length;

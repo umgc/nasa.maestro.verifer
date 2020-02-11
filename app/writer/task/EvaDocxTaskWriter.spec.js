@@ -10,8 +10,6 @@ const cloneDeep = require('lodash/cloneDeep');
 
 const CommanderProgram = require('../../model/CommanderProgram');
 const Procedure = require('../../model/Procedure');
-// const TaskRole = require('../app/model/TaskRole');
-// const taskRoleGenerator = require('../../test/generators/taskRoleGenerator');
 const testProcedureGenerator = require('../../../test/generators/testProcedureGenerator');
 
 const Step = require('../../model/Step');
@@ -316,9 +314,6 @@ describe('EvaDocxTaskWriter', function() {
 
 			const series1 = procedure1.tasks[0].concurrentSteps[0].subscenes.EV1;
 			const series2 = procedure2.tasks[0].concurrentSteps[0].subscenes.EV1;
-
-			// const tr1 = taskRoleGenerator.getSingleTaskRole('crewX', 'EV7');
-			// const tr2 = taskRoleGenerator.getSingleTaskRole('crewX', 'EV7');
 
 			step1 = new Step(def1, series1);
 			step2 = new Step(def2, series2);

@@ -105,10 +105,7 @@ module.exports = class Indexer {
 
 	delete(uuid) {
 		const prevAndNext = this.extract(uuid);
-
-		// FIXME enable
-		console.log(`Indexer.delete() would also delete ${uuid} from the index, in addition to extracting, but that's currently disabled`);
-		// delete this.index[uuid];
+		delete this.index[uuid];
 
 		return prevAndNext;
 	}

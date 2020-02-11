@@ -91,15 +91,11 @@ module.exports = class ReactTaskWriter extends TaskWriter {
 		return (
 			<tr>
 				{Object.keys(columns).map((colId) => {
-					// console.log(columns[colId].series); // FIXME remove
-					const startStep = this.preInsertSteps(); // FIXME this doesn't seem right
-
 					const seriesState = columns[colId].series;
 
 					return (
 						<SeriesComponent
 							key={seriesState.uuid}
-							startStep={startStep}
 							colspan={columns[colId].colspan}
 							primaryColumnKey={columns[colId].stateColumnKey}
 							columnKeys={columns[colId].columnKeys}

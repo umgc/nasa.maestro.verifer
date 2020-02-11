@@ -114,41 +114,7 @@ module.exports = class Server {
 	}
 
 	handleMoveFile = (req, res) => {
-		const filepath = this.validateFileRequest(req);
-		const newfilepath = this.validateFileRequest(req, 'newfilename');
 
-		const badFile = function(msg) {
-			console.log(msg);
-			res.send({ success: false, msg: msg });
-			return;
-		};
-
-		// FIXME fs.exists deprecated
-		fs.exists(filepath, function(currentExists) {
-			if (!currentExists) {
-				return badFile('ERROR: original file path doesn\'t exist');
-			}
-
-			fs.exists(newfilepath, function(newExists) {
-				if (newExists) {
-					return badFile('ERROR: file already exists at new file path');
-				}
-
-				fs.rename(filepath, newfilepath, function(err) {
-					if (err) {
-						return badFile(err.message);
-					}
-
-					res.send({
-						success: true,
-						msg: `${req.params.filename} moved to ${req.params.newfilename}`
-					});
-				});
-			});
-		});
-	}
-
-	handleMoveFile2 = (req, res) => {
 		const filepath = this.validateFileRequest(req);
 		const newfilepath = this.validateFileRequest(req, 'newfilename');
 
@@ -167,7 +133,6 @@ module.exports = class Server {
 
 	serve() {
 		this.app.get('/', (req, res) => {
-			// res.sendFile(this.baseHtmlFile);
 			res.send(nunjucks.render('maestro-conduct.html', {
 				title: 'Maestro',
 				procedureFiles: this.procedureFiles
@@ -176,7 +141,7 @@ module.exports = class Server {
 
 		this.app.post('/edit/:filetype/:filename', this.handleFileUpdates);
 		this.app.post('/exists/:filetype/:filename', this.handleCheckFileExists);
-		this.app.post('/move/:filetype/:filename/:newfilename', this.handleMoveFile2); // FIXME name
+		this.app.post('/move/:filetype/:filename/:newfilename', this.handleMoveFile);
 
 		this.app.listen(this.port, () => {
 			consoleHelper.success(

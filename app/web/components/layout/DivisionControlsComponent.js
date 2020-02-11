@@ -9,29 +9,6 @@ class DivisionControlsComponent extends React.PureComponent {
 		super(props);
 	}
 
-	/* FIXME: remove if this capability staying in sidebar
-	handleDeleteButtonClick = (e) => {
-		console.log('delete-division button click');
-		e.preventDefault();
-		e.stopPropagation();
-
-		const activityIndex = stateHandler.state.procedure
-			.TasksHandler.getTaskIndexByUuid(this.props.activityUuid);
-
-		const divisionIndex = stateHandler.state.procedure.tasks[activityIndex]
-			.getDivisionIndexByUuid(this.props.divisionUuid);
-
-		// this.props.deleteDivision(divisionIndex);
-		const activity = stateHandler.state.procedure.tasks[activityIndex];
-		console.log(`deleting division index ${divisionIndex}`);
-		console.log(activity.concurrentSteps[divisionIndex]);
-
-		activity.deleteDivision(divisionIndex);
-
-		stateHandler.saveChange(activityIndex);
-	}
-	*/
-
 	handleEditButtonClick = (e) => {
 		console.log('edit-division button click');
 		e.preventDefault();
@@ -112,10 +89,6 @@ class DivisionControlsComponent extends React.PureComponent {
 			bottom: '-10px',
 			left: 0,
 			right: 0
-
-			// temporary for dev only. FIXME.
-			// backgroundColor: 'red',
-			// opacity: 0.2
 		};
 
 		const controlsStyle = {

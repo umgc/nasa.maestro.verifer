@@ -193,18 +193,6 @@ class SummaryTimelineComponent extends React.Component {
 		});
 	}
 
-	/*
-	handleViewStepsClick = (event) => {
-		console.log(`clicked "view steps" for timeline activity ${event.target.dataset.uuid}`);
-		this.props.updateCurrentActivity(event.target.dataset.uuid);
-		this.props.showTimeline(false);
-	}
-
-	handleEditMetaClick = (event) => {
-		console.log(`clicked "edit metadata" for timeline activity ${event.target.dataset.uuid}`);
-
-	}*/
-
 	handleMoveUpClick = (event) => {
 		console.log(`clicked "move up" for timeline activity ${event.target.dataset.uuid}`);
 		const th = stateHandler.state.procedure.TasksHandler;
@@ -213,7 +201,7 @@ class SummaryTimelineComponent extends React.Component {
 			console.error('Can\'t move it any further up');
 			return;
 		}
-		th.moveTask(taskIndex, taskIndex - 1); // FIXME seems not right to have to subtract 2
+		th.moveTask(taskIndex, taskIndex - 1);
 		stateHandler.saveProcedureChange();
 	}
 

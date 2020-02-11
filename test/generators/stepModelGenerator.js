@@ -1,8 +1,6 @@
 'use strict';
 
-// const Step = require('../../app/model/Step');
 const Task = require('../../app/model/Task');
-// const taskRoleGenerator = require('./taskRoleGenerator');
 const testProcedureGenerator = require('../../test/generators/testProcedureGenerator');
 
 /**

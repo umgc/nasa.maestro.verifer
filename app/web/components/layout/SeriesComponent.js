@@ -174,17 +174,10 @@ class SeriesComponent extends React.Component {
 	}
 
 	render() {
-		// const startStep = this.props.taskWriter.preInsertSteps();
-		// console.log(`rendering series with colKeys = ${this.props.columnKeys}`);
-
 		return (
 			<td key={uuidv4()} colSpan={this.props.colspan} className='series-td'>
 				<div style={{ position: 'relative' }}>
-					{/* <ol> */}
 					<div>
-						{/*
-						FIXME start={startStep} removed from <ol> above -- need to fix step nums
-						*/}
 						{this.props.seriesState.steps.map((step, index) => {
 							return (
 								<StepComponent
@@ -204,7 +197,6 @@ class SeriesComponent extends React.Component {
 							);
 						})}
 					</div>
-					{/* </ol> */}
 					<div className='series-insert-step-wrapper'>
 						<div>
 							<InsertStepButtonComponent
@@ -230,7 +222,6 @@ class SeriesComponent extends React.Component {
 
 SeriesComponent.propTypes = {
 	colspan: PropTypes.number.isRequired,
-	startStep: PropTypes.number.isRequired,
 	columnKeys: PropTypes.array.isRequired,
 	seriesState: PropTypes.object.isRequired,
 	taskWriter: PropTypes.object.isRequired,
