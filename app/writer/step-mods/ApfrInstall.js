@@ -114,7 +114,7 @@ module.exports = class ApfrInstall extends StepModule {
 			text: `Install APFR in ${this.wif} `
 		});
 
-		if (this.step.text.length) {
+		if (this.step.props.text.length) {
 			// if there is step text, put first APFR text on a new line
 			installAPFR.break();
 		}

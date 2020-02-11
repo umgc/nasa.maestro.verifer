@@ -7,7 +7,10 @@ const assert = require('chai').assert;
 const Step = require('../../app/model/Step');
 const stepModules = require('../../app/writer/step-mods/stepModules');
 
-const taskRoleGenerator = require('../generators/taskRoleGenerator');
+// FIXME: remove taskRoleGenerator entirely if file is not used anymore
+// const taskRoleGenerator = require('../generators/taskRoleGenerator');
+
+const testProcedureGenerator = require('../../test/generators/testProcedureGenerator');
 
 module.exports = class StepModuleTester {
 
@@ -68,8 +71,10 @@ module.exports = class StepModuleTester {
 	}
 
 	generateModule(setting) {
-		const taskRoles = taskRoleGenerator.getSingleTaskRole('crewX', 'EV7');
-		const step = new Step(setting.actual, 'EV7', taskRoles);
+		const procedure = testProcedureGenerator('simple/procedures/proc.yml');
+		const series = procedure.tasks[0].concurrentSteps[0].subscenes.EV1;
+		// const taskRoles = taskRoleGenerator.getSingleTaskRole('crewX', series);
+		const step = new Step(setting.actual, series);
 		return new this.ModuleClass(
 			step,
 			setting.actual
@@ -77,12 +82,14 @@ module.exports = class StepModuleTester {
 	}
 
 	testConstructor() {
+		const procedure = testProcedureGenerator('simple/procedures/proc.yml');
+		const series = procedure.tasks[0].concurrentSteps[0].subscenes.EV1;
 
 		for (const setting of this.badInputs) {
 			it(`should error if invalid input ${JSON.stringify(setting)} is supplied`, function() {
 				assert.throws(function() {
-					const taskRoles = taskRoleGenerator.getSingleTaskRole('crewX', 'EV7');
-					const step = new Step(setting, 'EV7', taskRoles);
+					// const taskRoles = taskRoleGenerator.getSingleTaskRole('crewX', 'EV7');
+					const step = new Step(setting, series);
 					new this.ModuleClass(step, setting); // eslint-disable-line no-new
 				});
 			});

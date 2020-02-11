@@ -119,19 +119,16 @@ module.exports = class Task {
 	 * Constructor for Task object
 	 * @param  {Object} taskRequirementsDef     Info about this usage of task from procedure file
 	 * @param  {Object} procedure               Procedure instance
-	 *                                          OPTIMIZE: the procedure param was added later when
-	 *                                          it became obvious that tasks would need general info
-	 *                                          about procedures. Now it seems excessive to have the
-	 *                                          prior two params be part of the procedure param
+	 * @param {Object|null} taskDef             The contents of the task file
 	 */
-	constructor(taskRequirementsDef, procedure) {
+	constructor(taskRequirementsDef, procedure, taskDef = null) {
 		this.subscriberFns = {
 			deleteDivision: [],
 			insertDivision: [],
 			appendDivision: []
 		};
 
-		this.title = '';
+		this.title = 'Temp Name';
 		this.uuid = uuidv4(); // used by Procedure/TasksHandler to find this Task
 
 		this.divisionUuidToObj = {}; // used by Task to find Divisions
@@ -140,6 +137,10 @@ module.exports = class Task {
 		this.concurrentSteps = [];
 
 		this.updateTaskRequirements(taskRequirementsDef);
+
+		if (taskDef) {
+			this.setState(taskDef);
+		}
 	}
 
 	getDefinition() {
@@ -195,7 +196,6 @@ module.exports = class Task {
 
 		// if changes were made, notify
 		if (this.procedure.TasksHandler && taskFileChanges > 0) {
-			console.log('            --------- Actually running Task.setState() notifications');
 			this.procedure.TasksHandler.notifyTaskSubscription('setState', this);
 		}
 
@@ -218,9 +218,20 @@ module.exports = class Task {
 		return true;
 	}
 
-	// FIXME use this or throw it away
-	setDivisions(/* divisions */) {
-		throw new Error('not yet implemented');
+	setDivisions(divisionsDef) {
+		// remove previous divisions
+		this.divisionUuidToObj = {};
+		this.concurrentSteps = [];
+
+		// Get the steps. ConcurrentSteps class will handle the simo vs actor stuff in the yaml.
+		for (const divisionDef of divisionsDef) {
+			const division = new ConcurrentStep(divisionDef, this);
+			this.divisionUuidToObj[division.uuid] = division;
+			this.concurrentSteps.push(division);
+		}
+
+		// FIXME this should return false if no changes were made
+		return true;
 	}
 
 	formatTitleToFilename(titleToFormat) {
@@ -327,11 +338,8 @@ module.exports = class Task {
 			this.setRoles(taskDef.roles, false);
 		}
 
-		// Get the steps.  ConcurrentSteps class will handle the simo vs actor stuff in the yaml.
-		for (var concurrentStepYaml of taskDef.steps) {
-			const division = new ConcurrentStep(concurrentStepYaml, this);
-			this.divisionUuidToObj[division.uuid] = division;
-			this.concurrentSteps.push(division);
+		if (taskDef.steps) {
+			this.setDivisions(taskDef.steps);
 		}
 
 	}

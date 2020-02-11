@@ -118,7 +118,9 @@ module.exports = class EvaDocxTaskWriter extends DocxTaskWriter {
 		const steps = [];
 		this.preInsertSteps();
 		for (const step of series.steps) {
-			step.columnKeys = Array.isArray(columnKeys) ? columnKeys : [columnKeys];
+			// FIXME: shouldn't need to alter step props in this way. Why are column keys not set
+			// some other way? Should TaskWriter.insertStep instead pass step.parent.seriesActors?
+			step.props.columnKeys = Array.isArray(columnKeys) ? columnKeys : [columnKeys];
 			steps.push(...this.insertStep(step));
 		}
 		this.postInsertSteps();

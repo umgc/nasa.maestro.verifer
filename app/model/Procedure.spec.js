@@ -39,9 +39,9 @@ describe('Procedure', function() {
 		expect(procedure.tasks[0].concurrentSteps[0].subscenes.EV1.steps).to.be.an('array');
 		expect(procedure.tasks[0].concurrentSteps[0].subscenes.EV1.steps).to.have.all.keys(0);
 
-		assert.isArray(procedure.tasks[0].concurrentSteps[0].subscenes.EV1.steps[0].text);
+		assert.isArray(procedure.tasks[0].concurrentSteps[0].subscenes.EV1.steps[0].props.text);
 		assert.strictEqual(
-			procedure.tasks[0].concurrentSteps[0].subscenes.EV1.steps[0].text[0],
+			procedure.tasks[0].concurrentSteps[0].subscenes.EV1.steps[0].props.text[0],
 			'Go Outside'
 		);
 	};

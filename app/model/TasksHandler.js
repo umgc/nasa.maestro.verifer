@@ -152,6 +152,15 @@ module.exports = class TasksHandler {
 		subscriptionHelper.run(this.subscriberFns.moveTask, this);
 	}
 
+	/**
+	 * @deprecated
+	 * This creates a Task object with convenient defaults for generating new tasks in the UI. It
+	 * is deprecated, since instead these defaults should be added to the Task constructor.
+	 *
+	 * @param {Object} taskRequirementsDef
+	 * @param {Object} taskDef
+	 * @return {Task}
+	 */
 	makeTask({ file, rolesCast, color } = {}, { title, rolesNeeded, steps } = {}) {
 		// file = file || title || 'Temp_Name';
 		title = title || 'Temp Name';
@@ -160,7 +169,7 @@ module.exports = class TasksHandler {
 
 		const t = this.tasks[0]; // any random task. Hopefully there aren't zero. FIXME
 
-		if (!file && allTaskFiles.indexOf(file) !== -1) {
+		if (allTaskFiles.indexOf(file) !== -1) {
 			throw new Error('Trying to do TasksHandler.makeTask() with a task file name already in use');
 		} else if (!file) {
 			let suffix = 2;

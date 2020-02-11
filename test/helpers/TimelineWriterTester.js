@@ -49,8 +49,8 @@ module.exports = class TimelineWriterTester {
 			{
 				file: 'cases/complex-times/procedures/proc.yml',
 				expected: {
-					columns: ['EV3', 'EV4', 'EV1', 'EV2'],
-					actorToTimelineColumn: { EV3: 0, EV4: 1, EV1: 2, EV2: 3 },
+					columns: ['EV1', 'EV2', 'EV3', 'EV4'],
+					actorToTimelineColumn: { EV1: 0, EV2: 1, EV3: 2, EV4: 3 },
 					minutesToPixels: {
 						0: [0, 0],
 						31: [43, 43.4],

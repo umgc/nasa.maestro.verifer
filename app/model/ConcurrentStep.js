@@ -314,6 +314,9 @@ module.exports = class ConcurrentStep {
 			}
 		}
 		if (typeof seriesIndex !== 'number') {
+			console.log('series order', seriesOrder);
+			console.log('series', series);
+			console.log('subscenes', this.subscenes);
 			throw new Error(`Series ${series.uuid} not found in keys ${seriesOrder} of ${this.uuid}`);
 		}
 
