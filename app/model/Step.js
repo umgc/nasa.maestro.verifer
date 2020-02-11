@@ -179,8 +179,6 @@ module.exports = class Step {
 		this.props.modules = [];
 		this.props.substeps = [];
 
-		this.props.raw = definition; // FIXME pretty sure not used anywhere. Remove. UniqueEWCVDS
-
 		// Check if the step is a simple string
 		if (typeof definition === 'string') {
 			this.props.text = [this.parseStepText(definition)];
