@@ -1,5 +1,9 @@
 'use strict';
 
+const path = require('path');
+const childProcess = require('child_process');
+const shell = require('electron').shell;
+
 const { ipcRenderer } = require('electron');
 
 const ElectronProgram = require('../model/ElectronProgram');
@@ -14,6 +18,22 @@ if (!window.maestro) {
 	window.maestro = {};
 }
 window.maestro.app = new ElectronProgram(window.appComponent);
+
+window.maestro.exportToWord = function(procedureOutputFilename, successFn, failureFn) {
+	const maestroEntry = path.resolve(__dirname, '../../index.js');
+	const projectPath = window.maestro.app.projectPath;
+	childProcess.exec(
+		`node "${maestroEntry}" compose --eva-docx "${projectPath}"`,
+		(error, stdout, stderr) => {
+			if (error) {
+				failureFn(error, stdout, stderr);
+			} else {
+				successFn(stdout, stderr);
+				shell.openItem(path.join(projectPath, 'build', procedureOutputFilename));
+			}
+		}
+	);
+};
 
 console.log(`     __  ______    _____________________  ____
     /  |/  /   |  / ____/ ___/_  __/ __ \\/ __ \\

@@ -33,6 +33,7 @@ function handleProjectPath(projectPath) {
  * @return {boolean}
  */
 function pathMustExist(path, createIfMissing = false) {
+
 	try {
 		fs.statSync(path);
 	} catch (e) {
@@ -40,7 +41,7 @@ function pathMustExist(path, createIfMissing = false) {
 			fs.mkdirSync(path);
 			// FIXME: catch here, then return or not based upon whether mkdirSync is successful
 		} else {
-			console.error(`Path ${path} does not exist`);
+			console.error(`Path ${path} does not exist.`);
 			process.exit();
 		}
 	}
@@ -178,7 +179,7 @@ module.exports = class CommanderProgram extends Program {
 	 */
 	validateProgramArguments() {
 
-		this.setPathsFromProject(this.project);
+		this.setPathsFromProject(this.projectPath);
 
 		pathMustExist(this.proceduresPath);
 		pathMustExist(this.tasksPath);

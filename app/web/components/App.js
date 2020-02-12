@@ -2,6 +2,7 @@ const React = require('react');
 const YAML = require('js-yaml');
 
 const stateHandler = require('../state/index');
+const ExportToWordButton = require('./layout/ExportToWordButton');
 const SidebarComponent = require('./layout/SidebarComponent');
 const ProcedureViewerComponent = require('./pages/ProcedureViewerComponent');
 const ProcedureSelectorComponent = require('./pages/ProcedureSelectorComponent');
@@ -65,7 +66,10 @@ class App extends React.Component {
 		return (
 			<React.Fragment>
 				<header id='main-header'>
-					<h1>Maestro</h1>
+					<h1 style={{ float: 'left' }}>Maestro</h1>
+					<div style={{ float: 'right', margin: '20px 20px 0 0' }}>
+						<ExportToWordButton procedureFile={this.state.procedureFile} />
+					</div>
 				</header>
 				<div id='sidebar-and-content-wrapper'>
 					<div id="sidebar">
