@@ -2,6 +2,7 @@
 
 const fs = require('fs');
 const svg2img = require('svg2img');
+const envHelper = require('../../helpers/envHelper');
 const objectHelper = require('../../helpers/objectHelper');
 const TimelineWriter = require('./TimelineWriter');
 
@@ -231,21 +232,30 @@ module.exports = class SvgTimelineWriter extends TimelineWriter {
 	 */
 	create() {
 
-		// svgdom returns 'new Window()'. We don't want to get a reference to the same Window object
-		// on all uses. We want a new window each time. Get the Window constructor and construct our
-		// own new Window.
-		const WindowConstructor = require('svgdom').constructor;
-		const window = new WindowConstructor();
+		// If in a browser context (electron or other) use native window object
+		if (typeof window !== 'undefined' && window.isElectron || envHelper.isBrowser) {
 
-		// When SVG timeline extends generic timeline, move this to top of file
-		const document = window.document;
-		const { SVG, registerWindow } = require('@svgdotjs/svg.js');
+			const { SVG } = require('@svgdotjs/svg.js');
+			this.canvas = SVG().size(this.imageWidth, this.imageHeight);
 
-		// register window and document
-		registerWindow(window, document);
+		// In Node context, fabricate a window object
+		} else {
+			// svgdom returns 'new Window()'. We don't want to get a reference to the same Window
+			// object on all uses. We want a new window each time. Get the Window constructor and
+			// construct our own new Window.
+			const WindowConstructor = require('svgdom').constructor;
+			const window = new WindowConstructor();
 
-		// create canvas
-		this.canvas = SVG(document.documentElement).size(this.imageWidth, this.imageHeight);
+			// When SVG timeline extends generic timeline, move this to top of file
+			const document = window.document;
+			const { SVG, registerWindow } = require('@svgdotjs/svg.js');
+
+			// register window and document
+			registerWindow(window, document);
+
+			// create canvas
+			this.canvas = SVG().size(this.imageWidth, this.imageHeight);
+		}
 
 		// Create the underlying lines and text for the timeline (not tasks themselves)
 		addTimelineMarkings(this);
@@ -284,7 +294,16 @@ module.exports = class SvgTimelineWriter extends TimelineWriter {
 				if (error) {
 					throw error;
 				}
-				fs.writeFileSync(filename, buffer);
+				const isBase64 = typeof buffer.indexOf === 'function' &&
+					buffer.indexOf('data:image/png;base64,') !== -1;
+
+				if (isBase64) {
+					buffer = buffer.replace(/^data:image\/png;base64,/, '');
+				}
+
+				const options = isBase64 ? { encoding: 'base64' } : undefined;
+
+				fs.writeFileSync(filename, buffer, options);
 				callback(dimensions);
 			}
 		);
