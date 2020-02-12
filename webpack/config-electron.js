@@ -1,5 +1,5 @@
 const path = require('path');
-// const webpack = require('webpack');
+const webpack = require('webpack');
 
 // common config between web and electron
 const moduleRules = require('./common/module-rules');
@@ -26,7 +26,17 @@ module.exports = {
 
 	// Electron does not need to supply the mocks for things like fs, child_process, etc, since it
 	// has the full Node.js API.
-	plugins: [],
+	// But it doesn't need the node canvas element
+	plugins: [
+		new webpack.NormalModuleReplacementPlugin(
+			/^svg2img$/,
+			path.resolve(__dirname, '../app/web/mocks/svg2img.js')
+		),
+		new webpack.NormalModuleReplacementPlugin(
+			/^svgdom$/,
+			path.resolve(__dirname, '../app/web/mocks/svgdom.js')
+		)
+	],
 
 	context: configContext,
 	module: { rules: moduleRules }

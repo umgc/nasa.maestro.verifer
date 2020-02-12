@@ -36,6 +36,14 @@ module.exports = {
 			path.resolve(__dirname, '../app/web/mocks/child_process.js')
 		),
 		new webpack.NormalModuleReplacementPlugin(
+			/^svg2img$/,
+			path.resolve(__dirname, '../app/web/mocks/svg2img.js')
+		),
+		new webpack.NormalModuleReplacementPlugin(
+			/^svgdom$/,
+			path.resolve(__dirname, '../app/web/mocks/svgdom.js')
+		),
+		new webpack.NormalModuleReplacementPlugin(
 			/^.*\/envHelper$/,
 			path.resolve(__dirname, '../app/web/mocks/envHelper.js')
 		),
