@@ -49,6 +49,7 @@ function getMenuTemplate(window) {
 		menu('File', [
 			{
 				label: 'Open',
+				accelerator: 'CmdOrCtrl+O',
 				click: async() => {
 					dialog.showOpenDialog({ properties: ['openFile'] })
 						.then((result) => {
