@@ -2,11 +2,6 @@ const React = require('react');
 const PropTypes = require('prop-types');
 const exitCodes = require('../../../helpers/exitCodes');
 
-// FIXME cleansup all theses
-// const CommanderProgram = require('../../../model/CommanderProgram');
-// const Procedure = require('../../../model/Procedure');
-// const Program = require('../../../model/Program');
-// const EvaDocxProcedureWriter = require('../../../writer/procedure/EvaDocxProcedureWriter');
 const stateHandler = require('../../state/index');
 
 class ExportToWordButton extends React.Component {
@@ -82,47 +77,36 @@ class ExportToWordButton extends React.Component {
 
 	}
 
+	createSpan(text, bold = false) {
+		const style = { color: 'white' };
+		if (bold) {
+			style.fontWeight = 'bold';
+		}
+
+		return <span style={style}>
+			{text}
+		</span>;
+	}
+
 	render() {
 		if (!this.props.procedureFile) {
 			return null;
 		}
-		let element;
 		switch (this.state.exportStatus) {
 			case 'EXPORTING':
-				element = <span style={{ color: 'white' }}>
-					Exporting...this will take a few seconds
-				</span>;
-				break;
+				return this.createSpan('Exporting...this will take a few seconds');
 			case 'EXPORT_ERROR':
-				element = (
-					<span style={{ color: 'white', fontWeight: 'bold ' }}>
-						ERROR during export!
-					</span>
-				);
-				break;
+				return this.createSpan('ERROR during export!', true);
 			case 'EXPORT_ERROR_FILE_OPEN':
-				element = (
-					<span style={{ color: 'white', fontWeight: 'bold ' }}>
-						ERROR: Close file in Word prior to export
-					</span>
-				);
-				break;
+				return this.createSpan('ERROR: Close file in Word prior to export', true);
 			case 'EXPORT_SUCCESS':
-				element = (
-					<span style={{ color: 'white', fontWeight: 'bold ' }}>
-						Successfully exported!
-					</span>
-				);
-				break;
+				return this.createSpan('Successfully exported!', true);
 			default:
 				// case 'READY':
-				element = <a id='export-to-word-link' onClick={this.exportToWord}>
+				return <a id='export-to-word-link' onClick={this.exportToWord}>
 					Export to Word
 				</a>;
-				break;
 		}
-
-		return element;
 	}
 
 }
