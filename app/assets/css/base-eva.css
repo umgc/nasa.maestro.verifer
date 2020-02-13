@@ -430,28 +430,36 @@ input.error {
 	border: solid red 2px;
 }
 
-#export-to-word-link {
+.meastro-header-link {
 	color: white;
 }
 
-#export-to-word-link:visited {
+.meastro-header-link:visited {
 	color: white;
 }
 
-#export-to-word-link:focus {
+.meastro-header-link:focus {
 	color: white;
-	font-weight: bold;
+	/**
+	 * Was: font-weight: bold;
+	 *
+	 * Bold on header link hover shifts all the other header links position. There's definitely a
+	 * good way to handle this with CSS, but in the interest of time, just use underline for now.
+	 */
+	text-decoration: underline;
 }
 
-#export-to-word-link:hover {
+.meastro-header-link:hover {
 	color: white;
-	font-weight: bold;
+	/* font-weight: bold; see note above about bold here */
+	text-decoration: underline;
 	cursor: pointer;
 }
 
-#export-to-word-link:active {
+.meastro-header-link:active {
 	color: white;
-	font-weight: bold;
+	/* font-weight: bold; see note above about bold here */
+	text-decoration: underline;
 }
 
 #modal-close {

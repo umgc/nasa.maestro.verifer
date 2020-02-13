@@ -78,7 +78,7 @@ const DivisionMetaForm = ({ division, editorOptions }) => {
 	};
 
 	const handleCloseEditorClick = () => {
-		stateHandler.unsetEditorNode();
+		stateHandler.unsetEditorNode('DivisionMetaForm handleCloseEditorClick()');
 	};
 
 	const handleDeleteClick = () => {
@@ -91,7 +91,7 @@ const DivisionMetaForm = ({ division, editorOptions }) => {
 		activity.deleteDivision(divisionIndex);
 
 		stateHandler.saveChange(activityIndex);
-		stateHandler.unsetEditorNode();
+		stateHandler.unsetEditorNode('DivisionMetaForm handleDeleteClick()');
 	};
 
 	// validate={insertFunction}

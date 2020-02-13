@@ -65,7 +65,7 @@ class DivisionControlsComponent extends React.PureComponent {
 			.getDivisionByUuid(this.props.divisionUuid, true);
 
 		if (stateHandler.state.editorNode === division) {
-			stateHandler.unsetEditorNode();
+			stateHandler.unsetEditorNode('DivisionControlComponent componentWillUnmount()');
 		}
 	}
 

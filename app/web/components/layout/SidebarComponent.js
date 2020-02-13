@@ -9,6 +9,7 @@ const React = require('react');
 const stateHandler = require('../../state/index');
 
 const ActivityMetaForm = require('./ActivityMetaForm');
+const ViewChangesCommitForm = require('./ViewChangesCommitForm');
 const DivisionMetaForm = require('./DivisionMetaForm');
 
 class SidebarComponent extends React.Component {
@@ -19,18 +20,38 @@ class SidebarComponent extends React.Component {
 
 	constructor(props) {
 		super(props);
+
+		// FIXME this should just set a state.editorNode value rather than having functions to set
+		// state within this component.
 		stateHandler.setEditorNode = (editorNode, options = {}) => {
 			console.log('setEditorNode() -->', editorNode);
+			// stateHandler.setState({ editorNode: editorNode, editorNodeOptions: options });
 			this.setState({ editorNode: editorNode, editorNodeOptions: options });
 		};
-		stateHandler.unsetEditorNode = () => {
-			console.log('unsetEditorNode()');
+		stateHandler.unsetEditorNode = (msg = 'no message') => {
+			console.log(`unsetEditorNode('${msg}')`);
+			// stateHandler.setState({ editorNode: null, editorNodeOptions: {} });
 			this.setState({ editorNode: null, editorNodeOptions: {} });
+		};
+		stateHandler.getEditorNode = () => {
+			return this.state.editorNode;
 		};
 	}
 
 	render() {
-		for (const model of ['Step', 'Series', 'ConcurrentStep', 'Task', 'Procedure']) {
+		const models = [
+			'Step',
+			'Series',
+			'ConcurrentStep',
+			'Task',
+			'Procedure',
+
+			// FIXME: At this time, this is not a true model but will be faked with an object in the
+			// form { constructor: { name: 'ViewChanges' } }. SidebarComponent should be made more
+			// flexible so hacks like this are not necessary.
+			'ViewChanges'
+		];
+		for (const model of models) {
 			// if (this.state.editorNode instanceof model) {
 			if (this.state.editorNode && this.state.editorNode.constructor &&
 				this.state.editorNode.constructor.name === model
@@ -65,6 +86,10 @@ class SidebarComponent extends React.Component {
 
 	renderStepNode() {
 		return <div>Sidebar Step editor not yet available</div>;
+	}
+
+	renderViewChangesNode() {
+		return <ViewChangesCommitForm editorOptions={this.state.editorNodeOptions} />;
 	}
 
 	renderNoEditorNode() {
