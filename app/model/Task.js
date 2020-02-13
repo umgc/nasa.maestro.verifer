@@ -1,7 +1,7 @@
 'use strict';
 
 const uuidv4 = require('uuid/v4');
-const filenamify = require('filenamify');
+// const filenamify = require('filenamify');
 
 const Duration = require('./Duration');
 const ConcurrentStep = require('./ConcurrentStep');
@@ -10,6 +10,7 @@ const TaskRequirements = require('./TaskRequirements');
 const consoleHelper = require('../helpers/consoleHelper');
 const arrayHelper = require('../helpers/arrayHelper');
 const typeHelper = require('../helpers/typeHelper');
+const yamlFileNamify = require('../helpers/yamlFileNamify');
 const subscriptionHelper = require('../helpers/subscriptionHelper');
 
 const validTimeTypes = ['startTime', 'endTime', 'duration'];
@@ -231,7 +232,7 @@ module.exports = class Task {
 	}
 
 	formatTitleToFilename(titleToFormat) {
-		return filenamify(titleToFormat.replace(/\s+/g, '_') + '.yml');
+		return yamlFileNamify(titleToFormat);
 		// this.TaskReqs.setFile(filename);
 	}
 

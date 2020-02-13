@@ -5,10 +5,30 @@ const path = require('path');
 const YAML = require('js-yaml');
 const jsdiff = require('diff');
 
+const subscriptionHelper = require('../../helpers/subscriptionHelper');
+
 const state = {};
+const subscriberFns = {};
 
 // FIXME should this be in state too?
 const changesDiffs = [];
+
+/**
+ *
+ * @param {*} stateProp           - Property to subscribe to changes to, e.g. this.state.someprop
+ * @param {Function} subscriberFn - Function to run when value of prop changed
+ * @return {Function}             - Unsubscribe function
+ */
+function subscribe(stateProp, subscriberFn) {
+	if (!subscriberFns[stateProp]) {
+		subscriberFns[stateProp] = [];
+	}
+	const unsubscribeFn = subscriptionHelper.subscribe(
+		subscriberFn,
+		subscriberFns[stateProp]
+	);
+	return unsubscribeFn;
+}
 
 /**
  *
@@ -18,8 +38,10 @@ function setState(changes) {
 	for (const prop in changes) {
 		const change = changes[prop];
 		state[prop] = change;
+		if (subscriberFns[prop] && subscriberFns[prop].length > 0) {
+			subscriptionHelper.run(subscriberFns[prop], change);
+		}
 	}
-	// FIXME add subscription
 }
 
 /**
@@ -240,6 +262,7 @@ function saveProcedureChange() {
 module.exports = {
 	state: state,
 	setState: setState,
+	subscribe: subscribe,
 	saveChange: saveChange,
 	saveProcedureChange: saveProcedureChange,
 	recordAndReportChange: recordAndReportChange,

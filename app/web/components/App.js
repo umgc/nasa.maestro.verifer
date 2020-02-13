@@ -4,6 +4,7 @@ const YAML = require('js-yaml');
 const stateHandler = require('../state/index');
 const ExportToWordButton = require('./layout/ExportToWordButton');
 const SidebarComponent = require('./layout/SidebarComponent');
+const Modal = require('./layout/Modal');
 const ProcedureViewerComponent = require('./pages/ProcedureViewerComponent');
 const ProcedureSelectorComponent = require('./pages/ProcedureSelectorComponent');
 const ReactProcedureWriter = require('../../writer/procedure/ReactProcedureWriter');
@@ -86,6 +87,9 @@ class App extends React.Component {
 						}
 					</div>
 				</div>
+				<Modal>
+					<div style={{ backgroundColor: 'green' }}>this is a test</div>
+				</Modal>
 			</React.Fragment>
 		);
 	}

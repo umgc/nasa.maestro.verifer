@@ -15,7 +15,7 @@ module.exports = class ElectronProgram extends Program {
 	}
 
 	loadProcedure(procedureFilepath) {
-		console.log('running load program');
+		console.log('running load procedure from file');
 		const projectPath = path.dirname(path.dirname(procedureFilepath));
 		this.setPathsFromProject(projectPath);
 
@@ -24,6 +24,34 @@ module.exports = class ElectronProgram extends Program {
 			alwaysShowWildcardColumn: true
 		});
 		this.procedure.addProcedureDefinitionFromFile(procedureFilepath);
+
+		this.reactAppComponent.setProcedure(this.procedure);
+	}
+
+	loadProcedureFromDefinition(projectPath, procedureFileName, definition) {
+		console.log('running load procedure from definition');
+		this.setPathsFromProject(projectPath);
+
+		this.procedure = new Procedure({
+			alwaysShowRoleColumns: true,
+			alwaysShowWildcardColumn: true
+		});
+
+		this.procedure.procedureFile = procedureFileName;
+		this.procedure.procedureFilepath = path.join(projectPath, 'procedures', procedureFileName);
+
+		const procErr = this.procedure.addProcedureDefinition(definition.procedureDefinition);
+		if (procErr) {
+			return procErr;
+		}
+
+		const taskErr = this.procedure.updateTaskDefinitions(definition.taskDefinitions);
+		if (taskErr) {
+			throw taskErr;
+		}
+
+		this.procedure.setupTimeSync();
+		this.procedure.setupIndex();
 
 		this.reactAppComponent.setProcedure(this.procedure);
 	}
