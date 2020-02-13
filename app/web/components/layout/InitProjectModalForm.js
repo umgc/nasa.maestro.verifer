@@ -45,6 +45,7 @@ const InitProjectModalForm = () => {
 			fs.mkdirSync(path.join(newProjectPath, 'procedures'));
 			fs.mkdirSync(path.join(newProjectPath, 'tasks'));
 			fs.mkdirSync(path.join(newProjectPath, 'images'));
+			fs.writeFileSync(path.join(newProjectPath, '.gitignore'), 'build/*');
 		} catch (err) {
 			console.error(err); // need a way to "console.error() to the UI"
 			return;

@@ -14,6 +14,8 @@ const isRGBstring = (value) => (/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(value)
 	undefined : 'Must be a color string');
 const minLength = (min) => (value) => (typeof value === 'string' && value.length >= min ?
 	undefined : `Must be at least ${min} characters`);
+const maxLength = (max) => (value) => (typeof value === 'string' && value.length <= max ?
+	undefined : `Must be at no more than ${max} characters`);
 
 const composeValidators = (...validators) => (value) =>
 	validators.reduce((error, validator) => error || validator(value), undefined);
@@ -120,6 +122,7 @@ module.exports = {
 		minValue,
 		isZeroish,
 		isRGBstring,
-		minLength
+		minLength,
+		maxLength
 	}
 };

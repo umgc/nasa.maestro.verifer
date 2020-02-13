@@ -3,10 +3,12 @@ const YAML = require('js-yaml');
 
 const stateHandler = require('../state/index');
 const ExportToWordButton = require('./layout/ExportToWordButton');
+const ViewChangesButton = require('./layout/ViewChangesButton');
 const SidebarComponent = require('./layout/SidebarComponent');
 const Modal = require('./layout/Modal');
 const ProcedureViewerComponent = require('./pages/ProcedureViewerComponent');
 const ProcedureSelectorComponent = require('./pages/ProcedureSelectorComponent');
+const GitDiffContentPanel = require('./pages/GitDiffContentPanel');
 const ReactProcedureWriter = require('../../writer/procedure/ReactProcedureWriter');
 
 class App extends React.Component {
@@ -14,6 +16,9 @@ class App extends React.Component {
 	constructor() {
 		super();
 		window.appComponent = this;
+		stateHandler.subscribe('contentView', () => {
+			this.forceUpdate();
+		});
 	}
 
 	state = {
@@ -53,6 +58,18 @@ class App extends React.Component {
 		this.program = program;
 	}
 
+	renderProcedure() {
+		if (!stateHandler.state.contentView) {
+			return <ProcedureViewerComponent
+				procedureFile={this.state.procedureFile}
+			/>;
+		} else if (stateHandler.state.contentView === 'ViewChanges') {
+			return <GitDiffContentPanel />;
+		} else {
+			return <div>Unknown content selected</div>;
+		}
+	}
+
 	renderNoProcedure() {
 		if (window.isElectron) {
 			return (<p>Please select a procedure file from the file:open menu</p>);
@@ -71,6 +88,9 @@ class App extends React.Component {
 					<div style={{ float: 'right', margin: '20px 20px 0 0' }}>
 						<ExportToWordButton procedureFile={this.state.procedureFile} />
 					</div>
+					<div style={{ float: 'right', margin: '20px 20px 0 0' }}>
+						<ViewChangesButton procedureFile={this.state.procedureFile} />
+					</div>
 				</header>
 				<div id='sidebar-and-content-wrapper'>
 					<div id="sidebar">
@@ -78,12 +98,7 @@ class App extends React.Component {
 					</div>
 					<div id='content'>
 						{typeof this.state.procedureFile === 'string' ?
-							(
-								<ProcedureViewerComponent
-									procedureFile={this.state.procedureFile}
-								/>
-							) :
-							this.renderNoProcedure()
+							this.renderProcedure() : this.renderNoProcedure()
 						}
 					</div>
 				</div>

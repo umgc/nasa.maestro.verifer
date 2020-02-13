@@ -68,7 +68,11 @@ class SummaryTimelineComponent extends React.Component {
 		for (const unsubscribe of this.unsubscribeFns) {
 			unsubscribe(); // run each unsubscribe function
 		}
-		stateHandler.unsetEditorNode();
+
+		const editorNode = stateHandler.getEditorNode();
+		if (editorNode && editorNode.constructor && editorNode.constructor.name === 'Task') {
+			stateHandler.unsetEditorNode('SummaryTimelineComponent componentWillUnmount()');
+		}
 	}
 
 	render() {

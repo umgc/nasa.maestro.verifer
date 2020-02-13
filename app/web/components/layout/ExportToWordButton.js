@@ -103,7 +103,7 @@ class ExportToWordButton extends React.Component {
 				return this.createSpan('Successfully exported!', true);
 			default:
 				// case 'READY':
-				return <a id='export-to-word-link' onClick={this.exportToWord}>
+				return <a className='meastro-header-link' onClick={this.exportToWord}>
 					Export to Word
 				</a>;
 		}

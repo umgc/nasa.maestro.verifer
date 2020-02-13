@@ -157,7 +157,7 @@ const ActivityMetaForm = ({ task }) => {
 			.getTaskIndexByUuid(task.uuid);
 		stateHandler.state.procedure.TasksHandler.deleteTask(taskIndex);
 		stateHandler.saveProcedureChange();
-		stateHandler.unsetEditorNode();
+		stateHandler.unsetEditorNode('ActivityMetaForm handleDeleteClick()');
 	};
 
 	React.useEffect(() => {

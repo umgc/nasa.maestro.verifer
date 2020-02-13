@@ -1,5 +1,7 @@
 'use strict';
 
+const os = require('os');
+const fs = require('fs');
 const path = require('path');
 const childProcess = require('child_process');
 const shell = require('electron').shell;
@@ -7,6 +9,13 @@ const shell = require('electron').shell;
 const { ipcRenderer } = require('electron');
 
 const ElectronProgram = require('../model/ElectronProgram');
+
+const gitCmd = function(projectPath, cmd) {
+	return childProcess
+		.execSync(`cd ${projectPath} && ${cmd}`)
+		.toString()
+		.trim();
+};
 
 // Handles fresult of selecting a procedure file after doing File-->Open
 // FIXME: No error handling for invalid file (i.e. not a procedure file)
@@ -81,6 +90,104 @@ window.maestro.initGitRepoAndFirstCommit = function(projectPath) {
 			return { error, output };
 		}
 	}
+	return { output };
+};
+
+// FIXME see above
+window.maestro.getGitDiff = function() {
+	const projectPath = window.maestro.app.projectPath;
+
+	const output = [];
+	const commands = [
+		'git add .',
+		'git diff --staged'
+	];
+
+	for (const cmd of commands) {
+		try {
+			console.log(`Running git command on new repository: ${cmd}`);
+			output.push(
+				// FIXME don't use sync version here
+				childProcess
+					.execSync(`cd ${projectPath} && ${cmd}`)
+					.toString()
+					.trim()
+			);
+		} catch (error) {
+			console.error(error);
+			return { error, output };
+		}
+	}
+	return { output };
+};
+
+// FIXME see above
+window.maestro.gitCommit = function(summary, description = '') {
+	const projectPath = window.maestro.app.projectPath;
+
+	let commitMsg = summary.trim();
+	if (description) {
+		commitMsg += `\n\n${description.trim()}`;
+	}
+
+	const commitMsgFile = path.join(projectPath, '.commitmsg');
+	fs.writeFileSync(commitMsgFile, commitMsg);
+
+	const output = [];
+	const commands = [];
+
+	const username = os.userInfo().username;
+	let branches, currentBranch, userChangesBranch;
+	if (username) {
+		userChangesBranch = `${username}-changes`;
+		branches = gitCmd(projectPath, 'git branch').split('\n')
+			.map((branch) => {
+				if (branch[0] === '*') {
+					currentBranch = branch.substr(2); // trim off the "* " before the current branch
+					return currentBranch;
+				} else {
+					return branch.trim();
+				}
+			});
+		if (!currentBranch) {
+			throw new Error('Somehow there is no current branch');
+		} else if (currentBranch === userChangesBranch) {
+			console.log('already on desired branch');
+		} else if (branches.indexOf(userChangesBranch) !== -1) {
+			// For now do nothing here. May be able to do something more here at some point...
+			console.log('Desired branch exists and is not the current branch');
+		} else {
+			console.log('Not on current branch, and it doesn\'t exist. Create and use it.');
+			commands.push(`git checkout -b ${userChangesBranch}`);
+		}
+	}
+
+	commands.push('git commit -F .commitmsg');
+
+	const remotes = gitCmd(projectPath, 'git remote');
+	if (remotes && remotes.indexOf('origin') !== -1) {
+		commands.push(`git push origin ${userChangesBranch}`);
+	}
+
+	const stateHandler = window.maestro.state;
+	for (const cmd of commands) {
+		try {
+			console.log(`Running git command on new repository: ${cmd}`);
+			const result = gitCmd(projectPath, cmd);
+
+			// since the above git command is blocking, this won't likely show each change. This
+			// will be fixed when these are made async.
+			stateHandler.setState({
+				ViewChangesProgress: stateHandler.state.ViewChangesProgress + '\n\n' + result
+			});
+			output.push(result);
+		} catch (error) {
+			console.error(error);
+			return { error, output };
+		}
+	}
+
+	fs.unlinkSync(commitMsgFile);
 	return { output };
 };
 
