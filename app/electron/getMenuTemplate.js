@@ -53,9 +53,27 @@ function getMenuTemplate(window) {
 				click: async() => {
 					dialog.showOpenDialog({ properties: ['openFile'] })
 						.then((result) => {
-							console.log(result);
-							window.webContents.send('procedureSelected', result.filePaths[0]);
+							console.log('openProject --> result', result);
+							if (!result.canceled) {
+								window.webContents.send('procedureSelected', result.filePaths[0]);
+							}
 						}).catch((err) => {
+							console.log('error after dialog');
+							console.log(err);
+						});
+				}
+			},
+			{
+				label: 'New Project',
+				click: async() => {
+					dialog.showOpenDialog({ properties: ['openDirectory'] })
+						.then((result) => {
+							console.log('initNewProject --> result', result);
+							if (!result.canceled) {
+								window.webContents.send('initNewProject', result.filePaths[0]);
+							}
+						}).catch((err) => {
+							console.log('error after dialog');
 							console.log(err);
 						});
 				}

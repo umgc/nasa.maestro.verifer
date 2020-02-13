@@ -69,7 +69,7 @@ module.exports = class TaskRequirements {
 		return {
 			file: this.file,
 			roles: this.cloneRoles(this.roles),
-			color: this.color
+			color: this.color || '#FFFFFF'
 		};
 	}
 

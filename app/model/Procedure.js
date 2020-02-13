@@ -215,6 +215,7 @@ module.exports = class Procedure {
 		this.name = value;
 		this.filename = filenamify(value.replace(/\s+/g, '_')); // FIXME this doesn't have .yml ?!?!
 		// FIXME also how does this jive with this.procedureFile
+		// use helpers/yamlFileNamify
 	}
 
 	/**
