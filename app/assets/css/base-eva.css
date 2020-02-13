@@ -401,9 +401,6 @@ img {
     position: relative;
 }
 
-.sidebar-form input {
-}
-
 .field-row {
 	display: flex;
 	flex-flow: row nowrap;
@@ -431,4 +428,28 @@ img {
 
 input.error {
 	border: solid red 2px;
+}
+
+#export-to-word-link {
+	color: white;
+}
+
+#export-to-word-link:visited {
+	color: white;
+}
+
+#export-to-word-link:focus {
+	color: white;
+	font-weight: bold;
+}
+
+#export-to-word-link:hover {
+	color: white;
+	font-weight: bold;
+	cursor: pointer;
+}
+
+#export-to-word-link:active {
+	color: white;
+	font-weight: bold;
 }

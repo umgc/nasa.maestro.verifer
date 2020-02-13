@@ -12,6 +12,7 @@ if (!window.maestro) {
 	window.maestro = {};
 }
 
+window.maestro.state = require('../app/web/state/index');
 window.maestro.reactStepModuleFunctions = {};
 
 for (const mod of stepModules) {
