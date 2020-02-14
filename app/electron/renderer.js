@@ -182,6 +182,7 @@ window.maestro.gitCommit = function(summary, description = '') {
 			});
 			output.push(result);
 		} catch (error) {
+			fs.unlinkSync(commitMsgFile); // FIXME this should be a temp file not in project repo
 			console.error(error);
 			return { error, output };
 		}
