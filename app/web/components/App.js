@@ -84,7 +84,11 @@ class App extends React.Component {
 		return (
 			<React.Fragment>
 				<header id='main-header'>
-					<h1 style={{ float: 'left' }}>Maestro</h1>
+					<h1 style={{ float: 'left', marginLeft: '10px' }}>
+						Maestro <span style={{ fontSize: '12px' }}>
+							{this.program ? `v${this.program.version}` : null }
+						</span>
+					</h1>
 					<div style={{ float: 'right', margin: '20px 20px 0 0' }}>
 						<ExportToWordButton procedureFile={this.state.procedureFile} />
 					</div>
