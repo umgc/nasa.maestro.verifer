@@ -7,9 +7,68 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "Launch Program",
-            "program": "${workspaceFolder}/src\\index.js",
-            "args": ["-i src/samples/sta-134-eva/main.yml -o src/samples/sta-134-eva/sta-134-eva.html"]
+            "name": "Launch Maestro Compose Html",
+            "program": "${workspaceFolder}/index.js",
+            "args": [
+                "compose", 
+                "${workspaceFolder}/samples/sts-134",
+                "--html"],
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch Maestro Compose Eva-docx",
+            "program": "${workspaceFolder}/index.js",
+            "args": [
+                "compose", 
+                "${workspaceFolder}/samples/sts-134",
+                "--eva-docx"],
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch Maestro Compose sodf",
+            "program": "${workspaceFolder}/index.js",
+            "args": [
+                "compose", 
+                "${workspaceFolder}/samples/sts-134",
+                "--sodf"],
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
+        },
+        
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch Maestro Compose All",
+            "program": "${workspaceFolder}/index.js",
+            "args": [
+                "compose", 
+                "${workspaceFolder}/samples/sts-134",
+                "--all"],
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
+        },
+
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch Maestro Conduct",
+            "program": "${workspaceFolder}/index.js",
+            "args": [
+                "conduct", 
+                "${workspaceFolder}/samples/sts-134"],
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
         }
     ]
 }
