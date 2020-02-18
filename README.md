@@ -143,6 +143,14 @@ A pre-commit hook is in place forcing linting, style, and unit testing to all pa
 
 James Montalvo
 
+### UMUC Phase III Development Team, Spring 2020
+- Alberto L. Bonfiglio DVM
+- Rick Stuart
+- Beatrice Oluwabuyi
+- Jacquetta Reid
+- Kenya Foster
+
+TBD
 ### UMUC Phase III Development Team, Fall 2019
 
 TBD
