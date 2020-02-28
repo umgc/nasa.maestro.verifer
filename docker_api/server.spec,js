@@ -1,0 +1,7 @@
+/* Specify environment to include mocha globals */
+/* eslint-env node, mocha */
+
+'use strict';
+
+const assert = require('chai').assert;
+const expect = require('chai').expect;
