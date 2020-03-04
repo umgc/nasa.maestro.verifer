@@ -99,3 +99,15 @@ RUN groupadd --gid ${MAESTRO_USER_GID} maestro \
   && useradd --uid ${MAESTRO_USER_UID} --gid maestro --shell /bin/bash --home /maestro --no-create-home maestro \
   && mkdir /maestro \
   && chown maestro: /maestro
+
+# |--------------------------------------------------------------------------
+# | Installs Nodejs, the app and sets up the port
+# |--------------------------------------------------------------------------
+# |
+RUN mkdir -p /usr/src/app
+WORKDIR /usr/src/app
+COPY . .
+RUN npm install
+EXPOSE 3000
+
+CMD ["npm", "run", "start"]
