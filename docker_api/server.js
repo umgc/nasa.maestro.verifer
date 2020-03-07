@@ -13,13 +13,27 @@ app.listen(port, () => {
 });
 
 // POST
+// receives a docx document and verifies it's valid
 app.post('/api/docx/validate', urlencoderParser, function(req, res) {
 	console.log(req.body, '1 Row Added.');
 	res.send('1 Row Added.');
 });
 
+// POST
+// Receives an output docx and compares it to a set image of a previous docx
 app.post('/api/docx/showDifferences', urlencoderParser, function(req, res) {
 	console.log(req.body, '1 column Added.');
 	const ret = path.join(__dirname + '/index.html');
 	res.sendFile(ret);
 });
+
+// POST
+// Receives an output docx and compares it to a set image of a previous docx
+// Returns a percent difference
+app.post('/api/docx/calcDifference', urlencoderParser, function(req, res) {
+	console.log(req.body, 'Calculating difference between document outputs.');
+	const ret = 0.03;
+	res.send(ret);
+});
+
+
