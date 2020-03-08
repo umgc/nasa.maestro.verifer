@@ -1,3 +1,5 @@
+'use strict';
+
 /* eslint-disable no-mixed-spaces-and-tabs */
 /* eslint-disable max-len */
 import Rembrandt from 'rembrandt';

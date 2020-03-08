@@ -1,9 +1,11 @@
+#!/usr/bin/env node
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
-import CheckerService from './app/checkerService.js';
 import fileUpload from 'express-fileupload';
-import unoconv from 'unoconv2';
+
+import CheckerService from './checkerService.js';
+import UnoService from './unoListener.js';
 
 // TODO refactor to implement dependency injection https://blog.risingstack.com/dependency-injection-in-node-js/
 
@@ -11,7 +13,7 @@ const app = express();
 const urlencoderParser = bodyParser.json();
 const port = process.env.port || 3000;
 const svc = new CheckerService();
-const unoListener = unoconv.listen();
+const unoSvc = new UnoService().listen();
 
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -19,7 +21,7 @@ app.use(bodyParser.json());
 app.use(fileUpload({ createParentPath: true }));
 
 // Starts the unoconv listener
-unoListener.stderr.on('data', (data) => {
+unoSvc.stderr.on('data', (data) => {
 	console.log('stderr: ' + data.toString('utf8'));
 });
 
@@ -53,3 +55,4 @@ app.post('/api/docx/checkDifference', urlencoderParser, async(req, res) => {
 		});
 	}
 });
+

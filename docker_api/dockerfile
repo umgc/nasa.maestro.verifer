@@ -1,7 +1,7 @@
 FROM node:buster-slim
 
 # |--------------------------------------------------------------------------
-# | Common libraries
+# | Common libraries and dependencies for conversion to img
 # |--------------------------------------------------------------------------
 RUN echo "deb http://httpredir.debian.org/debian/ buster main contrib non-free" > /etc/apt/sources.list &&\
     apt-get update &&\
