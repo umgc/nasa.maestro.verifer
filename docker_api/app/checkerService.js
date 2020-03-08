@@ -4,8 +4,8 @@ import Rembrandt from 'rembrandt';
 import path from 'path';
 import _ from 'lodash';
 import unoconv from 'unoconv-promise';
-
 import uuid from 'uuidv4';
+// import PDFImage from 'pdf-image';
 
 export default class CheckerService {
 	constructor() {
@@ -69,10 +69,8 @@ export default class CheckerService {
 			});
 			// move photo to uploads directory
 			docx.mv(`./uploads/${session}/${docx.name}`);
-			// this.convertDocxToPdf(session, docx);
+			this.convertDocxToPdf(session, docx);
 		});
-		this.convertDocxToPdf(session, uploads[0]);
-
 		console.log('[DEBUG] -- ', uploads);
 		return uploads;
 	}
@@ -87,6 +85,7 @@ export default class CheckerService {
 		})
 			.then((filePath) => {
 				console.log('convertPdf to img');
+				this.convertPdfToImg(session, docx);
 				console.log(filePath);
 			})
 			.catch((e) => {
@@ -97,8 +96,10 @@ export default class CheckerService {
 		console.log('convertDocxToPdf gets done here', docx.name);
 	}
 
-	convertDocxToImg(session, docs) {
-		console.log('convertDocxToImg TO BE IMPLEMENTED STILL!!', docs);
+	convertPdfToImg(session, doc) {
+		console.log('convertPdfToImg gets here', doc.name);
+
+		console.log('convertPdfToImg gets done here', doc.name);
 		return session;
 	}
 

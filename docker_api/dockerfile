@@ -5,7 +5,8 @@ FROM node:buster-slim
 # |--------------------------------------------------------------------------
 RUN echo "deb http://httpredir.debian.org/debian/ buster main contrib non-free" > /etc/apt/sources.list &&\
     apt-get update &&\
-    apt-get install -y curl wget gnupg ttf-mscorefonts-installer procps
+    apt-get install -y curl wget gnupg ttf-mscorefonts-installer procps \
+    && apt-get install -y imagemagick ghostscript poppler-utils
 
 # |--------------------------------------------------------------------------
 # | LibreOffice
