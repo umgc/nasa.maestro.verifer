@@ -3,7 +3,7 @@
 import Rembrandt from 'rembrandt';
 import path from 'path';
 import _ from 'lodash';
-import unoconvp from 'unoconv-promise';
+import unoconv from 'unoconv-promise';
 
 import uuid from 'uuidv4';
 
@@ -26,9 +26,9 @@ export default class CheckerService {
 
 			// Possibly move exceptions in private functions
 			// const data = this.convertDocxToImg(session, uploads);
-		
+
 			console.log('Gets here 1');
-			//this.processImages(session, data);
+			// this.processImages(session, data);
 			const rembrandt = new Rembrandt({
 				// `imageA` and `imageB` can be either Strings (file path on node.js, public url on Browsers) or Buffers
 				imageA: this.imageA, imageB: this.imageB,
@@ -50,11 +50,9 @@ export default class CheckerService {
 					return result;
 				})
 				.catch((e) => console.error(e));
-			
-			console.log(retVal);	
+			console.log(retVal);
 			return retVal;
-		}
-		catch (err) {
+		} catch (err) {
 			console.log(err);
 		}
 	}
@@ -71,7 +69,7 @@ export default class CheckerService {
 			});
 			// move photo to uploads directory
 			docx.mv(`./uploads/${session}/${docx.name}`);
-			//this.convertDocxToPdf(session, docx);
+			// this.convertDocxToPdf(session, docx);
 		});
 		this.convertDocxToPdf(session, uploads[0]);
 
@@ -79,31 +77,29 @@ export default class CheckerService {
 		return uploads;
 	}
 
-
-	convertDocxToPdf(session, docx){
+	convertDocxToPdf(session, docx) {
 		console.log('convertDocxToPdf gets here', docx.name);
-		//unoconv.convert(`./uploads/${session}/${docx.name}`, 'pdf')
-		
-		unoconvp.run({
+		// unoconv.convert(`./uploads/${session}/${docx.name}`, 'pdf')
+
+		unoconv.run({
 			file: `./uploads/${session}/${docx.name}`,
 			output: `./uploads/${session}/${docx.name}.pdf`
-			})
-			.then(filePath => {
+		})
+			.then((filePath) => {
 				console.log('convertPdf to img');
 				console.log(filePath);
 			})
-			.catch(e => {
+			.catch((e) => {
 				console.log('[DEBUG] Unoconv error --> ', e);
 				throw e;
 			});
-	
+
 		console.log('convertDocxToPdf gets done here', docx.name);
 	}
 
-
 	convertDocxToImg(session, docs) {
-		console.log('convertDocxToImg TO BE IMPLEMENTED STILL!!');
-		return session, docs;
+		console.log('convertDocxToImg TO BE IMPLEMENTED STILL!!', docs);
+		return session;
 	}
 
 	isValidDocxDocument(doc) {

@@ -4,6 +4,7 @@ import bodyParser from 'body-parser';
 import CheckerService from './app/checkerService.js';
 import fileUpload from 'express-fileupload';
 import unoconvp from 'unoconv-promise';
+
 // TODO refactor to implement dependency injection https://blog.risingstack.com/dependency-injection-in-node-js/
 
 const app = express();
