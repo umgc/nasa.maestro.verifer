@@ -1,18 +1,22 @@
 import express from 'express';
-import path from 'path';
+import cors from 'cors';
 import bodyParser from 'body-parser';
-import ImageChecker from './app/imageChecker.js';
-import { upload } from './app/uploadMiddleware.js';
+import CheckerService from './app/checkerService.js';
+import fileUpload from 'express-fileupload';
+import unoconvp from 'unoconv-promise';
+// TODO refactor to implement dependency injection https://blog.risingstack.com/dependency-injection-in-node-js/
 
 const app = express();
 const urlencoderParser = bodyParser.json();
 const port = process.env.port || 3000;
-// eslint-disable-next-line no-underscore-dangle
-const __dirname = path.resolve();
-const checker = new ImageChecker();
+const svc = new CheckerService();
 
+app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use(fileUpload({ createParentPath: true }));
+
+unoconvp.listen();
 
 // Api code here
 app.listen(port, () => {
@@ -28,25 +32,19 @@ app.post('/api/docx/validate', urlencoderParser, function(req, res) {
 
 // POST
 // Receives an output docx and compares it to a set image of a previous docx
-app.post('/api/docx/showDifferences', upload.single, function(req, res) {
-	console.log(req.body, '1 column Added.');
-	console.log(__dirname);
-	const ret = path.join(__dirname + '/index.html');
-	res.sendFile(ret);
-});
-
-// POST
-// Receives an output docx and compares it to a set image of a previous docx
 // Returns a percent difference
-app.post('/api/docx/checkDifference', urlencoderParser, function(req, res) {
+app.post('/api/docx/checkDifference', urlencoderParser, async(req, res) => {
 	console.log(req.body, 'Calculating difference between document outputs.');
-
-	checker.checkDifference(0.01, 0.02)
-		.then((result) => {
+	if (!req.files) {
+		res.send({ status: false, message: 'No file uploaded' });
+	} else {
+		svc.checkDifference(
+			req.files, req.body.threshold, req.body.delta, req.body.offset, req.body.render
+		).then((result) => {
 			console.log('retval => ', result);
 			res.send(result);
-		})
-		.catch((error) => {
+		}).catch((error) => {
 			res.status(500).send(error);
 		});
+	}
 });
