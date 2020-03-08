@@ -55,4 +55,3 @@ app.post('/api/docx/checkDifference', urlencoderParser, async(req, res) => {
 		});
 	}
 });
-

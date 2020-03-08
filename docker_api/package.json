@@ -4,15 +4,18 @@
   "description": "Dockerized WebAPI",
   "main": "./app/server.js",
   "type": "module",
+  
   "scripts": {
     "start": "nodemon ./app/server.js",
     "test": "env BABEL_ENV=test  mocha --no-config --timeout 10000"
   },
+  
   "author": "Alberto L. Bonfiglio",
+  
   "license": "ISC",
-  "eslintIgnore": [
-    "node_modules"
-  ],
+  
+  "eslintIgnore": ["node_modules"],
+  
   "babel": {
     "env": {
       "build": {
@@ -34,14 +37,11 @@
       }
     }
   },
+  
   "mocha": {
     "diff": true,
-    "extension": [
-      "js"
-    ],
-    "require": [
-      "@babel/register"
-    ],
+    "extension": ["js"],
+    "require": ["@babel/register"],
     "opts": false,
     "package": "./package.json",
     "reporter": "spec",
@@ -57,6 +57,7 @@
       "./node_modules/**"
     ]
   },
+  
   "dependencies": {
     "body-parser": "^1.19.0",
     "canvas": "^2.6.1",
@@ -70,6 +71,7 @@
     "unoconv-promise": "^1.0.8",
     "uuidv4": "^6.0.6"
   },
+
   "devDependencies": {
     "@babel/core": "^7.8.7",
     "babel-loader": "^8.0.6",

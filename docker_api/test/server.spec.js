@@ -1,9 +1,10 @@
-/* eslint-disable no-undef */
 'use strict';
 
 const chai = require('chai');
 
 chai.use(require('chai-http'));
+
+/*
 
 const app = require('../app/server.js'); // Our app
 
@@ -50,3 +51,4 @@ describe('API endpoint /checker', function() {
 			});
 	});
 });
+*/
