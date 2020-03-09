@@ -7,5 +7,7 @@
 **/api-docs/
 test/cases/**/build
 build/*
-**/uploads
-**/dist
+
+**/uploads/**
+**/dist/**
+**/samples/**

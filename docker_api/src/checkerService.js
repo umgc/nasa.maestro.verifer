@@ -1,113 +1,153 @@
 'use strict';
 
-/* eslint-disable no-mixed-spaces-and-tabs */
 /* eslint-disable max-len */
 import Rembrandt from 'rembrandt';
 import path from 'path';
 import _ from 'lodash';
 import unoconv from 'unoconv-promise';
 import uuid from 'uuidv4';
+
 // import PDFImage from 'pdf-image';
 
 export default class CheckerService {
 	constructor() {
-    	this.imageA = path.resolve() + '/img1.jpg';
-    	this.imageB = path.resolve() + '/img2.jpg';
+		this.imageA = path.resolve() + '/uploads/img1.jpg';
+		this.imageB = path.resolve() + '/uploads/img2.jpg';
 		console.log(this.imageA);
 	}
 
+	/**
+	 * checkDifference
+	 * @param {any} files The files from the request upload
+	 * @param {number} threshold defaults to 0
+	 * @param {number} delta defaults to 0
+	 * @param {number} offset defaults to 0
+	 * @param {boolean} render defaults to false
+	 * @return {[any]} an JSON object with the operation results
+	 */
 	async checkDifference(files, threshold = 0, delta = 0, offset = 0, render = false) {
 		try {
 			const session = uuid.uuid();
-			const uploads = this.saveUploadedFiles(session, files);
 
-			// Should throw an exception if not enough files
-			if (uploads.lenght < 2) {
-				throw new Error('Not enough files uploaded');
-			}
+			const pdfs = await this.saveUploadedFiles(session, files);
+			console.log('pdfs');
 
-			// Possibly move exceptions in private functions
-			// const data = this.convertDocxToImg(session, uploads);
+			const images = await this.convertFiles(session, pdfs);
 
-			console.log('Gets here 1');
-			// this.processImages(session, data);
-			const rembrandt = new Rembrandt({
-				// `imageA` and `imageB` can be either Strings (file path on node.js, public url on Browsers) or Buffers
-				imageA: this.imageA, imageB: this.imageB,
-				// imageB: fs.readFileSync('/path/to/imageB'),
-				thresholdType: Rembrandt.THRESHOLD_PERCENT, // either THRESHOLD_PERCENT or THRESHOLD_PIXELS
-				maxThreshold: threshold, //  (0...1 for THRESHOLD_PERCENT, pixel count for THRESHOLD_PIXELS
-				maxDelta: delta, // Maximum color delta (0...1):
-				maxOffset: offset, // Maximum surrounding pixel offset
-				renderComposition: render, // Should Rembrandt render a composition image?
-				compositionMaskColor: Rembrandt.Color.RED // Color of unmatched pixels
-			});
+			console.log('images');
 
-			console.log('Gets here 2');
-			const retVal = await rembrandt.compare()
-				.then((result) => {
-					console.log('Passed:', result.passed);
-					console.log('Pixel Difference:', result.differences, 'Percentage Difference', result.percentageDifference, '%');
-					console.log('Composition image buffer:', result.compositionImage);
-					return result;
-				})
-				.catch((e) => console.error(e));
-			console.log(retVal);
-			return retVal;
+			return await this.performAnalisys(threshold, delta, offset, render);
 		} catch (err) {
 			console.log(err);
 		}
 	}
 
+	/**
+	 * saveUploadedFiles
+	 * @param {uuid} session The current session
+	 * @param {any} files The files from the request upload
+	 * @return {[any]} an array of doc metadata
+	 */
 	async saveUploadedFiles(session, files) {
 		const uploads = [];
-		// loop all files
-		_.forEach(_.keysIn(files.docs), (key) => {
-			const docx = files.docs[key];
-			uploads.push({
-				name: docx.name,
-				mimetype: docx.mimetype,
-				size: docx.size
-			});
-			// move photo to uploads directory
-			docx.mv(`./uploads/${session}/${docx.name}`);
-			this.convertDocxToPdf(session, docx);
+		return new Promise((resolve, reject) => {
+			try {
+				// loop through all files
+				_.forEach(_.keysIn(files.docs), (key) => {
+					const docx = files.docs[key];
+					uploads.push({
+						name: docx.name,
+						mimetype: docx.mimetype,
+						size: docx.size
+					});
+					// move photo to uploads directory
+					docx.mv(`./uploads/${session}/${docx.name}`);
+				});
+				resolve(uploads);
+			} catch (err) {
+				reject(err);
+			}
 		});
-		console.log('[DEBUG] -- ', uploads);
-		return uploads;
 	}
 
-	convertDocxToPdf(session, docx) {
-		console.log('convertDocxToPdf gets here', docx.name);
-		// unoconv.convert(`./uploads/${session}/${docx.name}`, 'pdf')
+	async convertFiles(session, files) {
+		// loop through all files
+		for (const f of files) {
+			const docx = f;
+			await this.convertDocxToPdf(session, docx);
+			await this.convertPdfToImg(session, docx);
+			console.log('docx converted!');
+		}
+	}
 
-		unoconv.run({
+	/**
+	 * convertDocxToPdf
+	 * @param {uuid} session The current session
+	 * @param {Object} docx The document metadata to convert
+	 * @return {Promise<any>} a promise
+	 */
+	async convertDocxToPdf(session, docx) {
+		return await unoconv.run({
 			file: `./uploads/${session}/${docx.name}`,
 			output: `./uploads/${session}/${docx.name}.pdf`
-		})
-			.then((filePath) => {
-				console.log('convertPdf to img');
-				this.convertPdfToImg(session, docx);
-				console.log(filePath);
+		});
+	}
+
+	/**
+	 * convertPdfToImg.
+	 * @param {uuid} session The current session
+	 * @param {Object} doc The document metadata to convert
+	 * @return {Promise<any>} a promise
+	 */
+	async convertPdfToImg(session, doc) {
+		const t = this.later(2);
+		console.log('conversion to image', doc.name);
+		return t;
+	}
+
+	async performAnalisys(threshold = 0, delta = 0, offset = 0, render = false) {
+		console.log('analisys');
+
+		// this.processImages(session, data);
+		const rembrandt = new Rembrandt({
+			// `imageA` and `imageB` can be either Strings (file path on node.js, public url on Browsers) or Buffers
+			imageA: this.imageA, imageB: this.imageB,
+			// imageB: fs.readFileSync('/path/to/imageB'),
+			thresholdType: Rembrandt.THRESHOLD_PERCENT, // either THRESHOLD_PERCENT or THRESHOLD_PIXELS
+			maxThreshold: threshold, //  (0...1 for THRESHOLD_PERCENT, pixel count for THRESHOLD_PIXELS
+			maxDelta: delta, // Maximum color delta (0...1):
+			maxOffset: offset, // Maximum surrounding pixel offset
+			renderComposition: render, // Should Rembrandt render a composition image?
+			compositionMaskColor: Rembrandt.Color.RED // Color of unmatched pixels
+		});
+
+		const retVal = await rembrandt.compare()
+			.then((result) => {
+				console.log('Passed:', result.passed);
+				console.log('Pixel Difference:', result.differences, 'Percentage Difference', result.percentageDifference, '%');
+				console.log('Composition image buffer:', result.compositionImage);
+				return result;
 			})
-			.catch((e) => {
-				console.log('[DEBUG] Unoconv error --> ', e);
-				throw e;
-			});
+			.catch((e) => console.error(e));
 
-		console.log('convertDocxToPdf gets done here', docx.name);
+		return retVal;
 	}
 
-	convertPdfToImg(session, doc) {
-		console.log('convertPdfToImg gets here', doc.name);
-
-		console.log('convertPdfToImg gets done here', doc.name);
-		return session;
-	}
-
-	isValidDocxDocument(doc) {
+	/**
+	 * isValidDocxDocument.
+	 * @param {uuid} session The current session
+	 * @param {Object} doc The document metadata to validate
+	 * @return {boolean} a promise
+	 */
+	isValidDocxDocument(session, doc) {
 		console.log('isValidDocxDocument TO BE IMPLEMENTED STILL!!', doc);
 		return true;
+	}
+
+	later(delay) {
+		return new Promise(function(resolve) {
+			setTimeout(resolve, delay);
+		});
 	}
 
 }
