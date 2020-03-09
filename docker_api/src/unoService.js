@@ -25,7 +25,7 @@ export default class UnoService {
 			bin = options.bin;
 		}
 
-		console.log('Unoservece is listening', self);
+		console.log('UnoService is listening', self);
 		return spawn(bin, args);
 	}
 

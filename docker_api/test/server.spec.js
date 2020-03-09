@@ -1,8 +1,19 @@
 'use strict';
 
-const chai = require('chai');
+import chai from 'chai';
+import app from '../src/server.js'; // Our app
 
-chai.use(require('chai-http'));
+// chai.use(require('chai-http'));
+
+describe('index test', () => {
+	describe('sayHello function', () => {
+		it('should say Hello guys!', () => {
+			const str = 'Hello guys!';
+			chai.expect(str).to.equal('Hello guys!');
+			console.log(app.name);
+		});
+	});
+});
 
 /*
 

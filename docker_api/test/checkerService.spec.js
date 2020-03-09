@@ -1,7 +1,16 @@
-/* eslint-disable no-unused-expressions */
-/* eslint-disable no-undef */
 'use strict';
 
-const chai = require('chai');
+import chai from 'chai';
 
-chai.use(require('chai-http'));
+import app from '../src/server.js'; // Our app
+
+describe('index test', () => {
+	describe('sayHello too function', () => {
+		it('should say Hello too guys!', () => {
+
+			const str = 'Hello too guys!';
+			chai.expect(str).to.equal('Hello too guys!');
+			console.log(app.name);
+		});
+	});
+});
