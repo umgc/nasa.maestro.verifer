@@ -34,7 +34,7 @@ export default class CheckerService {
 
 			const images = await this.convertFiles(session, pdfs);
 
-			console.log('images');
+			console.log('images', images);
 
 			return await this.performAnalisys(threshold, delta, offset, render);
 		} catch (err) {
