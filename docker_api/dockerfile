@@ -9,6 +9,23 @@ RUN echo "deb http://httpredir.debian.org/debian/ buster main contrib non-free" 
     && apt-get install -y imagemagick ghostscript poppler-utils
 
 # |--------------------------------------------------------------------------
+# This is due to a security vulnerability that has been addressed in Ghostscript 9.24 (source). 
+# Make sure you have Ghostscript ≥9.24:
+# gs --version
+# If yes, just remove the whole following section from /etc/ImageMagick-6/policy.xml:
+# <!-- disable ghostscript format types -->
+# <policy domain="coder" rights="none" pattern="PS" />
+# <policy domain="coder" rights="none" pattern="PS2" />
+# <policy domain="coder" rights="none" pattern="PS3" />
+# <policy domain="coder" rights="none" pattern="EPS" />
+# <policy domain="coder" rights="none" pattern="PDF" />
+# <policy domain="coder" rights="none" pattern="XPS" />
+
+
+# For canvas
+# sudo apt-get install build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev 
+
+# |--------------------------------------------------------------------------
 # | LibreOffice
 # |--------------------------------------------------------------------------
 # | https://github.com/nextcloud/docker/issues/380

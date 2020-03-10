@@ -6,8 +6,7 @@ import path from 'path';
 import _ from 'lodash';
 import unoconv from 'unoconv-promise';
 import uuid from 'uuidv4';
-
-// import PDFImage from 'pdf-image';
+import PDFImage from 'pdf-image';
 
 export default class CheckerService {
 	constructor() {
@@ -30,13 +29,11 @@ export default class CheckerService {
 			const session = uuid.uuid();
 
 			const pdfs = await this.saveUploadedFiles(session, files);
-			console.log('pdfs');
 
-			const images = await this.convertFiles(session, pdfs);
+			await this.convertFiles(session, pdfs);
 
-			console.log('images', images);
+			return await this.performAnalisys(session, pdfs, threshold, delta, offset, render);
 
-			return await this.performAnalisys(threshold, delta, offset, render);
 		} catch (err) {
 			console.log(err);
 		}
@@ -62,6 +59,7 @@ export default class CheckerService {
 					});
 					// move photo to uploads directory
 					docx.mv(`./uploads/${session}/${docx.name}`);
+					console.log(`${docx.name} saved!`);
 				});
 				resolve(uploads);
 			} catch (err) {
@@ -70,13 +68,19 @@ export default class CheckerService {
 		});
 	}
 
+	/**
+	 * convertFiles
+	 * @param {uuid} session The current session
+	 * @param {any} files The files from the request upload
+	 * @return {[any]} an array of doc metadata
+	 */
 	async convertFiles(session, files) {
 		// loop through all files
 		for (const f of files) {
 			const docx = f;
 			await this.convertDocxToPdf(session, docx);
 			await this.convertPdfToImg(session, docx);
-			console.log('docx converted!');
+			console.log(`${docx.name} converted to pdf and png!`);
 		}
 	}
 
@@ -100,18 +104,19 @@ export default class CheckerService {
 	 * @return {Promise<any>} a promise
 	 */
 	async convertPdfToImg(session, doc) {
-		const t = this.later(2);
-		console.log('conversion to image', doc.name);
-		return t;
+		console.log(`Attempting conversion of: ./uploads/${session}/${doc.name}.pdf`);
+		const converter = new PDFImage.PDFImage(`./uploads/${session}/${doc.name}.pdf`, { combinedImage: true });
+		return converter.convertFile();
 	}
 
-	async performAnalisys(threshold = 0, delta = 0, offset = 0, render = false) {
-		console.log('analisys');
+	async performAnalisys(session, files, threshold = 0.01, delta = 20, offset = 0, render = false) {
+		console.log('analisys', threshold, delta, offset, render);
 
 		// this.processImages(session, data);
 		const rembrandt = new Rembrandt({
 			// `imageA` and `imageB` can be either Strings (file path on node.js, public url on Browsers) or Buffers
-			imageA: this.imageA, imageB: this.imageB,
+			imageA: `./uploads/${session}/${files[0].name}.png`,
+			imageB: `./uploads/${session}/${files[1].name}.png`,
 			// imageB: fs.readFileSync('/path/to/imageB'),
 			thresholdType: Rembrandt.THRESHOLD_PERCENT, // either THRESHOLD_PERCENT or THRESHOLD_PIXELS
 			maxThreshold: threshold, //  (0...1 for THRESHOLD_PERCENT, pixel count for THRESHOLD_PIXELS

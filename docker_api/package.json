@@ -38,7 +38,9 @@
     }
   },
   "standard": {
-    "env": [ "mocha" ]
+    "env": [
+      "mocha"
+    ]
   },
   "mocha": {
     "diff": true,
