@@ -1,13 +1,13 @@
 'use strict';
 
 /* eslint-disable max-len */
-import Rembrandt from 'rembrandt';
+import Rembrandt from 'rembrandt/build/node.js';
 import path from 'path';
 import _ from 'lodash';
 import unoconv from 'unoconv-promise';
 import uuid from 'uuidv4';
 import PDFImage from 'pdf-image';
-
+ 
 export default class CheckerService {
 	constructor() {
 		this.imageA = path.resolve() + '/uploads/img1.jpg';
@@ -109,7 +109,7 @@ export default class CheckerService {
 		return converter.convertFile();
 	}
 
-	async performAnalisys(session, files, threshold = 0.01, delta = 20, offset = 0, render = false) {
+	async performAnalisys(session, files, threshold = 0.01, delta = 0.02, offset = 0, render = false) {
 		console.log('analisys', threshold, delta, offset, render);
 
 		// this.processImages(session, data);
@@ -131,8 +131,9 @@ export default class CheckerService {
 				console.log('Passed:', result.passed);
 				console.log('Pixel Difference:', result.differences, 'Percentage Difference', result.percentageDifference, '%');
 				console.log('Composition image buffer:', result.compositionImage);
+				this.writeOutputFile(result.compositionImage);
 				return result;
-			})
+  		})
 			.catch((e) => console.error(e));
 
 		return retVal;
@@ -155,4 +156,7 @@ export default class CheckerService {
 		});
 	}
 
+	writeOutputFile(bytearray) {
+		console.log(bytearray);
+	}
 }
