@@ -7,7 +7,7 @@ import _ from 'lodash';
 import unoconv from 'unoconv-promise';
 import uuid from 'uuidv4';
 import PDFImage from 'pdf-image';
- 
+
 export default class CheckerService {
 	constructor() {
 		this.imageA = path.resolve() + '/uploads/img1.jpg';
@@ -133,7 +133,7 @@ export default class CheckerService {
 				console.log('Composition image buffer:', result.compositionImage);
 				this.writeOutputFile(result.compositionImage);
 				return result;
-  		})
+			})
 			.catch((e) => console.error(e));
 
 		return retVal;
