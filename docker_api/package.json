@@ -8,6 +8,7 @@
     "start": "nodemon --exec babel-node ./src/server.js",
     "test": "env BABEL_ENV=test  mocha --no-config --timeout 10000 --require @babel/register",
     "build": "babel src --out-dir ./dist --source-maps",
+    "build:prod": "babel src --out-dir ./dist",
     "serve": "node ./dist/server.js",
     "debug": "node --inspect-brk ./dist/server.js"
   },

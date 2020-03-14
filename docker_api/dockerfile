@@ -50,10 +50,13 @@ RUN curl -Ls $UNO_URL -o /usr/bin/unoconv &&\
 # | Installs PDFtk as an alternative to pdfcpu for merging PDFs.
 # | https://github.com/thecodingmachine/maestro/issues/29
 # |
-RUN apt-get -y install pdftk
+# RUN apt-get -y install pdftk
 
-RUN apt-get purge -y build-essential curl wget unzip git cmake && \
-    apt-get autoremove -y --purge
+#RUN apt-get purge -y build-essential curl wget unzip git libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev cmake && \
+#    apt-get autoremove -y --purge
+
+# For canvas
+RUN apt-get -y install build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev 
 
 # |--------------------------------------------------------------------------
 # | Default user
