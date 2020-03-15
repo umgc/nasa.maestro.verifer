@@ -46,7 +46,7 @@ app.post('/api/docx/checkDifference', urlencoderParser, async(req, res) => {
 		res.send({ status: false, message: 'No file uploaded' });
 	} else {
 		svc.checkDifference(
-			req.files, req.body.threshold, req.body.delta, req.body.offset, req.body.render
+			req.files, req.body.threshold, req.body.color, req.body.render
 		).then((result) => {
 			console.log('retval => ', result);
 			res.send(result);

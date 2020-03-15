@@ -1,30 +1,27 @@
 'use strict';
-
 /* eslint-disable max-len */
-import Rembrandt from 'rembrandt/build/node.js';
-import path from 'path';
+// import Rembrandt from 'rembrandt/build/node.js';
+// import path from 'path';
 import _ from 'lodash';
 import unoconv from 'unoconv-promise';
 import uuid from 'uuidv4';
 import PDFImage from 'pdf-image';
+import gm from 'gm';
 
 export default class CheckerService {
-	constructor() {
-		this.imageA = path.resolve() + '/uploads/img1.jpg';
-		this.imageB = path.resolve() + '/uploads/img2.jpg';
-		console.log(this.imageA);
-	}
+	imageMagick = gm.subClass({ imageMagick: true });
+
+	constructor() { }
 
 	/**
 	 * checkDifference
 	 * @param {any} files The files from the request upload
 	 * @param {number} threshold defaults to 0
-	 * @param {number} delta defaults to 0
-	 * @param {number} offset defaults to 0
+	 * @param {number} color defaults to 0
 	 * @param {boolean} render defaults to false
 	 * @return {[any]} an JSON object with the operation results
 	 */
-	async checkDifference(files, threshold = 0, delta = 0, offset = 0, render = false) {
+	async checkDifference(files, threshold = 0.01, color = 'red', render = false) {
 		try {
 			const session = uuid.uuid();
 
@@ -32,7 +29,7 @@ export default class CheckerService {
 
 			await this.convertFiles(session, pdfs);
 
-			return await this.performAnalisys(session, pdfs, threshold, delta, offset, render);
+			return await this.performGMAnalisys(session, pdfs, threshold, color, render);
 
 		} catch (err) {
 			console.log(err);
@@ -106,9 +103,14 @@ export default class CheckerService {
 	async convertPdfToImg(session, doc) {
 		console.log(`Attempting conversion of: ./uploads/${session}/${doc.name}.pdf`);
 		const converter = new PDFImage.PDFImage(`./uploads/${session}/${doc.name}.pdf`, { combinedImage: true });
-		return converter.convertFile();
+		return converter.convertFile()
+			.then(
+				(img) => { console.log('Converted: ', img); },
+				(err) => { console.log(err); }
+			);
 	}
 
+	/*
 	async performAnalisys(session, files, threshold = 0.01, delta = 0.02, offset = 0, render = false) {
 		console.log('analisys', threshold, delta, offset, render);
 
@@ -138,6 +140,36 @@ export default class CheckerService {
 
 		return retVal;
 	}
+	*/
+
+	async performGMAnalisys(session, files, threshold = 0.01, color = 'red', render = false) {
+		console.log('analisys', threshold, color, render);
+		const options = {
+			file: `./uploads/${session}/diff.png`,
+			highlightColor: 'red',
+			tolerance: Number(threshold),
+			highlightStyle: 'assign',
+			metric: 'mae'
+		};
+
+		// convert -density 300 -colorspace sRGB -alpha off STS-134_EVA_2.sodf.docx.pdf -quality 100 -resize 25% -append out2.png
+
+		return new Promise((resolve, reject) => {
+			gm.compare(
+				`./uploads/${session}/${files[1].name}.png`,
+				`./uploads/${session}/${files[0].name}.png`,
+				options,
+				async(err, isEqual, equality, raw) => {
+					if (err) {
+						return reject(err);
+					}
+					const retVal = await this.analisysComplete(err, isEqual, equality, raw);
+					console.log('retVal =', retVal);
+					resolve(retVal);
+				}
+			);
+		});
+	}
 
 	/**
 	 * isValidDocxDocument.
@@ -150,13 +182,15 @@ export default class CheckerService {
 		return true;
 	}
 
-	later(delay) {
-		return new Promise(function(resolve) {
-			setTimeout(resolve, delay);
-		});
-	}
-
-	writeOutputFile(bytearray) {
-		console.log(bytearray);
+	async analisysComplete(err, isEqual, equality, raw) {
+		return new Promise(
+			(resolve, reject) => {
+				if (err) {
+					reject(err);
+				} else {
+					resolve({ isEqual: isEqual, equality: equality, raw: JSON.stringify(raw) });
+				}
+			}
+		);
 	}
 }

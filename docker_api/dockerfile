@@ -6,24 +6,8 @@ FROM node:buster-slim
 RUN echo "deb http://httpredir.debian.org/debian/ buster main contrib non-free" > /etc/apt/sources.list &&\
     apt-get update &&\
     apt-get install -y curl wget gnupg ttf-mscorefonts-installer procps \
-    && apt-get install -y imagemagick ghostscript poppler-utils
+    && apt-get install -y imagemagick graphicsmagick ghostscript poppler-utils
 
-# |--------------------------------------------------------------------------
-# This is due to a security vulnerability that has been addressed in Ghostscript 9.24 (source). 
-# Make sure you have Ghostscript ≥9.24:
-# gs --version
-# If yes, just remove the whole following section from /etc/ImageMagick-6/policy.xml:
-# <!-- disable ghostscript format types -->
-# <policy domain="coder" rights="none" pattern="PS" />
-# <policy domain="coder" rights="none" pattern="PS2" />
-# <policy domain="coder" rights="none" pattern="PS3" />
-# <policy domain="coder" rights="none" pattern="EPS" />
-# <policy domain="coder" rights="none" pattern="PDF" />
-# <policy domain="coder" rights="none" pattern="XPS" />
-
-
-# For canvas
-# sudo apt-get install build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev 
 
 # |--------------------------------------------------------------------------
 # | LibreOffice
@@ -41,22 +25,10 @@ ENV UNO_URL=https://raw.githubusercontent.com/dagwieers/unoconv/master/unoconv
 RUN curl -Ls $UNO_URL -o /usr/bin/unoconv &&\
     chmod +x /usr/bin/unoconv &&\
     ln -s /usr/bin/python3 /usr/bin/python &&\
-    unoconv --version
-
-# |--------------------------------------------------------------------------
-# | PDFtk
-# |--------------------------------------------------------------------------
-# |
-# | Installs PDFtk as an alternative to pdfcpu for merging PDFs.
-# | https://github.com/thecodingmachine/maestro/issues/29
-# |
-# RUN apt-get -y install pdftk
-
-#RUN apt-get purge -y build-essential curl wget unzip git libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev cmake && \
-#    apt-get autoremove -y --purge
-
-# For canvas
-RUN apt-get -y install build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev 
+    unoconv --version 
+WORKDIR /etc/init.d    
+COPY unoconvd .
+RUN update-rc.d unoconvd defaults
 
 # |--------------------------------------------------------------------------
 # | Default user
