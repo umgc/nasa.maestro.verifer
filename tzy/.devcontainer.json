@@ -1,0 +1,6 @@
+{
+    "image": "nasa_maestro_checker",
+    "forwardPorts": [
+        3000
+    ]
+}
