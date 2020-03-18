@@ -1,14 +1,14 @@
 'use strict';
 /* eslint-disable max-len */
-// import Rembrandt from 'rembrandt/build/node.js';
-// import path from 'path';
 import _ from 'lodash';
 import unoconv from 'unoconv-promise';
 import uuid from 'uuidv4';
 import PDFImage from 'pdf-image';
 import gm from 'gm';
+import spawn from 'cross-spawn';
 
-// NB for some reason seems to hanf if there are spaces or parenthesis in the file names....
+// NB for some reason seems to hang if there are spaces
+// or parenthesis in the file names....
 
 export default class CheckerService {
 	imageMagick = gm.subClass({ imageMagick: true });
@@ -31,7 +31,7 @@ export default class CheckerService {
 
 			await this.convertFiles(session, pdfs);
 
-			return await this.performGMAnalisys(session, pdfs, threshold, color, render);
+			return await this.performIMAnalisys(session, pdfs, threshold, color, render);
 
 		} catch (err) {
 			console.log(err);
@@ -112,64 +112,24 @@ export default class CheckerService {
 			);
 	}
 
-	/*
-	async performAnalisys(session, files, threshold = 0.01, delta = 0.02, offset = 0, render = false) {
-		console.log('analisys', threshold, delta, offset, render);
+	async performIMAnalisys(session, files, threshold = 0.01, color = 'red', render = false) {
+		console.log(threshold, color, render);
+		const output = `./uploads/${session}/diff.png`;
+		const file0 = `./uploads/${session}/${files[0].name}.png`;
+		const file1 = `./uploads/${session}/${files[1].name}.png`;
 
-		// this.processImages(session, data);
-		const rembrandt = new Rembrandt({
-			// `imageA` and `imageB` can be either Strings (file path on node.js, public url on Browsers) or Buffers
-			imageA: `./uploads/${session}/${files[0].name}.png`,
-			imageB: `./uploads/${session}/${files[1].name}.png`,
-			// imageB: fs.readFileSync('/path/to/imageB'),
-			thresholdType: Rembrandt.THRESHOLD_PERCENT, // either THRESHOLD_PERCENT or THRESHOLD_PIXELS
-			maxThreshold: threshold, //  (0...1 for THRESHOLD_PERCENT, pixel count for THRESHOLD_PIXELS
-			maxDelta: delta, // Maximum color delta (0...1):
-			maxOffset: offset, // Maximum surrounding pixel offset
-			renderComposition: render, // Should Rembrandt render a composition image?
-			compositionMaskColor: Rembrandt.Color.RED // Color of unmatched pixels
-		});
+		const opts = { env: process.env, killSignal: 'SIGKILL', stdio: 'inherit' };
 
-		const retVal = await rembrandt.compare()
-			.then((result) => {
-				console.log('Passed:', result.passed);
-				console.log('Pixel Difference:', result.differences, 'Percentage Difference', result.percentageDifference, '%');
-				console.log('Composition image buffer:', result.compositionImage);
-				this.writeOutputFile(result.compositionImage);
-				return result;
-			})
-			.catch((e) => console.error(e));
+		const args = [
+			'-metric', 'AE', '-fuzz', '5%',
+			file0, file1, '-compose', 'src',
+			output
+		];
 
-		return retVal;
-	}
-	*/
-
-	async performGMAnalisys(session, files, threshold = 0.01, color = 'red', render = false) {
-		console.log('analisys', threshold, color, render);
-		const options = {
-			file: `./uploads/${session}/diff.png`,
-			highlightColor: 'red',
-			tolerance: Number(threshold),
-			highlightStyle: 'assign',
-			metric: 'mae'
-		};
-
-		// convert -density 300 -colorspace sRGB -alpha off STS-134_EVA_2.sodf.docx.pdf -quality 100 -resize 25% -append out2.png
-
-		return new Promise((resolve, reject) => {
-			gm.compare(
-				`./uploads/${session}/${files[1].name}.png`,
-				`./uploads/${session}/${files[0].name}.png`,
-				options,
-				async(err, isEqual, equality, raw) => {
-					if (err) {
-						return reject(err);
-					}
-					const retVal = await this.analisysComplete(err, isEqual, equality, raw);
-					resolve(retVal);
-				}
-			);
-		});
+		try {
+			const proc = spawn.sync('compare', args, opts);
+			console.log(proc);
+		} catch (err) { console.error(err); }
 	}
 
 	/**

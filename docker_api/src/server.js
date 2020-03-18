@@ -5,7 +5,7 @@ import bodyParser from 'body-parser';
 import fileUpload from 'express-fileupload';
 
 import CheckerService from './checkerService.js';
-import UnoService from './unoService.js';
+// import UnoService from './unoService.js';
 
 // TODO refactor to implement dependency injection https://blog.risingstack.com/dependency-injection-in-node-js/
 
@@ -13,7 +13,7 @@ const app = express();
 const urlencoderParser = bodyParser.json();
 const port = process.env.port || 3000;
 const svc = new CheckerService();
-const unoSvc = new UnoService().listen();
+// const unoSvc = new UnoService().listen();
 
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -21,9 +21,9 @@ app.use(bodyParser.json());
 app.use(fileUpload({ createParentPath: true }));
 
 // Starts the unoconv listener
-unoSvc.stderr.on('data', (data) => {
-	console.log('stderr: ' + data.toString('utf8'));
-});
+// unoSvc.stderr.on('data', (data) => {
+// console.log('stderr: ' + data.toString('utf8'));
+// });
 
 // Starts the Api service
 app.listen(port, () => {
