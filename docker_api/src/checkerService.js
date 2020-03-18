@@ -8,6 +8,8 @@ import uuid from 'uuidv4';
 import PDFImage from 'pdf-image';
 import gm from 'gm';
 
+// NB for some reason seems to hanf if there are spaces or parenthesis in the file names....
+
 export default class CheckerService {
 	imageMagick = gm.subClass({ imageMagick: true });
 
@@ -164,7 +166,6 @@ export default class CheckerService {
 						return reject(err);
 					}
 					const retVal = await this.analisysComplete(err, isEqual, equality, raw);
-					console.log('retVal =', retVal);
 					resolve(retVal);
 				}
 			);
