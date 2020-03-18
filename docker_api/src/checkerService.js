@@ -113,6 +113,7 @@ export default class CheckerService {
 	}
 
 	async performIMAnalisys(session, files, threshold = 0.01, color = 'red', render = false) {
+		console.log(threshold, color, render);
 		const output = `./uploads/${session}/diff.png`;
 		const file0 = `./uploads/${session}/${files[0].name}.png`;
 		const file1 = `./uploads/${session}/${files[1].name}.png`;
