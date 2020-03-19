@@ -15,9 +15,6 @@ describe('index test', () => {
 	});
 });
 
-
-
-
 /*
 
 const app = require('../app/server.js'); // Our app
