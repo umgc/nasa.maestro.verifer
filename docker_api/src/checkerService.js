@@ -140,6 +140,9 @@ export default class CheckerService {
 	 */
 	isValidDocxDocument(session, doc) {
 		console.log('isValidDocxDocument TO BE IMPLEMENTED STILL!!', doc);
+		if (doc === null) {
+			return false;
+		}
 		return true;
 	}
 
