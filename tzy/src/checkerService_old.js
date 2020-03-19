@@ -8,14 +8,11 @@ import uuid from 'uuidv4';
 import PDFImage from 'pdf-image';
 import gm from 'gm';
 import path from 'path';
-import fs from 'fs';
 
 export default class CheckerService {
 	imageMagick = gm.subClass({ imageMagick: true });
 
-	constructor() { 
-	  //const dir_uploads = path.join(path.resolve(), 'uploads');
-	}
+	constructor() { };
 
 	/**
 	 * checkDifference
@@ -37,8 +34,8 @@ export default class CheckerService {
 
 		} catch (err) {
 			console.log(err);
-		}
-	}
+		};
+	};
 
 	/**
 	 * saveUploadedFiles
@@ -46,7 +43,7 @@ export default class CheckerService {
 	 * @param {any} files The files from the request upload
 	 * @return {[any]} an array of doc metadata
 	 */
-	async saveUploadedFiles_old(session, files) {
+	async saveUploadedFiles(session, files) {
 		const uploads = [];
 		return new Promise((resolve, reject) => {
 			try {
@@ -67,51 +64,15 @@ export default class CheckerService {
 				reject(err);
 			}
 		});
-	}
+	};
   
-  //tzy: upload files to upload directory
-  async saveUploadedFiles(session, files) {
-	const outfiles = new Array();
-	files.forEach(file => {
-      //console.log(file);
-      const out = path.join(path.resolve(), 'test/uploads', session, path.parse(file).base);
-      //console.log(out);
-	  const target = this.copyFile(file, out);        
-	  target.then( res => {
-		  outfiles.push(res)
-		});
-	})
-    return Promise.resolve(outfiles);
-  }//func end
-  
-  //tzy: copy file
-  async copyFile(sourceFile, targetFile) {
-    var rd = fs.createReadStream(sourceFile);
-    var wr = fs.createWriteStream(targetFile);
-    try {
-      return new Promise( (resolve, reject) => {
-        rd.on('read error', reject);
-        wr.on('write error', reject);
-        wr.on('write finished', resolve);
-		rd.pipe(wr);
-		//console.log('###', targetFile);
-        resolve(targetFile);
-      });
-    } catch (error) {
-      rd.destroy();
-      wr.end();
-      throw error;
-    }
-  }//
-
-  changeExtension(inFile, extName){
+  function changeExtension(inFile, extName){
     var fileParse = path.parse(inFile);
     const newName = fileParse.name + extName;
     const newFile = path.join(fileParse.dir, newName);
     //console.log(fileParse);
     return newFile;
   };
-  
 	/**
 	 * convertFiles
 	 * @param {uuid} session The current session
@@ -126,19 +87,18 @@ export default class CheckerService {
 			await this.convertPdfToImg(session, docx);
 			console.log(`${docx.name} converted to pdf and png!`);
 		}
-	}
+	};
 
 	async convertFiles(files, resolve) {
 		// loop through all files
 		for (const DOCX of files) {
 			const  PDF = this.changeExtension(DOCX, '.pdf');
-			await this.convertDocxToPdf(DOCX, PDF);
-			await this.convertPdfToImg(PDF);
+			//this.convertDocxToPdf(DOCX, PDF);
+			//this.convertPdfToImg(PDF);
 			console.log(`${DOCX} converted to pdf and png!`);
 		}
 		return resolve(1);
 	};
-
 	/**
 	 * convertDocxToPdf
 	 * @param {uuid} session The current session
@@ -146,11 +106,12 @@ export default class CheckerService {
 	 * @return {Promise<any>} a promise
 	 */
 	async convertDocxToPdf_old(session, docx) {
+	  console.log(`###./uploads/${session}/${docx.name}`);
 		return await unoconv.run({
 			file: `./uploads/${session}/${docx.name}`,
 			output: `./uploads/${session}/${docx.name}.pdf`
 		});
-	}
+	};
 
 	async convertDocxToPdf(docx, pdf) {
 	  //console.log(docx)
@@ -174,8 +135,8 @@ export default class CheckerService {
 				(img) => { console.log('Converted: ', img); },
 				(err) => { console.log(err); }
 			);
-	}
-
+	};
+	
   //tzy
 	async convertPdfToImg(PDF) {
 		console.log(`Attempt to convert ${PDF}`);
@@ -189,7 +150,37 @@ export default class CheckerService {
 				(err) => { console.log(err); }
 			);
 	};
+	/*
+	async performAnalisys(session, files, threshold = 0.01, delta = 0.02, offset = 0, render = false) {
+		console.log('analisys', threshold, delta, offset, render);
 
+		// this.processImages(session, data);
+		const rembrandt = new Rembrandt({
+			// `imageA` and `imageB` can be either Strings (file path on node.js, public url on Browsers) or Buffers
+			imageA: `./uploads/${session}/${files[0].name}.png`,
+			imageB: `./uploads/${session}/${files[1].name}.png`,
+			// imageB: fs.readFileSync('/path/to/imageB'),
+			thresholdType: Rembrandt.THRESHOLD_PERCENT, // either THRESHOLD_PERCENT or THRESHOLD_PIXELS
+			maxThreshold: threshold, //  (0...1 for THRESHOLD_PERCENT, pixel count for THRESHOLD_PIXELS
+			maxDelta: delta, // Maximum color delta (0...1):
+			maxOffset: offset, // Maximum surrounding pixel offset
+			renderComposition: render, // Should Rembrandt render a composition image?
+			compositionMaskColor: Rembrandt.Color.RED // Color of unmatched pixels
+		});
+
+		const retVal = await rembrandt.compare()
+			.then((result) => {
+				console.log('Passed:', result.passed);
+				console.log('Pixel Difference:', result.differences, 'Percentage Difference', result.percentageDifference, '%');
+				console.log('Composition image buffer:', result.compositionImage);
+				this.writeOutputFile(result.compositionImage);
+				return result;
+			})
+			.catch((e) => console.error(e));
+
+		return retVal;
+	}
+	*/
 
 	async performGMAnalisys(session, files, threshold = 0.01, color = 'red', render = false) {
 		console.log('analisys', threshold, color, render);
@@ -218,7 +209,7 @@ export default class CheckerService {
 				}
 			);
 		});
-	}
+	};
 
 	/**
 	 * isValidDocxDocument.
@@ -229,7 +220,7 @@ export default class CheckerService {
 	isValidDocxDocument(session, doc) {
 		console.log('isValidDocxDocument TO BE IMPLEMENTED STILL!!', doc);
 		return true;
-	}
+	};
 
 	async analisysComplete(err, isEqual, equality, raw) {
 		return new Promise(
@@ -241,5 +232,5 @@ export default class CheckerService {
 				}
 			}
 		);
-	}
-}
+	};
+};

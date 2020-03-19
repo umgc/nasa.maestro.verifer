@@ -1,8 +1,10 @@
 'use strict';
 
 import chai from 'chai';
+import unoconv from 'unoconv-promise';
+import app from '../src/checkerService.js'; // Our app
 
-import app from '../src/server.js'; // Our app
+app.checkDifference;
 
 describe('index test', () => {
 	describe('sayHello too function', () => {
