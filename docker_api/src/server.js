@@ -6,12 +6,15 @@ import fileUpload from 'express-fileupload';
 import fs from 'fs';
 import stream from 'stream';
 import path from 'path';
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
 
 import CheckerService from './checkerService.js';
 
 // TODO refactor to implement dependency injection https://blog.risingstack.com/dependency-injection-in-node-js/
 const root = path.resolve();
-
+// eslint-disable-next-line no-underscore-dangle
+const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
 const urlencoderParser = bodyParser.json();
 const port = process.env.port || 3000;
@@ -30,8 +33,7 @@ app.listen(port, () => {
 // POST
 // receives a docx document and verifies it's valid
 app.post('/api/docx/validate', urlencoderParser, function(req, res) {
-	console.log(req.body, '1 Row Added.');
-	res.send('1 Row Added.');
+	res.send('NOT IMPLEMENTED YET');
 });
 
 // POST
@@ -42,22 +44,25 @@ app.post('/api/docx/checkDifference', urlencoderParser, async(req, res) => {
 	if (!req.files) {
 		res.send({ status: false, message: 'No file uploaded' });
 	} else {
-		svc.checkDifference(
-			req.files, req.body.threshold, req.body.color, req.body.render
-		).then((result) => {
-			const retVal = {
-				response: result.data,
-				link: `${req.headers.host}/api/docx/getDiffImage?sessionId=${result.sessionId}`
-			};
-			res.send(retVal);
-		}).catch((error) => {
-			res.status(500).send(error);
-		});
+		svc.checkDifference(req.files)
+			.then((result) => {
+				const retVal = {
+					response: result.data,
+					diffLink: `${req.headers.host}/api/docx/getDiffImage?sessionId=${result.sessionId}`,
+					imageLinks: [
+						{ url: `${req.headers.host}/api/docx/getImage?sessionId=${result.sessionId}&index=1` },
+						{ url: `${req.headers.host}/api/docx/getImage?sessionId=${result.sessionId}&index=2` }
+					]
+				};
+				res.send(retVal);
+			})
+			.catch((error) => {
+				res.status(500).send(error);
+			});
 	}
 });
 
 app.get('/api/docx/getDiffImage', urlencoderParser, async(req, res) => {
-	console.log(req.query);
 	const session = req.query.sessionId;
 	const path = `./uploads/${session}/diff.png`;
 	if (!fs.existsSync(path)) {
@@ -65,6 +70,17 @@ app.get('/api/docx/getDiffImage', urlencoderParser, async(req, res) => {
 		return res.sendStatus(400);
 	}
 	res.sendFile(`./uploads/${session}/diff.png`, { root: root });
+});
+
+app.get('/api/docx/getImage', urlencoderParser, async(req, res) => {
+	const session = req.query.sessionId;
+	const index = req.query.index;
+	const path = `./uploads/${session}/image-${index}.png`;
+	if (!fs.existsSync(path)) {
+		console.log(`${path} not found`); // No such file or any other kind of error
+		return res.sendStatus(400);
+	}
+	res.sendFile(path, { root: root });
 });
 
 app.get('/api/docx/getDiffImageStream', urlencoderParser, async(req, res) => {
@@ -83,6 +99,14 @@ app.get('/api/docx/getDiffImageStream', urlencoderParser, async(req, res) => {
 		}
 	});
 	ps.pipe(res);
+});
+
+app.get('/', urlencoderParser, async(req, res) => {
+	res.sendFile(path.join(__dirname, '/index.html'));
+});
+
+app.get('/help', urlencoderParser, async(req, res) => {
+	res.sendFile(path.join(__dirname, '/help.html'));
 });
 
 export default app;
