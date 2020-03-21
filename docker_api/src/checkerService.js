@@ -10,8 +10,6 @@ import spawn from 'cross-spawn';
 // or parenthesis in the file names....
 
 export default class CheckerService {
-	// imageMagick = gm.subClass({ imageMagick: true });
-
 	constructor() { }
 
 	/**
@@ -28,9 +26,7 @@ export default class CheckerService {
 			const pdfs = await this.saveUploadedFiles(session, files);
 			await this.convertFiles(session, pdfs);
 			const analisysData = await this.performIMAnalisys(session, pdfs, threshold, color, render);
-
 			console.log('data=> ', analisysData);
-
 			return {
 				data: analisysData,
 				sessionId: session
@@ -144,17 +140,5 @@ export default class CheckerService {
 			return false;
 		}
 		return true;
-	}
-
-	async analisysComplete(err, isEqual, equality, raw) {
-		return new Promise(
-			(resolve, reject) => {
-				if (err) {
-					reject(err);
-				} else {
-					resolve({ isEqual: isEqual, equality: equality, raw: JSON.stringify(raw) });
-				}
-			}
-		);
 	}
 }

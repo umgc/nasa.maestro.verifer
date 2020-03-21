@@ -10,7 +10,9 @@
     "build": "babel src --out-dir ./dist --source-maps",
     "build:prod": "babel src --out-dir ./dist",
     "serve": "node ./dist/server.js",
-    "debug": "node --inspect-brk ./dist/server.js"
+    "debug": "node --inspect-brk ./dist/server.js",
+    "lint": "eslint . --color",
+    "lint:fix": "eslint . --color --fix"
   },
   "author": "Alberto L. Bonfiglio",
   "license": "ISC",
@@ -72,24 +74,24 @@
     "cross-spawn": "^7.0.1",
     "express": "^4.17.1",
     "express-fileupload": "^1.1.6",
-    "gm": "^1.23.1",
     "lodash": "^4.17.15",
     "pdf-image": "^2.0.0",
     "unoconv-promise": "^1.0.8",
     "uuidv4": "^6.0.6"
   },
   "devDependencies": {
-    "@babel/core": "^7.8.7",
     "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.8.7",
     "@babel/node": "^7.8.7",
     "@babel/plugin-proposal-class-properties": "^7.8.3",
     "@babel/preset-env": "^7.8.7",
     "@babel/register": "^7.8.6",
     "chai": "^4.2.0",
     "chai-http": "^4.3.0",
+    "eslint": "^6.8.0",
     "mocha": "^7.1.0",
     "mocha-junit-reporter": "^1.23.3",
-    "webpack": "^4.42.0",
-    "nodemon": "^2.0.2"
+    "nodemon": "^2.0.2",
+    "webpack": "^4.42.0"
   }
 }

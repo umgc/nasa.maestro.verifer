@@ -45,7 +45,6 @@ app.post('/api/docx/checkDifference', urlencoderParser, async(req, res) => {
 		svc.checkDifference(
 			req.files, req.body.threshold, req.body.color, req.body.render
 		).then((result) => {
-			console.log('retval => ', result);
 			const retVal = {
 				response: result.data,
 				link: `${req.headers.host}/api/docx/getDiffImage?sessionId=${result.sessionId}`
