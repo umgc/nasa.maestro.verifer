@@ -8,7 +8,6 @@ RUN echo "deb http://httpredir.debian.org/debian/ buster main contrib non-free" 
     apt-get install -y curl wget gnupg ttf-mscorefonts-installer procps \
     && apt-get install -y imagemagick graphicsmagick ghostscript poppler-utils
 
-
 # |--------------------------------------------------------------------------
 # | LibreOffice
 # |--------------------------------------------------------------------------
@@ -47,6 +46,7 @@ RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 COPY . .
 RUN npm install 
+RUN npm run-script build:prod
 EXPOSE 3000
 
-CMD ["npm", "run", "start"]
+CMD ["npm", "run-script", "serve"]

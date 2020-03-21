@@ -4,14 +4,14 @@ import _ from 'lodash';
 import unoconv from 'unoconv-promise';
 import uuid from 'uuidv4';
 import PDFImage from 'pdf-image';
-import gm from 'gm';
+// import gm from 'gm';
 import spawn from 'cross-spawn';
 
 // NB for some reason seems to hang if there are spaces
 // or parenthesis in the file names....
 
 export default class CheckerService {
-	imageMagick = gm.subClass({ imageMagick: true });
+	// imageMagick = gm.subClass({ imageMagick: true });
 
 	constructor() { }
 
@@ -26,13 +26,16 @@ export default class CheckerService {
 	async checkDifference(files, threshold = 0.01, color = 'red', render = false) {
 		try {
 			const session = uuid.uuid();
-
 			const pdfs = await this.saveUploadedFiles(session, files);
-
 			await this.convertFiles(session, pdfs);
+			const analisysData = await this.performIMAnalisys(session, pdfs, threshold, color, render);
 
-			return await this.performIMAnalisys(session, pdfs, threshold, color, render);
+			console.log('data=> ', analisysData);
 
+			return {
+				data: analisysData,
+				sessionId: session
+			};
 		} catch (err) {
 			console.log(err);
 		}
@@ -117,18 +120,16 @@ export default class CheckerService {
 		const output = `./uploads/${session}/diff.png`;
 		const file0 = `./uploads/${session}/${files[0].name}.png`;
 		const file1 = `./uploads/${session}/${files[1].name}.png`;
-
-		const opts = { env: process.env, killSignal: 'SIGKILL', stdio: 'inherit' };
-
+		const opts = { env: process.env, killSignal: 'SIGKILL' };
 		const args = [
 			'-metric', 'AE', '-fuzz', '5%',
 			file0, file1, '-compose', 'src',
 			output
 		];
-
 		try {
 			const proc = spawn.sync('compare', args, opts);
 			console.log(proc);
+			return proc;
 		} catch (err) { console.error(err); }
 	}
 
