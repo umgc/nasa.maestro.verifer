@@ -4,7 +4,6 @@ import _ from 'lodash';
 import unoconv from 'unoconv-promise';
 import uuid from 'uuidv4';
 import PDFImage from 'pdf-image';
-// import gm from 'gm';
 import spawn from 'cross-spawn';
 
 // NB for some reason seems to hang if there are spaces
