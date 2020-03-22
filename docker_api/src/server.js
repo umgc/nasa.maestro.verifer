@@ -6,15 +6,11 @@ import fileUpload from 'express-fileupload';
 import fs from 'fs';
 import stream from 'stream';
 import path from 'path';
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
 
 import CheckerService from './checkerService.js';
 
 // TODO refactor to implement dependency injection https://blog.risingstack.com/dependency-injection-in-node-js/
 const root = path.resolve();
-// eslint-disable-next-line no-underscore-dangle
-const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
 const urlencoderParser = bodyParser.json();
 const port = process.env.port || 3000;
@@ -102,11 +98,11 @@ app.get('/api/docx/getDiffImageStream', urlencoderParser, async(req, res) => {
 });
 
 app.get('/', urlencoderParser, async(req, res) => {
-	res.sendFile(path.join(__dirname, '/index.html'));
+	res.sendFile(path.join(root, '/src/index.html'));
 });
 
 app.get('/help', urlencoderParser, async(req, res) => {
-	res.sendFile(path.join(__dirname, '/help.html'));
+	res.sendFile(path.join(root, '/src/help.html'));
 });
 
 export default app;

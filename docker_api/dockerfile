@@ -45,7 +45,8 @@ RUN groupadd --gid ${MAESTRO_USER_GID} maestro \
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 COPY . .
-RUN npm install 
+RUN rm -rf node_modules \
+    && npm install 
 RUN npm run-script build:prod
 EXPOSE 3000
 

@@ -7,14 +7,18 @@
   "scripts": {
     "start": "nodemon --exec babel-node ./src/server.js",
     "test": "env BABEL_ENV=test  mocha --no-config --timeout 10000 --require @babel/register",
+    "serve": "node ./src/server.js",
+    "debug": "node --inspect-brk ./dist/server.js",
     "build": "babel src --out-dir ./dist --source-maps",
     "build:prod": "babel src --out-dir ./dist",
-    "serve": "node ./dist/server.js",
-    "debug": "node --inspect-brk ./dist/server.js",
     "lint": "eslint . --color",
     "lint:fix": "eslint . --color --fix"
   },
   "author": "Alberto L. Bonfiglio",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/xOPERATIONS/maestro.git"
+  },
   "license": "ISC",
   "eslintIgnore": [
     "node_modules"
