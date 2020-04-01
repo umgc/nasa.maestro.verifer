@@ -8,6 +8,7 @@ import stream from 'stream';
 import path from 'path';
 
 import CheckerService from './checkerService.js';
+import DocXValidatorService from './docXValidator.js';
 
 // TODO refactor to implement dependency injection https://blog.risingstack.com/dependency-injection-in-node-js/
 const root = path.resolve();
@@ -28,8 +29,19 @@ app.listen(port, () => {
 
 // POST
 // receives a docx document and verifies it's valid
-app.post('/api/docx/validate', urlencoderParser, function(req, res) {
-	res.send('NOT IMPLEMENTED YET');
+app.post('/api/docx/validate', urlencoderParser, async(req, res) => {
+	const docxSvc = new DocXValidatorService();
+	if (!req.files) {
+		// TODO Retun appropriate status
+		res.send({ status: false, message: 'No file uploaded' });
+	} else {
+		docxSvc.validate(req.files.docs).then((result) => {
+			res.send(result);
+		})
+			.catch((error) => {
+				res.status(500).send(error);
+			});
+	}
 });
 
 // POST
