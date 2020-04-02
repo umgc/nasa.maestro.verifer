@@ -4,15 +4,13 @@ import _ from 'lodash';
 import unoconv from 'unoconv-promise';
 import uuid from 'uuidv4';
 import PDFImage from 'pdf-image';
-import gm from 'gm';
-import spawn from 'cross-spawn';
+import spawn from 'child_process';
+import fs from 'fs';
 
 // NB for some reason seems to hang if there are spaces
 // or parenthesis in the file names....
 
 export default class CheckerService {
-	imageMagick = gm.subClass({ imageMagick: true });
-
 	constructor() { }
 
 	/**
@@ -23,16 +21,16 @@ export default class CheckerService {
 	 * @param {boolean} render defaults to false
 	 * @return {[any]} an JSON object with the operation results
 	 */
-	async checkDifference(files, threshold = 0.01, color = 'red', render = false) {
+	async checkDifference(files) {
 		try {
 			const session = uuid.uuid();
-
 			const pdfs = await this.saveUploadedFiles(session, files);
-
 			await this.convertFiles(session, pdfs);
-
-			return await this.performIMAnalisys(session, pdfs, threshold, color, render);
-
+			const analisysData = await this.performIMAnalisys(session, pdfs);
+			return {
+				data: analisysData,
+				sessionId: session
+			};
 		} catch (err) {
 			console.log(err);
 		}
@@ -48,6 +46,7 @@ export default class CheckerService {
 		const uploads = [];
 		return new Promise((resolve, reject) => {
 			try {
+				console.log('Saving uploaded files to session folder');
 				// loop through all files
 				_.forEach(_.keysIn(files.docs), (key) => {
 					const docx = files.docs[key];
@@ -75,10 +74,15 @@ export default class CheckerService {
 	 */
 	async convertFiles(session, files) {
 		// loop through all files
+		console.log('converting uploaded files to pdf and then images (png)');
+		let i = 0;
 		for (const f of files) {
+			console.log(`Processing uploaded file # ${i}`);
 			const docx = f;
 			await this.convertDocxToPdf(session, docx);
-			await this.convertPdfToImg(session, docx);
+			await this.convertPdfToImg(session, docx, i++);
+			fs.renameSync(`./uploads/${session}/${docx.name}.png`, `./uploads/${session}/image-${i}.png`);
+
 			console.log(`${docx.name} converted to pdf and png!`);
 		}
 	}
@@ -100,26 +104,35 @@ export default class CheckerService {
 	 * convertPdfToImg.
 	 * @param {uuid} session The current session
 	 * @param {Object} doc The document metadata to convert
+	 * @param {number} index The document index to rename the image
 	 * @return {Promise<any>} a promise
 	 */
 	async convertPdfToImg(session, doc) {
 		console.log(`Attempting conversion of: ./uploads/${session}/${doc.name}.pdf`);
-		const converter = new PDFImage.PDFImage(`./uploads/${session}/${doc.name}.pdf`, { combinedImage: true });
+		const opts = { '-quality': '100' };
+		const converter = new PDFImage.PDFImage(
+			`./uploads/${session}/${doc.name}.pdf`,
+			{ opts, combinedImage: true });
 		return converter.convertFile()
 			.then(
-				(img) => { console.log('Converted: ', img); },
+				(img) => {
+					console.log('Converted: ', img);
+					return img;
+				},
 				(err) => { console.log(err); }
 			);
 	}
 
-	async performIMAnalisys(session, files, threshold = 0.01, color = 'red', render = false) {
-		console.log(threshold, color, render);
+	/**
+	 * performIMAnalisys.
+	 * @param {uuid} session The current session
+	 * @param {[]} files The image metadata to convert
+	 * @return {Promise<any>} a promise
+	 */
+	async performIMAnalisys(session) {
 		const output = `./uploads/${session}/diff.png`;
-		const file0 = `./uploads/${session}/${files[0].name}.png`;
-		const file1 = `./uploads/${session}/${files[1].name}.png`;
-
-		const opts = { env: process.env, killSignal: 'SIGKILL', stdio: 'inherit' };
-
+		const file0 = `./uploads/${session}/image-1.png`;
+		const file1 = `./uploads/${session}/image-2.png`;
 		const args = [
 			'-metric', 'AE', '-fuzz', '5%',
 			file0, file1, '-compose', 'src',
@@ -127,8 +140,44 @@ export default class CheckerService {
 		];
 
 		try {
-			const proc = spawn.sync('compare', args, opts);
-			console.log(proc);
+			const opts = { env: process.env, killSignal: 'SIGKILL', stdio: ['inherit'] };
+			const proc = spawn.spawnSync('compare', args, opts);
+			const retVal = {};
+
+			if (proc.stderr) {
+				// we use the stderr as for dissimilar images imagemagik quirkly returns 1
+				// and a non zero return code usually indicates an error
+				const difference = proc.stderr.toString('utf8', 0, proc.stderr.length);
+				const diffImageSize = this.getImageSize(output);
+				retVal.status = proc.status;
+				retVal.isIdentical = (proc.status === 0);
+				retVal.imageASize = this.getImageSize(file0);
+				retVal.imageBSize = this.getImageSize(file1);
+				retVal.pixelDiff = parseInt(difference);
+				retVal.percentDiff = parseFloat(difference / diffImageSize).toFixed(4);
+			}
+			return retVal;
+		} catch (err) { console.error(err); }
+	}
+
+	getImageSize(file) {
+		const args = ['-format', '%w %h', file];
+		const retVal = {
+			height: 0, // success
+			width: 0
+		};
+		const NUMERIC_REGEXP = /[-]{0,1}[\d]*[.]{0,1}[\d]+/g;
+		try {
+			const opts = { env: process.env, killSignal: 'SIGKILL', stdio: ['inherit'] };
+			const proc = spawn.spawnSync('identify', args, opts);
+
+			retVal.status = proc.status;
+			if (proc.status === 0 && proc.stdout) {
+				const data = proc.stdout.toString('utf8', 0, proc.stdout.length);
+				retVal.width = data.match(NUMERIC_REGEXP)[0];
+				retVal.height = data.match(NUMERIC_REGEXP)[1];
+			}
+			return retVal.height * retVal.width;
 		} catch (err) { console.error(err); }
 	}
 
@@ -144,17 +193,5 @@ export default class CheckerService {
 			return false;
 		}
 		return true;
-	}
-
-	async analisysComplete(err, isEqual, equality, raw) {
-		return new Promise(
-			(resolve, reject) => {
-				if (err) {
-					reject(err);
-				} else {
-					resolve({ isEqual: isEqual, equality: equality, raw: JSON.stringify(raw) });
-				}
-			}
-		);
 	}
 }
