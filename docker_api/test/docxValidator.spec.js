@@ -2,7 +2,7 @@
 'use strict';
 
 import chai from 'chai';
-import app from '../src/server.js'; // Our app
+// import app from '../src/server.js'; // Our app
 import DocXValidatorService from '../src/docXValidator.js';
 
 describe('index test', () => {

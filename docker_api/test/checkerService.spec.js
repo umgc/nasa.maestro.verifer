@@ -2,7 +2,7 @@
 'use strict';
 
 import chai from 'chai';
-import app from '../src/server.js'; // Our app
+// import app from '../src/server.js'; // Our app
 import CheckerService from '../src/checkerService.js';
 
 describe('index test', () => {
