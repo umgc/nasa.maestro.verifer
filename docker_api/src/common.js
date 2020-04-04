@@ -1,8 +1,6 @@
 'use strict';
 /* eslint-disable max-len */
 import _ from 'lodash';
-import unoconv from 'unoconv-promise';
-import uuid from 'uuidv4';
 
 // NB for some reason seems to hang if there are spaces
 // or parenthesis in the file names....
@@ -39,6 +37,4 @@ export default class Common {
 			}
 		});
 	}
-
-
 }
