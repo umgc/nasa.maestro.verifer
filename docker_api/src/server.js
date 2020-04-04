@@ -35,12 +35,13 @@ app.post('/api/docx/validate', urlencoderParser, async(req, res) => {
 		// TODO Retun appropriate status
 		res.send({ status: false, message: 'No file uploaded' });
 	} else {
-		docxSvc.validate(req.files.docs).then((result) => {
-			res.send(result);
-		})
-			.catch((error) => {
-				res.status(500).send(error);
-			});
+		const files = (Array.isArray(req.files.docs)) ?
+			req.files.docs :
+			[req.files.docs];
+
+		docxSvc.validate(files)
+			.then((result) => { res.send(result); })
+			.catch((error) => { res.status(500).send(error); });
 	}
 });
 

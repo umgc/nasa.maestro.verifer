@@ -1,10 +1,12 @@
 POST <hostname><port>/api/docx/validate
-file --> a docx to validate
-returns --> boolean 
+files docs --> an array of docx to validate
+returns --> Http response code 
+    and payload with validation 
 
 POST <hostname><port>/api/docx/checkDifference
-files -- > an array of 2 docx files to compare 
-returns --> a JSON obj with 
+files docs -- > an array of 2 docx files to compare 
+returns --> Http response code
+    and a JSON obj with 
     success status,
     Identical status,
     converted Image sizes

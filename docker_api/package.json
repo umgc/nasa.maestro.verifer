@@ -5,8 +5,8 @@
   "main": "./src/server.js",
   "type": "module",
   "scripts": {
-    "start": "nodemon --exec babel-node ./src/server.js",
-    "test": "env BABEL_ENV=test  mocha --no-config --timeout 10000 --require @babel/register",
+    "start": "nodemon --experimental-modules  --exec babel-node ./src/server.js",
+    "test": "mocha --no-config --timeout 10000 --require @babel/register",
     "serve": "node ./src/server.js",
     "debug": "node --inspect-brk ./dist/server.js",
     "build": "babel src --out-dir ./dist --source-maps",
@@ -81,21 +81,21 @@
     "lodash": "^4.17.15",
     "pdf-image": "^2.0.0",
     "unoconv-promise": "^1.0.8",
-    "uuidv4": "^6.0.6"
+    "uuidv4": "^6.0.7"
   },
   "devDependencies": {
     "@babel/cli": "^7.8.4",
-    "@babel/core": "^7.8.7",
+    "@babel/core": "^7.9.0",
     "@babel/node": "^7.8.7",
     "@babel/plugin-proposal-class-properties": "^7.8.3",
-    "@babel/preset-env": "^7.8.7",
-    "@babel/register": "^7.8.6",
+    "@babel/preset-env": "^7.9.0",
+    "@babel/register": "^7.9.0",
     "chai": "^4.2.0",
     "chai-http": "^4.3.0",
     "eslint": "^6.8.0",
-    "mocha": "^7.1.0",
+    "mocha": "^7.1.1",
     "mocha-junit-reporter": "^1.23.3",
     "nodemon": "^2.0.2",
-    "webpack": "^4.42.0"
+    "webpack": "^4.42.1"
   }
 }

@@ -16,9 +16,6 @@ export default class CheckerService {
 	/**
 	 * checkDifference
 	 * @param {any} files The files from the request upload
-	 * @param {number} threshold defaults to 0
-	 * @param {number} color defaults to 0
-	 * @param {boolean} render defaults to false
 	 * @return {[any]} an JSON object with the operation results
 	 */
 	async checkDifference(files) {
