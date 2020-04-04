@@ -6,7 +6,6 @@ import fileUpload from 'express-fileupload';
 import fs from 'fs';
 import stream from 'stream';
 import path from 'path';
-
 import CheckerService from './checkerService.js';
 import DocXValidatorService from './docXValidator.js';
 
@@ -27,8 +26,12 @@ app.listen(port, () => {
 	console.log('Server is started on http://localhost:' + port);
 });
 
-// POST
-// receives a docx document and verifies it's valid
+/**
+ * receives a docx document and verifies it's valid
+ * POST
+ * req.files.docs can be either single or multiple files
+ * returns a status code with a json result object
+ */
 app.post('/api/docx/validate', urlencoderParser, async(req, res) => {
 	const docxSvc = new DocXValidatorService();
 	if (!req.files) {
@@ -45,15 +48,21 @@ app.post('/api/docx/validate', urlencoderParser, async(req, res) => {
 	}
 });
 
-// POST
-// Receives an output docx and compares it to a set image of a previous docx
-// Returns a percent difference
+/**
+ * Receives two docx and compares them
+ * POST
+ * req.files.docs can be either single or multiple files
+ * returns a status code with a json result object including
+ * a percent difference, and formed links to the images produced
+ */
 app.post('/api/docx/checkDifference', urlencoderParser, async(req, res) => {
 	console.log(req.body, 'Calculating difference between document outputs.');
 	if (!req.files) {
 		res.send({ status: false, message: 'No file uploaded' });
+	} else if (req.files.docs.length !== 2) {
+		res.send({ status: false, message: 'Maximum 2 files can be compared at a time' });
 	} else {
-		svc.checkDifference(req.files)
+		svc.processData(req.files.docs, true)
 			.then((result) => {
 				const retVal = {
 					response: result.data,
@@ -71,6 +80,30 @@ app.post('/api/docx/checkDifference', urlencoderParser, async(req, res) => {
 	}
 });
 
+/**
+ * Receives n docx and converts them the the standard png used for comparison
+ * POST
+ * req.files.docs can be either single or multiple files
+ * returns a status code with a json result object including
+ *  formed links to the images produced
+ */
+app.post('/api/docx/convertDocX', urlencoderParser, async(req, res) => {
+	if (!req.files) {
+		res.send({ status: false, message: 'No file uploaded' });
+	} else {
+		svc.processData(req.files.docs, false)
+			.then((result) => {
+				res.send(result);
+			})
+			.catch((error) => {
+				res.status(500).send(error);
+			});
+	}
+});
+
+/**
+ * getDiffImage returns the diff image from a specific session
+*/
 app.get('/api/docx/getDiffImage', urlencoderParser, async(req, res) => {
 	const session = req.query.sessionId;
 	const path = `./uploads/${session}/diff.png`;
@@ -81,6 +114,9 @@ app.get('/api/docx/getDiffImage', urlencoderParser, async(req, res) => {
 	res.sendFile(`./uploads/${session}/diff.png`, { root: root });
 });
 
+/**
+ * getDiffImage returns the one of the images from a specific session
+*/
 app.get('/api/docx/getImage', urlencoderParser, async(req, res) => {
 	const session = req.query.sessionId;
 	const index = req.query.index;
@@ -92,6 +128,10 @@ app.get('/api/docx/getImage', urlencoderParser, async(req, res) => {
 	res.sendFile(path, { root: root });
 });
 
+/**
+ * getDiffImage returns the diff image from a specific session
+ * as a byte stream
+*/
 app.get('/api/docx/getDiffImageStream', urlencoderParser, async(req, res) => {
 	const session = req.query.sessionId;
 	const path = `./uploads/${session}/diff.png`;
@@ -110,10 +150,16 @@ app.get('/api/docx/getDiffImageStream', urlencoderParser, async(req, res) => {
 	ps.pipe(res);
 });
 
+/**
+ * Produces a the app main info page (to be developed)
+*/
 app.get('/', urlencoderParser, async(req, res) => {
 	res.sendFile(path.join(root, '/src/index.html'));
 });
 
+/**
+ * Produces a the app help page (to be developed)
+*/
 app.get('/help', urlencoderParser, async(req, res) => {
 	res.sendFile(path.join(root, '/src/help.html'));
 });

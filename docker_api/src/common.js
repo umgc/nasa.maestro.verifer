@@ -2,14 +2,14 @@
 /* eslint-disable max-len */
 import _ from 'lodash';
 
-// NB for some reason seems to hang if there are spaces
-// or parenthesis in the file names....
-
 export default class Common {
 	constructor() { }
 
 	/**
 	 * saveUploadedFiles
+	 * Loops throught the uploaded files array,
+	 * extraxts basic metadata
+	 * and saves them to a temporary directory
 	 * @param {uuid} session The current session
 	 * @param {any} files The files from the request upload
 	 * @return {[any]} an array of doc metadata

@@ -1,66 +1,45 @@
 'use strict';
 /* eslint-disable max-len */
-import _ from 'lodash';
 import unoconv from 'unoconv-promise';
 import uuid from 'uuidv4';
 import PDFImage from 'pdf-image';
 import spawn from 'child_process';
 import fs from 'fs';
+import Common from './common.js';
 
 // NB for some reason seems to hang if there are spaces
 // or parenthesis in the file names....
 
 export default class CheckerService {
+	common = new Common();
 	constructor() { }
 
 	/**
-	 * checkDifference
+	 * processData
 	 * @param {any} files The files from the request upload
+	 * @param {boolean} analyze specifies if the process ends with the generation
+	 * of images or the analisys
 	 * @return {[any]} an JSON object with the operation results
 	 */
-	async checkDifference(files) {
+	async processData(files, analyze = false) {
 		try {
 			const session = uuid.uuid();
-			const pdfs = await this.saveUploadedFiles(session, files);
+			const pdfs = await this.common.saveUploadedFiles(session, files);
 			await this.convertFiles(session, pdfs);
-			const analisysData = await this.performIMAnalisys(session, pdfs);
-			return {
-				data: analisysData,
-				sessionId: session
-			};
+			if (analyze) {
+				return {
+					sessionId: session,
+					data: await this.performIMAnalisys(session, pdfs)
+				};
+			} else {
+				return {
+					sessionId: session,
+					data: await this.generateLinks(session, pdfs)
+				};
+			}
 		} catch (err) {
 			console.log(err);
 		}
-	}
-
-	/**
-	 * saveUploadedFiles
-	 * @param {uuid} session The current session
-	 * @param {any} files The files from the request upload
-	 * @return {[any]} an array of doc metadata
-	 */
-	async saveUploadedFiles(session, files) {
-		const uploads = [];
-		return new Promise((resolve, reject) => {
-			try {
-				console.log('Saving uploaded files to session folder');
-				// loop through all files
-				_.forEach(_.keysIn(files.docs), (key) => {
-					const docx = files.docs[key];
-					uploads.push({
-						name: docx.name,
-						mimetype: docx.mimetype,
-						size: docx.size
-					});
-					// move photo to uploads directory
-					docx.mv(`./uploads/${session}/${docx.name}`);
-					console.log(`${docx.name} saved!`);
-				});
-				resolve(uploads);
-			} catch (err) {
-				reject(err);
-			}
-		});
 	}
 
 	/**
@@ -178,17 +157,19 @@ export default class CheckerService {
 		} catch (err) { console.error(err); }
 	}
 
-	/**
-	 * isValidDocxDocument.
-	 * @param {uuid} session The current session
-	 * @param {Object} doc The document metadata to validate
-	 * @return {boolean} a promise
-	 */
-	isValidDocxDocument(session, doc) {
-		console.log('isValidDocxDocument TO BE IMPLEMENTED STILL!!', doc);
-		if (doc === null) {
-			return false;
+	async generateLinks(session, files) {
+		// loop through all files
+		const linksArray = [];
+		let i = 0;
+		for (const f of files) {
+			const value = {
+				docx: f.name,
+				link: `<Host:port>/api/docx/getImage?sessionId=${session}&index=${i}`
+			};
+			i++;
+			linksArray.push(value);
 		}
-		return true;
+		console.log(linksArray);
+		return linksArray;
 	}
 }
