@@ -1,0 +1,89 @@
+{
+  "id": "efdd185c-3f19-450d-96f6-5b0d34dba100",
+  "version": "2.0",
+  "name": "createProject",
+  "url": "http://localhost:8000",
+  "tests": [{
+    "id": "354ba586-282b-488d-9861-a1c84f2ec190",
+    "name": "Untitled",
+    "commands": [{
+      "id": "d1018a58-fa22-4bf4-84d8-4b9bd3c0c30d",
+      "comment": "",
+      "command": "open",
+      "target": "/nasa-enter",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "d11a179a-d0f5-4a39-9e95-9bb8d9352994",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "1919x1079",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "b48d6872-2a1a-47aa-8f77-1d054da33576",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=Create a new project",
+      "targets": [
+        ["linkText=Create a new project", "linkText"],
+        ["css=p:nth-child(2) > a", "css:finder"],
+        ["xpath=//a[contains(text(),'Create a new project')]", "xpath:link"],
+        ["xpath=//a[contains(@href, 'createProject')]", "xpath:href"],
+        ["xpath=//a", "xpath:position"],
+        ["xpath=//a[contains(.,'Create a new project')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "0cff6c9a-0623-4786-b660-e65fced0e9b4",
+      "comment": "",
+      "command": "click",
+      "target": "id=projectName",
+      "targets": [
+        ["id=projectName", "id"],
+        ["name=projectName", "name"],
+        ["css=#projectName", "css:finder"],
+        ["xpath=//input[@id='projectName']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "2ba26b39-729a-47ad-98c7-4e79eea49022",
+      "comment": "",
+      "command": "type",
+      "target": "id=projectName",
+      "targets": [
+        ["id=projectName", "id"],
+        ["name=projectName", "name"],
+        ["css=#projectName", "css:finder"],
+        ["xpath=//input[@id='projectName']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": "sts-674"
+    }, {
+      "id": "125ea469-58dd-4862-9fc9-22cffcaf4923",
+      "comment": "",
+      "command": "click",
+      "target": "id=createBtn",
+      "targets": [
+        ["id=createBtn", "id"],
+        ["name=createBtn", "name"],
+        ["css=#createBtn", "css:finder"],
+        ["xpath=//button[@id='createBtn']", "xpath:attributes"],
+        ["xpath=//button", "xpath:position"],
+        ["xpath=//button[contains(.,'OK')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }]
+  }],
+  "suites": [{
+    "id": "ed25aa7c-2575-41f7-9200-260ca2e10f32",
+    "name": "Default Suite",
+    "persistSession": false,
+    "parallel": false,
+    "timeout": 300,
+    "tests": ["354ba586-282b-488d-9861-a1c84f2ec190"]
+  }],
+  "urls": ["http://localhost:8000/"],
+  "plugins": []
+}

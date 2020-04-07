@@ -1,0 +1,23 @@
+<%- include('header.ejs') %>
+<div>
+    <p><a href='new-entry'>Enter new entry</a></p>
+    <p><a href='personal-profile'>Edit personal profile</a></p>
+    <p><a href='nasa-enter'>Enter NASA maestro software</a></p>
+</div>
+
+<% if (entries.length) { %>
+    <% entries.forEach( entry =>{ %>
+        <div>
+            <div class="title">
+                <strong>Title: <%= entry.title %></strong>
+            </div>
+            <div class="content">
+                <%= entry.content %>
+            </div><hr
+        </div>
+     <%}) %>
+<% }else{ %>
+    no entry!
+<% } %>
+
+<%- include('footer.ejs') %>

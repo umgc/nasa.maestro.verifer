@@ -130,6 +130,13 @@ module.exports = class CommanderProgram extends Program {
 			.action((projectPath, options) => {
 				this.serveMaestroWeb(projectPath, options);
 			});
+		this.commander
+			.command('format [projectPath]')
+			.description('Serve Maestro web app')
+			.option('-p, --port <num>', 'specify port on which to serve', 8000)
+			.action((projectPath, options) => {
+				this.serveFormatWeb(projectPath, options);
+			});
 
 	}
 
@@ -256,6 +263,18 @@ module.exports = class CommanderProgram extends Program {
 	}
 
 	serveMaestroWeb(projectPath, options) {
+		this.projectPath = handleProjectPath(projectPath);
+		this.validateProgramArguments();
+
+		const server = new Server(this);
+		server
+			.setPort(options.port)
+			.setupStatic()
+			.serve();
+	}
+
+	serveFormatWeb(projectPath, options) {
+		console.log(__dirname);
 		this.projectPath = handleProjectPath(projectPath);
 		this.validateProgramArguments();
 

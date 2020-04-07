@@ -1,0 +1,23 @@
+<%- include('header')%>
+
+<div>
+    <a href="/nasa-enter">&#8592Go back to main</a>
+</div>
+
+<div>
+    <h5>Upload DOCX file into server for file conversion</h5>
+    <!-- enctype="multipart/form-data" is important for file upload-->
+    <!-- file input must have a name property -->
+    <form action="/uploadDocx" method="post" enctype="multipart/form-data" for="form">
+        <%- include('projectSelect', {name: 'project'}) %>
+        <div>
+            <label for="docxFile">Select a DOCX file</label>
+            <input type="file" id="fileInput" name="docxFile">
+        </div>
+        <input type="submit" id="uploadBtn" name="uploadBtn" class="btn">
+            Upload the selected file
+        </input>
+    </form>
+</div>
+
+<%- include('footer')%>

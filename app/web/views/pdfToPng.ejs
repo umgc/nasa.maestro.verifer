@@ -1,0 +1,16 @@
+<%- include('header')%>
+
+<div>
+    <a href="/nasa-enter">&#8592Go back to main</a>
+</div>
+<div>
+    <h5>Convert DOCX to PDF</h5>
+    <form action="/pdfToPng" method="post">
+        <%- include('comboSelect')%>
+        <input type="submit" id="covertPdf" name="covertPdf">
+            Convert PDF file
+        </input>
+    </form>
+</div>
+
+<%- include('footer')%>

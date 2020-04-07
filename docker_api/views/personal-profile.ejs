@@ -1,0 +1,27 @@
+<%- include('header')%>
+<form action="/personal-profile", method="post" role="form">
+    <div>
+        <label for="firstNameText">First Name:</label>
+        <input type="text" id="firstNameInput"  name="firstName" class="text">
+    </div>
+    <div>
+        <label for="lastNameText">First Name:</label>
+        <input type="text" id="lastNameInput" name="lastName" class="text">
+    </div>
+    <div>
+        <label for="ageText">Age Year:</label>
+        <input type="number" id="ageText" name="age" class="number">
+    </div>
+    <div>
+        <label for="genderRadio">Gender: </label>
+        <input type="radio" id="maleRadio" name="gender" class="radio" value="Male">Male
+        <input type="radio" id="femaleRadio" name="gender" class="radio" value="Female">Female
+        <input type="radio" id="otherGenderRadio" name="gender" class="radio" value="Other">Other
+    </div>
+    <div>
+        <input type="submit" class="button" value="submit">
+        <input type="reset" class="button" value="reset">
+    </div>
+</form>
+
+<%- include('footer')%>

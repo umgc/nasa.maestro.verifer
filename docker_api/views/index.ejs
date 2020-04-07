@@ -1,0 +1,18 @@
+<%- include('header.ejs') %>
+<div>
+    <p><a href='nasa-enter'>Enter NASA maestro software</a></p>
+</div>
+
+<hr>
+<h5>Current tasks:</h5>
+<% if (projects.length) { %>
+    <% projects.forEach( entry =>{ %>
+        <div>
+                <p><%= entry %></p>
+        </div>
+     <%}) %>
+<% }else{ %>
+    no entry!
+<% } %>
+
+<%- include('footer.ejs') %>

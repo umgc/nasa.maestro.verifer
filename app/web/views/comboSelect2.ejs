@@ -1,0 +1,93 @@
+    <div>
+        <label for="select1"><%=label1%></label>
+        <select name="select1" id="select1">
+        </select>
+    </div>
+    <div>
+        <label for="select2"><%=label2%></label>
+        <select name="select2" id="select2">
+        </select>
+    </div>
+    <div>
+        <label for="select3"><%=label3%></label>
+        <select name="select3" id="select3">
+        </select>
+    </div>
+
+    <script>
+        var data = <%- JSON.stringify(data) %>
+        var select1 = document.getElementById('select1')
+        var select2 = document.getElementById('select2')
+        var select3 = document.getElementById('select3')
+
+        // dynamic options
+        const getOptions = function(list){
+            var options = []
+            list.forEach( (item)=>{
+                options.push( '<option>'+ item +'</option>')
+            })  
+            //console.log(options.join("\n"))
+            return options.join("\n")
+        }
+
+        // 
+        var state ={
+            option1: Object.keys(data),
+            select1: '',
+            option2: data[Object.keys(data)[0]],
+            select2: '',
+            option3: data[Object.keys(data)[0]],
+            select3: ''
+        }
+        var setState = function(newState){
+            state = {
+                ...state,
+                ...newState
+            }
+            render()
+        }
+
+        var render = function(){
+            select1.innerHTML = getOptions(state.option1)
+            select1.value = state.select1
+            select2.innerHTML = getOptions(state.option2)
+            select2.value = state.select2
+            select3.innerHTML = getOptions(state.option3)
+            select3.value = state.select3
+            //console.log(select1.selected)
+            console.log(`${state.select1}, ${state.select2}, ${state.select3}`)
+        }
+
+        select1.addEventListener('click', (e)=>{
+            //console.log(`Selected value: ${e.target.value}`)
+            //console.log(`Selected index: ${e.target.selectedIndex}`)
+            var newState = {
+                select1: e.target.value,
+                select2: '',
+                option2: data[e.target.value],
+                select3: '',
+                option3: data[e.target.value]
+            }
+            setState(newState)
+        })
+
+        select2.addEventListener('click', (e)=>{
+            // console.log(e.target.selectedIndex)
+            const newOption3 = [...state.option2]
+            newOption3.splice(e.target.selectedIndex, 1)
+            var newState = {
+                select2: e.target.value,
+                option3: newOption3
+            }
+            setState(newState)
+        })
+
+        select3.addEventListener('click', (e)=>{
+            console.log(e.target.selectedIndex)
+            var newState = {
+                select3: e.target.value
+            }
+            setState(newState)
+        })
+        render()
+    </script>

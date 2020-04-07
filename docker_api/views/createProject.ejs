@@ -1,0 +1,20 @@
+<%- include('header')%>
+
+<div>
+    <a href="/nasa-enter">&#8592Go back to main</a>
+</div>
+<div>
+    <h5>Create a new project</h5>
+    <form action="/createProject" method="post" for="form">
+        <div>
+            <label for="projectName">Enter project name</label>
+            <input type="text" id="projectName" name="projectName" 
+                placeholder="Enter project name">
+        </div>
+        <button type="submit" id="createBtn" name="createBtn">OK</button>
+        <button type="reset" id="resetBtn" name="resetBtn">Reset</button>
+    </form>
+</div>
+
+<%-include('projectList')%>
+<%- include('footer')%>

@@ -1,0 +1,12 @@
+<div>
+    <label for="project">Select a project</label>
+    
+    <select name=<%=name%> id=<%=name%> >
+        <% projects.forEach((item)=>{ %>
+            <option>
+                <%=item%>
+            </option>
+        <% }) %>
+        
+    </select>
+</div>

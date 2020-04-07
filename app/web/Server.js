@@ -7,16 +7,20 @@ const express = require('express');
 const nunjucks = require('../model/nunjucksEnvironment');
 
 const consoleHelper = require('../helpers/consoleHelper');
-
+//
+const ejs = require('ejs');
 module.exports = class Server {
 
 	constructor(program) {
 
 		this.program = program;
 		this.procedureFiles = program.getProjectProcedureFiles();
-
+		// console.log(this.procedureFiles);
 		this.app = express();
 		this.port = 8000;
+		this.app.set('views', path.resolve(__dirname, 'views'));
+		console.log(path.resolve(__dirname, 'views'));
+		this.app.set('view engine', 'ejs');
 
 		this.staticResources = [
 			// Serve project resources
@@ -135,8 +139,12 @@ module.exports = class Server {
 		this.app.get('/', (req, res) => {
 			res.send(nunjucks.render('maestro-conduct.html', {
 				title: 'Maestro',
-				procedureFiles: this.procedureFiles
+				procedureFiles: [this.procedureFiles]
 			}));
+		});
+		this.app.get('/nasa-enter', (req, res)=>{
+			// res.send('nasa maestro team 1');
+			res.render('nasa-enter');
 		});
 
 		this.app.post('/edit/:filetype/:filename', this.handleFileUpdates);

@@ -1,0 +1,14 @@
+<hr>
+<h5>List of projects</h5>
+
+<% if (projects.length) { %>
+    <% projects.forEach( entry =>{ %>
+        <ul>
+            <li>
+                <%= entry%>
+            </li>
+        </ul>
+     <%}) %>
+<% }else{ %>
+    No data!
+<% } %>

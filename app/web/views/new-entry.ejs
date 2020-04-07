@@ -1,0 +1,15 @@
+<%- include('header')%>
+<form action="/new-entry" method='post' role='form'>
+    <div>
+        <h6>Title</h6>
+        <input type='textArea' id='title' name='title'></input>
+    </div>
+    <div>
+        <h6>Note</h6>
+        <input type='textArea' id='content' name='content'></input>
+    </div><br>
+    <div>
+        <input type="submit" value='Post entry'></input>
+    </div>
+</form>
+<%- include('footer')%>
