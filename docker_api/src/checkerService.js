@@ -1,18 +1,18 @@
 'use strict';
 /* eslint-disable max-len */
-import unoconv from 'unoconv-promise';
 import uuid from 'uuidv4';
-import PDFImage from 'pdf-image';
-import spawn from 'child_process';
 import fs from 'fs';
-import Common from './common.js';
 
 // NB for some reason seems to hang if there are spaces
 // or parenthesis in the file names....
 
 export default class CheckerService {
-	common = new Common();
-	constructor() { }
+	constructor(opts) {
+		this.common = opts.common;
+		this.unoconv = opts.unoconv;
+		this.spawn = opts.spawn;
+		this.pdf2imageService = opts.pdf2imageService;
+	}
 
 	/**
 	 * processData
@@ -70,7 +70,7 @@ export default class CheckerService {
 	 * @return {Promise<any>} a promise
 	 */
 	async convertDocxToPdf(session, docx) {
-		return await unoconv.run({
+		return await this.unoconv.run({
 			file: `./uploads/${session}/${docx.name}`,
 			output: `./uploads/${session}/${docx.name}.pdf`
 		});
@@ -86,7 +86,7 @@ export default class CheckerService {
 	async convertPdfToImg(session, doc) {
 		console.log(`Attempting conversion of: ./uploads/${session}/${doc.name}.pdf`);
 		const opts = { '-quality': '100' };
-		const converter = new PDFImage.PDFImage(
+		const converter = new this.pdf2imageService.PDFImage(
 			`./uploads/${session}/${doc.name}.pdf`,
 			{ opts, combinedImage: true });
 		return converter.convertFile()
@@ -117,7 +117,7 @@ export default class CheckerService {
 
 		try {
 			const opts = { env: process.env, killSignal: 'SIGKILL', stdio: ['inherit'] };
-			const proc = spawn.spawnSync('compare', args, opts);
+			const proc = this.spawn.spawnSync('compare', args, opts);
 			const retVal = {};
 
 			if (proc.stderr) {
@@ -145,7 +145,7 @@ export default class CheckerService {
 		const NUMERIC_REGEXP = /[-]{0,1}[\d]*[.]{0,1}[\d]+/g;
 		try {
 			const opts = { env: process.env, killSignal: 'SIGKILL', stdio: ['inherit'] };
-			const proc = spawn.spawnSync('identify', args, opts);
+			const proc = this.spawn.spawnSync('identify', args, opts);
 
 			retVal.status = proc.status;
 			if (proc.status === 0 && proc.stdout) {
