@@ -10,7 +10,7 @@ describe('index test', () => {
 		it('should say Hello too guys!', () => {
 
 			const str = 'Hello too guys!';
-			chai.expect(str).to.equal('Hello too guyz!');
+			chai.expect(str).to.equal('Hello too guys!');
 		});
 	});
 });

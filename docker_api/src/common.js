@@ -15,14 +15,14 @@ export default class Common {
 	 * @return {[any]} an array of doc metadata
 	 */
 	async saveUploadedFiles(session, files) {
-		const uploads = [];
+		const savedUploads = [];
 		return new Promise((resolve, reject) => {
 			try {
 				console.log('Saving uploaded files to session folder');
 				// loop through all files
 				_.forEach(_.keysIn(files), (key) => {
 					const docx = files[key];
-					uploads.push({
+					savedUploads.push({
 						name: docx.name,
 						mimetype: docx.mimetype,
 						size: docx.size
@@ -30,7 +30,7 @@ export default class Common {
 					docx.mv(`./uploads/${session}/${docx.name}`);
 					console.log(`${docx.name} saved!`);
 				});
-				resolve(uploads);
+				resolve(savedUploads);
 			} catch (err) {
 				console.log(err);
 				reject(err);
