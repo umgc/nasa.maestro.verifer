@@ -1,0 +1,14 @@
+version: '3'
+services:
+  api:
+    image: maestro-verify-gm
+    build: .
+    networks:
+      - backend
+    ports:
+      - "3001:3000"
+
+  
+networks:
+  backend:
+    driver: bridge

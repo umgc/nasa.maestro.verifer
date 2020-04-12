@@ -1,0 +1,53 @@
+FROM node:buster-slim
+
+# |--------------------------------------------------------------------------
+# | Common libraries and dependencies for conversion to img
+# |--------------------------------------------------------------------------
+RUN echo "deb http://httpredir.debian.org/debian/ buster main contrib non-free" > /etc/apt/sources.list &&\
+    apt-get update &&\
+    apt-get install -y curl wget gnupg ttf-mscorefonts-installer procps \
+    && apt-get install -y imagemagick graphicsmagick ghostscript poppler-utils
+
+# |--------------------------------------------------------------------------
+# | LibreOffice
+# |--------------------------------------------------------------------------
+# | https://github.com/nextcloud/docker/issues/380
+RUN mkdir -p /usr/share/man/man1mkdir -p /usr/share/man/man1 &&\ 
+    echo "deb http://httpredir.debian.org/debian/ buster-backports main contrib non-free" >> /etc/apt/sources.list &&\
+    apt-get update &&\
+    apt-get -t buster-backports -y install libreoffice
+
+# |--------------------------------------------------------------------------
+# | Unoconv
+# |--------------------------------------------------------------------------
+ENV UNO_URL=https://raw.githubusercontent.com/dagwieers/unoconv/master/unoconv
+RUN curl -Ls $UNO_URL -o /usr/bin/unoconv &&\
+    chmod +x /usr/bin/unoconv &&\
+    ln -s /usr/bin/python3 /usr/bin/python &&\
+    unoconv --version 
+WORKDIR /etc/init.d    
+COPY unoconvd .
+RUN update-rc.d unoconvd defaults
+
+# |--------------------------------------------------------------------------
+# | Default user
+# |--------------------------------------------------------------------------
+ARG MAESTRO_USER_GID=1001
+ARG MAESTRO_USER_UID=1001
+RUN groupadd --gid ${MAESTRO_USER_GID} maestro \
+    && useradd --uid ${MAESTRO_USER_UID} --gid maestro --shell /bin/bash --home /maestro --no-create-home maestro \
+    && mkdir /maestro \
+    && chown maestro: /maestro
+
+# |--------------------------------------------------------------------------
+# | Installs the app and sets up the port
+# |--------------------------------------------------------------------------
+RUN mkdir -p /usr/src/app
+WORKDIR /usr/src/app
+COPY . .
+RUN rm -rf node_modules \
+    && npm install 
+RUN npm run-script build:prod
+EXPOSE 3000
+
+CMD ["npm", "run-script", "serve"]

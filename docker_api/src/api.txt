@@ -1,0 +1,36 @@
+POST <hostname><port>/api/docx/validate
+files docs --> an array of docx to validate
+returns --> Http response code 
+    and payload with validation 
+
+POST <hostname><port>/api/docx/checkDifference
+files docs -- > an array of 2 docx files to compare 
+returns --> Http response code
+    and a JSON obj with 
+    success status,
+    Identical status,
+    converted Image sizes
+    pixel difference,
+    percent difference
+    and links to produced imageLinks
+
+GET <hostname><port>/api/docx/getDiffImage
+sessionId
+returns the diff image
+
+GET <hostname><port>/api/docx/getImage
+sessionId
+index
+returns the image @ index
+
+
+GET <hostname><port>/api/docx/getDiffImageStream
+sessionId
+returns the diffimage as a byte stream
+
+
+GET <hostname><port>
+returns the main page for the api (empty at this time)
+
+GET <hostname><port>/help
+returns the help page for the api (empty at this time)

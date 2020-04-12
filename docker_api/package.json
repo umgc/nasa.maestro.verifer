@@ -1,0 +1,101 @@
+{
+  "name": "docker_api",
+  "version": "0.0.0",
+  "description": "Dockerized WebAPI",
+  "main": "./src/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "nodemon --experimental-modules  --exec babel-node ./src/server.js",
+    "test": "mocha --no-config --timeout 10000 --require @babel/register",
+    "serve": "node ./src/server.js",
+    "debug": "node --inspect-brk ./dist/server.js",
+    "build": "babel src --out-dir ./dist --source-maps",
+    "build:prod": "babel src --out-dir ./dist",
+    "lint": "eslint . --color",
+    "lint:fix": "eslint . --color --fix"
+  },
+  "author": "Alberto L. Bonfiglio",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/xOPERATIONS/maestro.git"
+  },
+  "license": "ISC",
+  "eslintIgnore": [
+    "node_modules"
+  ],
+  "babel": {
+    "env": {
+      "build": {
+        "presets": [
+          "@babel/preset-env"
+        ],
+        "plugins": [
+          "@babel/plugin-proposal-class-properties"
+        ]
+      },
+      "test": {
+        "presets": [
+          "@babel/env"
+        ],
+        "plugins": [
+          "@babel/plugin-proposal-class-properties",
+          "@babel/plugin-transform-runtime"
+        ]
+      }
+    }
+  },
+  "standard": {
+    "env": [
+      "mocha"
+    ]
+  },
+  "mocha": {
+    "diff": true,
+    "extension": [
+      "js"
+    ],
+    "require": [
+      "@babel/register"
+    ],
+    "opts": false,
+    "package": "./package.json",
+    "reporter": "spec",
+    "slow": 75,
+    "timeout": 2000,
+    "ui": "bdd",
+    "spec": "./test/*.spec.js",
+    "watch-files": [
+      "./app/*.js",
+      "./test/*.spec.js"
+    ],
+    "watch-ignore": [
+      "./node_modules/**"
+    ]
+  },
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "cross-spawn": "^7.0.1",
+    "express": "^4.17.1",
+    "express-fileupload": "^1.1.6",
+    "lodash": "^4.17.15",
+    "pdf-image": "^2.0.0",
+    "unoconv-promise": "^1.0.8",
+    "uuidv4": "^6.0.7"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.9.0",
+    "@babel/node": "^7.8.7",
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
+    "@babel/preset-env": "^7.9.0",
+    "@babel/register": "^7.9.0",
+    "chai": "^4.2.0",
+    "chai-http": "^4.3.0",
+    "eslint": "^6.8.0",
+    "mocha": "^7.1.1",
+    "mocha-junit-reporter": "^1.23.3",
+    "nodemon": "^2.0.2",
+    "webpack": "^4.42.1"
+  }
+}

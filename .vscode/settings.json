@@ -4,5 +4,6 @@
     "files.insertFinalNewline": true,
     "editor.codeActionsOnSave": {
         "source.fixAll.eslint": true
-    }
+    },
+    "python.pythonPath": "/bin/python3"
 }

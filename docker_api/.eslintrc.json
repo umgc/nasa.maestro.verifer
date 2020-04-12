@@ -1,0 +1,52 @@
+{
+	"env": {
+		"browser": true,
+		"node": true,
+		"mocha": true
+	},
+	"parser": "babel-eslint",
+	"extends": [
+		// Based upon Wikimedia Foundation guidelines [1]. Why WMF? It's
+		// maintained by a good-enough democracy that will probably make better
+		// decisions than any dictator will, and is highly focused on inclusion
+		// and what works best for the widest range of people.
+		//
+		// Base options are "wikimedia/server" and "wikimedia/client"
+		// Per [1], wikimedia/server = wikimedia, wikimedia/node, and
+		// wikimedia/language/es6. The config below switches
+		// wikimedia/language/es6 for wikimedia/language/es2016, but otherwise
+		// is equivalent to wikimedia/server.
+		//
+		// IN ORDER TO SUPPORT BROWSER-BASED RENDERING, MAY NEED TO SWITCH TO
+		// wikimedia/client. Or just don't support older browsers.
+		//
+		// [1] https://github.com/wikimedia/eslint-config-wikimedia
+		"wikimedia",
+		"wikimedia/node",
+		"wikimedia/language/es2019",
+		"plugin:react/recommended"
+	],
+    "parserOptions": {
+		"ecmaVersion": 2018,
+		"sourceType": "module"
+    },
+	"rules": {
+		// can't have this without causing headaches on Windows
+		"linebreak-style": "off",
+
+		// Don't follow WMF standard here because it would require so many
+		// changes to current codebase.
+		"space-in-parens": ["error", "never"],
+		"computed-property-spacing": ["error", "never"],
+		"array-bracket-spacing": ["error", "never"],
+		"space-before-function-paren": ["error", "never"],
+
+		// warn = 1, require = 2
+		"require-jsdoc": 1
+	},
+	"settings": {
+		"react": {
+			"version": "detect"
+		}
+	}
+}
