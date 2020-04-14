@@ -1,0 +1,19 @@
+
+
+# start web application:
+
+
+1. got into the directory docker_api
+
+2. launch the web by "npm start"
+
+
+#launch mocha test
+
+
+1. got into the directory docker_api
+
+2. then move one of *.spec.js file form ./test/pass to ./test
+
+3. launch the web by "npm test"
+

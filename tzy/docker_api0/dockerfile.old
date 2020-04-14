@@ -1,0 +1,149 @@
+FROM node:buster-slim
+
+# |--------------------------------------------------------------------------
+# | Common libraries
+# |--------------------------------------------------------------------------
+# |
+# | Libraries used in the build process of this image.
+# |
+RUN echo "deb http://httpredir.debian.org/debian/ buster main contrib non-free" > /etc/apt/sources.list &&\
+    apt-get update &&\
+    apt-get install -y curl wget gnupg ttf-mscorefonts-installer procps cmake
+
+# |--------------------------------------------------------------------------
+# | LibreOffice
+# |--------------------------------------------------------------------------
+# |
+# | Installs LibreOffice.
+# |
+
+# https://github.com/nextcloud/docker/issues/380
+RUN mkdir -p /usr/share/man/man1mkdir -p /usr/share/man/man1 &&\ 
+    echo "deb http://httpredir.debian.org/debian/ buster-backports main contrib non-free" >> /etc/apt/sources.list &&\
+    apt-get update &&\
+    apt-get -t buster-backports -y install libreoffice
+
+# |--------------------------------------------------------------------------
+# | Unoconv
+# |--------------------------------------------------------------------------
+# |
+# | Installs unoconv.
+# |
+ENV UNO_URL=https://raw.githubusercontent.com/dagwieers/unoconv/master/unoconv
+
+RUN curl -Ls $UNO_URL -o /usr/bin/unoconv &&\
+    chmod +x /usr/bin/unoconv &&\
+    ln -s /usr/bin/python3 /usr/bin/python &&\
+    unoconv --version
+
+# |--------------------------------------------------------------------------
+# | PDFtk
+# |--------------------------------------------------------------------------
+# |
+# | Installs PDFtk as an alternative to pdfcpu for merging PDFs.
+# | https://github.com/thecodingmachine/maestro/issues/29
+# |
+RUN apt-get -y install pdftk
+
+# |--------------------------------------------------------------------------
+# | opencv
+# |--------------------------------------------------------------------------
+
+ENV OPENCV_VERSION=4.2.0
+ENV WITH_CONTRIB=Y 
+ENV OPENCV4NODEJS_DISABLE_AUTOBUILD=1
+ENV NODE_PATH = /usr/lib/node_modules
+
+RUN apt-get update && \
+    apt-get install -y build-essential curl && \
+    apt-get install -y --no-install-recommends wget unzip git python cmake && \
+    rm -rf /var/lib/apt/lists/* && \
+    mkdir opencv && \
+    cd opencv && \
+    wget https://github.com/Itseez/opencv/archive/${OPENCV_VERSION}.zip --no-check-certificate -O opencv-${OPENCV_VERSION}.zip && \
+    unzip opencv-${OPENCV_VERSION}.zip && \
+    if [ -n "$WITH_CONTRIB" ]; then \
+    wget https://github.com/Itseez/opencv_contrib/archive/${OPENCV_VERSION}.zip --no-check-certificate -O opencv_contrib-${OPENCV_VERSION}.zip; \
+    unzip opencv_contrib-${OPENCV_VERSION}.zip; \
+    fi && \
+    mkdir opencv-${OPENCV_VERSION}/build && \
+    cd opencv-${OPENCV_VERSION}/build && \
+    cmake_flags="-D CMAKE_BUILD_TYPE=RELEASE \
+    -D BUILD_EXAMPLES=OFF \
+    -D BUILD_DOCS=OFF \
+    -D BUILD_TESTS=OFF \
+    -D BUILD_PERF_TESTS=OFF \
+    -D BUILD_JAVA=OFF \
+    -D BUILD_opencv_apps=OFF \
+    -D BUILD_opencv_aruco=OFF \
+    -D BUILD_opencv_bgsegm=OFF \
+    -D BUILD_opencv_bioinspired=OFF \
+    -D BUILD_opencv_ccalib=OFF \
+    -D BUILD_opencv_datasets=OFF \
+    -D BUILD_opencv_dnn_objdetect=OFF \
+    -D BUILD_opencv_dpm=OFF \
+    -D BUILD_opencv_fuzzy=OFF \
+    -D BUILD_opencv_hfs=OFF \
+    -D BUILD_opencv_java_bindings_generator=OFF \
+    -D BUILD_opencv_js=OFF \
+    -D BUILD_opencv_img_hash=OFF \
+    -D BUILD_opencv_line_descriptor=OFF \
+    -D BUILD_opencv_optflow=OFF \
+    -D BUILD_opencv_phase_unwrapping=OFF \
+    -D BUILD_opencv_python3=OFF \
+    -D BUILD_opencv_python_bindings_generator=OFF \
+    -D BUILD_opencv_reg=OFF \
+    -D BUILD_opencv_rgbd=OFF \
+    -D BUILD_opencv_saliency=OFF \
+    -D BUILD_opencv_shape=OFF \
+    -D BUILD_opencv_stereo=OFF \
+    -D BUILD_opencv_stitching=OFF \
+    -D BUILD_opencv_structured_light=OFF \
+    -D BUILD_opencv_superres=OFF \
+    -D BUILD_opencv_surface_matching=OFF \
+    -D BUILD_opencv_ts=OFF \
+    -D BUILD_opencv_xobjdetect=OFF \
+    -D BUILD_opencv_xphoto=OFF \
+    -D CMAKE_INSTALL_PREFIX=/usr/local" && \
+    if [ -n "$WITH_CONTRIB" ]; then \
+    cmake_flags="$cmake_flags -D OPENCV_EXTRA_MODULES_PATH=../../opencv_contrib-${OPENCV_VERSION}/modules"; \
+    fi && \
+    echo $cmake_flags && \
+    cmake $cmake_flags .. && \
+    make -j $(nproc) && \
+    make install && \
+    sh -c 'echo "/usr/local/lib" > /etc/ld.so.conf.d/opencv.conf' && \
+    ldconfig && \
+    cd ../../../ && \
+    rm -rf opencv && \
+    npm install -g opencv4nodejs --unsafe-perm && \
+    apt-get purge -y build-essential curl wget unzip git cmake && \
+    apt-get autoremove -y --purge
+# |--------------------------------------------------------------------------
+# | Default user
+# |--------------------------------------------------------------------------
+# |
+# | All processes in the Docker container will run as a dedicated 
+# | non-root user.
+# |
+
+ARG MAESTRO_USER_GID=1001
+ARG MAESTRO_USER_UID=1001
+
+RUN groupadd --gid ${MAESTRO_USER_GID} maestro \
+  && useradd --uid ${MAESTRO_USER_UID} --gid maestro --shell /bin/bash --home /maestro --no-create-home maestro \
+  && mkdir /maestro \
+  && chown maestro: /maestro
+
+# |--------------------------------------------------------------------------
+# | Installs Nodejs, the app and sets up the port
+# |--------------------------------------------------------------------------
+# |
+
+RUN mkdir -p /usr/src/app
+WORKDIR /usr/src/app
+COPY . .
+RUN npm install
+EXPOSE 3000
+
+CMD ["npm", "run", "start"]

@@ -8,7 +8,7 @@ import checkDir from './checkDir.js';
 const dirApp = new checkDir();
 import checkFile from './checkFile.js';
 const fileApp = new checkFile();
-import * as serviceApp from './checkService.js';
+import * as serviceApp from './checkerService.js';
 
 const __dirname = path.resolve();
 // middleware for form handling
@@ -101,7 +101,21 @@ export function doConvertPdf(req, res) {
 
 export function compareImg(req, res) {
 	// console.log('compare images')
-	const project = req.body.select1;
-	const png1 = req.body.select2;
-	const png2 = req.body.select3;
+	const session = req.body.select1;
+	const img1 = req.body.select2;
+	const img2 = req.body.select3;
+	// console.log(`${session}: ${img1} vs. ${img2}`);
+	const tolerance = req.body.gmTolerance;
+	const color = req.body.gmColor;
+	//
+	const imgs = [img1, img2];
+	const options = {
+		tolerance: Number(tolerance) / 100,
+		highlightColor: color
+	};
+	// console.log(options);
+	serviceApp.performGMAnalysis(session, imgs, options)
+		.then((res)=>{
+			console.log(res);
+		});
 }

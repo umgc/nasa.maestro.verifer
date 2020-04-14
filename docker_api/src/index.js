@@ -2,7 +2,8 @@ import express from 'express';
 const app = express();
 const router = express.Router();
 import * as adminPost from './adminPost.js';
-import * as serviceApp from './checkService.js';
+// import * as checkerService from './checkerService.js';
+import * as checkSync from './checkSync.js';
 
 // define routes here..
 router.get('/', (request, response)=>{
@@ -22,14 +23,14 @@ router.get('/docxToPdf', (request, response)=>{
 	response.render('docxToPdf', {
 		label1: 'Select a project',
 		label2: 'Select a docx file',
-		data: serviceApp.getProjectFiles('.docx')
+		data: checkSync.getProjectFiles('.docx')
 	});
 });
 router.get('/pdfToPng', (request, response)=>{
 	response.render('pdfToPng', {
 		label1: 'Select a project',
 		label2: 'Select a pdf file',
-		data: serviceApp.getProjectFiles('.pdf')
+		data: checkSync.getProjectFiles('.pdf')
 	});
 });
 router.get('/compareImg', (request, response)=>{
@@ -37,7 +38,7 @@ router.get('/compareImg', (request, response)=>{
 		label1: 'Select a project',
 		label2: 'Select a png file',
 		label3: 'Select another png file',
-		data: serviceApp.getProjectFiles('.png')
+		data: checkSync.getProjectFiles('.png')
 	});
 });
 

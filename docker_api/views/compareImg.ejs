@@ -1,7 +1,5 @@
 <%- include('header')%>
 
-
-
 <div>
     <a href="/nasa-enter">&#8592Go back to main</a>
 </div>
@@ -11,8 +9,26 @@
         <div>
             <%- include('comboSelect2')%>
         </div>
+        <!-- input for GM analysis -->
+        <%- include('input-defaultValue', {
+                name: 'gmColor', 
+                label: 'Highlight color', 
+                defaultInput: 'red'
+            })
+        %>
+        <%- include('input-range', {
+                name: 'gmTolerance',
+                label: 'Tolerance threshold',
+                min: '1',
+                max: '10',
+                defaultInput:2
+            })
+        %>
         <input type="submit" id="compareImg" name="compareImg" value="Compare images">
     </form>
 </div>
 
+<div>
+    
+</div>
 <%- include('footer')%>
