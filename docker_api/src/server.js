@@ -6,15 +6,37 @@ import fileUpload from 'express-fileupload';
 import fs from 'fs';
 import stream from 'stream';
 import path from 'path';
+import Unoconv from 'unoconv-promise';
+import Common from './common.js';
 import CheckerService from './checkerService.js';
 import DocXValidatorService from './docXValidator.js';
+import PDFImage from 'pdf-image';
+import spawn from 'child_process';
+import awilix from 'awilix';
 
-// TODO refactor to implement dependency injection https://blog.risingstack.com/dependency-injection-in-node-js/
+// TODO refactor to implement dependency injection
+// https://blog.risingstack.com/dependency-injection-in-node-js/
+
 const root = path.resolve();
 const app = express();
 const urlencoderParser = bodyParser.json();
 const port = process.env.port || 3000;
-const svc = new CheckerService();
+
+// initializes the dependency injection container
+const container = awilix.createContainer({
+	injectionMode: awilix.InjectionMode.PROXY
+});
+
+container.register({
+	// Here we are telling Awilix how to resolve a
+	// userController: by instantiating a class.
+	common: awilix.asClass(Common),
+	checkService: awilix.asClass(CheckerService),
+	docXService: awilix.asClass(DocXValidatorService),
+	pdf2imageService: awilix.asValue(PDFImage),
+	unoconv: awilix.asValue(Unoconv),
+	spawn: awilix.asValue(spawn)
+});
 
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -33,18 +55,22 @@ app.listen(port, () => {
  * returns a status code with a json result object
  */
 app.post('/api/docx/validate', urlencoderParser, async(req, res) => {
-	const docxSvc = new DocXValidatorService();
-	if (!req.files) {
-		// TODO Retun appropriate status
-		res.send({ status: false, message: 'No file uploaded' });
-	} else {
-		const files = (Array.isArray(req.files.docs)) ?
-			req.files.docs :
-			[req.files.docs];
+	const docSvc = container.resolve('docXService');
+	try {
+		if (!req.files) {
+			// TODO Retun appropriate status
+			res.status(400).send({ status: false, message: 'No file uploaded' });
+		} else {
+			const files = (Array.isArray(req.files.docs)) ?
+				req.files.docs :
+				[req.files.docs];
 
-		docxSvc.validate(files)
-			.then((result) => { res.send(result); })
-			.catch((error) => { res.status(500).send(error); });
+			docSvc.validate(files)
+				.then((result) => { res.send(result); })
+				.catch((error) => { res.status(500).send(error); });
+		}
+	} catch {
+		res.status(500).send('internal server error');
 	}
 });
 
@@ -58,11 +84,12 @@ app.post('/api/docx/validate', urlencoderParser, async(req, res) => {
 app.post('/api/docx/checkDifference', urlencoderParser, async(req, res) => {
 	console.log(req.body, 'Calculating difference between document outputs.');
 	if (!req.files) {
-		res.send({ status: false, message: 'No file uploaded' });
+		res.status(400).send({ status: false, message: 'No file uploaded' });
 	} else if (req.files.docs.length !== 2) {
-		res.send({ status: false, message: 'Maximum 2 files can be compared at a time' });
+		res.status(400).send({ status: false, message: 'Maximum 2 files can be compared at a time' });
 	} else {
-		svc.processData(req.files.docs, true)
+		const chkSvc = container.resolve('checkService');
+		chkSvc.processData(req.files.docs, true)
 			.then((result) => {
 				const retVal = {
 					response: result.data,
@@ -91,7 +118,8 @@ app.post('/api/docx/convertDocX', urlencoderParser, async(req, res) => {
 	if (!req.files) {
 		res.send({ status: false, message: 'No file uploaded' });
 	} else {
-		svc.processData(req.files.docs, false)
+		const chkSvc = container.resolve('checkService');
+		chkSvc.processData(req.files.docs, false)
 			.then((result) => {
 				res.send(result);
 			})
